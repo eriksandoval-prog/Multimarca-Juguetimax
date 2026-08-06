@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal de Reportes - Multimarca & Juguetimax</title>
-  <!-- Tailwind CSS para diseño moderno -->
+  <title>Panel de Reportes - Multimarca & Juguetimax</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-6 font-sans">
 
-  <div class="max-w-5xl mx-auto space-y-6">
+  <div class="max-w-6xl mx-auto space-y-6">
     <!-- Encabezado -->
-    <header class="border-b border-slate-700 pb-4 flex justify-between items-center">
+    <header class="border-b border-slate-700 pb-4 flex justify-between items-center flex-wrap gap-4">
       <div>
         <h1 class="text-2xl font-bold text-white">Panel de Reportes</h1>
         <p class="text-slate-400 text-sm">Gestión de cobertura, soportes y facturación</p>
@@ -30,10 +29,10 @@
     <!-- Indicador de marca activa -->
     <div class="flex items-center space-x-2 text-indigo-400 font-semibold text-lg">
       <span>Marca seleccionada:</span>
-      <span id="label-marca" class="uppercase tracking-wide text-white bg-slate-800 px-3 py-1 rounded-md border border-slate-700">Juguetimax</span>
+      <span id="label-marca" class="uppercase tracking-wide text-white bg-slate-800 px-3 py-1 rounded-md border border-slate-700">JUGUETIMAX</span>
     </div>
 
-    <!-- Contenedor de Secciones / Categorías -->
+    <!-- Contenedor de Tarjetas -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
       <!-- 1. Reportes de Cobertura -->
@@ -44,10 +43,14 @@
             <h2 class="font-semibold text-lg text-white">Reportes de Cobertura</h2>
           </div>
           <p class="text-slate-400 text-sm mb-4">Archivos de inventario y disponibilidad regional.</p>
+          <ul id="lista-cobertura" class="space-y-2 text-sm mb-4"></ul>
         </div>
-        <ul id="lista-cobertura" class="space-y-2 text-sm">
-          <!-- Se llena dinámicamente -->
-        </ul>
+        
+        <!-- Botón de subida de archivo -->
+        <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-indigo-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex items-center justify-center space-x-2 transition-colors">
+          <span>➕ Subir archivo (Excel/PDF)</span>
+          <input type="file" accept=".pdf, .xls, .xlsx" class="hidden" onchange="subirArchivo(event, 'cobertura')">
+        </label>
       </div>
 
       <!-- 2. Soportes de Factura -->
@@ -58,10 +61,13 @@
             <h2 class="font-semibold text-lg text-white">Soportes de Factura</h2>
           </div>
           <p class="text-slate-400 text-sm mb-4">Comprobantes de entrega, acuses y notas.</p>
+          <ul id="lista-soportes" class="space-y-2 text-sm mb-4"></ul>
         </div>
-        <ul id="lista-soportes" class="space-y-2 text-sm">
-          <!-- Se llena dinámicamente -->
-        </ul>
+
+        <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-emerald-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex items-center justify-center space-x-2 transition-colors">
+          <span>➕ Subir archivo (Excel/PDF)</span>
+          <input type="file" accept=".pdf, .xls, .xlsx" class="hidden" onchange="subirArchivo(event, 'soportes')">
+        </label>
       </div>
 
       <!-- 3. Facturación -->
@@ -72,47 +78,42 @@
             <h2 class="font-semibold text-lg text-white">Facturación</h2>
           </div>
           <p class="text-slate-400 text-sm mb-4">Facturas emitidas en PDF o Excel.</p>
+          <ul id="lista-facturacion" class="space-y-2 text-sm mb-4"></ul>
         </div>
-        <ul id="lista-facturacion" class="space-y-2 text-sm">
-          <!-- Se llena dinámicamente -->
-        </ul>
+
+        <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-purple-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex items-center justify-center space-x-2 transition-colors">
+          <span>➕ Subir archivo (Excel/PDF)</span>
+          <input type="file" accept=".pdf, .xls, .xlsx" class="hidden" onchange="subirArchivo(event, 'facturacion')">
+        </label>
       </div>
 
     </div>
   </div>
 
   <script>
-    // Base de datos local con los enlaces de tus reportes
+    let marcaActual = 'juguetimax';
+
+    // Base de datos de archivos iniciales
     const reportes = {
       juguetimax: {
-        cobertura: [
-          { nombre: "Cobertura Junio.xls", url: "reportes/juguetimax/cobertura-junio.xls" }
-        ],
-        soportes: [
-          { nombre: "Soporte Entrega #102.pdf", url: "reportes/juguetimax/soporte-102.pdf" }
-        ],
-        facturacion: [
-          { nombre: "Factura_F1002.pdf", url: "reportes/juguetimax/factura-1002.pdf" }
-        ]
+        cobertura: [{ nombre: "Cobertura Junio.xls", url: "#" }],
+        soportes: [{ nombre: "Soporte Entrega #102.pdf", url: "#" }],
+        facturacion: [{ nombre: "Factura_F1002.pdf", url: "#" }]
       },
       multimarca: {
-        cobertura: [
-          { nombre: "Cobertura General.xls", url: "reportes/multimarca/cobertura-general.xls" }
-        ],
+        cobertura: [],
         soportes: [],
-        facturacion: [
-          { nombre: "Factura_M501.pdf", url: "reportes/multimarca/factura-501.pdf" }
-        ]
+        facturacion: []
       }
     };
 
     function cambiarMarca(marca) {
-      // Actualizar vista de botones
+      marcaActual = marca;
       const btnJ = document.getElementById('btn-juguetimax');
       const btnM = document.getElementById('btn-multimarca');
       const label = document.getElementById('label-marca');
 
-      label.innerText = marca;
+      label.innerText = marca.toUpperCase();
 
       if (marca === 'juguetimax') {
         btnJ.className = "px-4 py-2 text-sm font-medium rounded-md transition-all bg-indigo-600 text-white";
@@ -122,10 +123,13 @@
         btnJ.className = "px-4 py-2 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-white";
       }
 
-      // Cargar archivos de la marca
-      renderLista('lista-cobertura', reportes[marca].cobertura);
-      renderLista('lista-soportes', reportes[marca].soportes);
-      renderLista('lista-facturacion', reportes[marca].facturacion);
+      actualizarListas();
+    }
+
+    function actualizarListas() {
+      renderLista('lista-cobertura', reportes[marcaActual].cobertura);
+      renderLista('lista-soportes', reportes[marcaActual].soportes);
+      renderLista('lista-facturacion', reportes[marcaActual].facturacion);
     }
 
     function renderLista(elementId, items) {
@@ -136,15 +140,31 @@
       }
       container.innerHTML = items.map(item => `
         <li>
-          <a href="${item.url}" target="_blank" class="flex items-center justify-between p-2 rounded bg-slate-900/50 hover:bg-indigo-600/20 text-indigo-300 hover:text-indigo-200 transition-colors">
-            <span class="truncate">${item.nombre}</span>
-            <span>↗</span>
+          <a href="${item.url}" target="_blank" download="${item.nombre}" class="flex items-center justify-between p-2 rounded bg-slate-900/60 hover:bg-indigo-600/20 text-indigo-300 hover:text-indigo-200 transition-colors">
+            <span class="truncate pr-2">${item.nombre}</span>
+            <span class="text-xs">↗</span>
           </a>
         </li>
       `).join('');
     }
 
-    // Cargar Juguetimax por defecto
+    function subirArchivo(event, categoria) {
+      const file = event.target.files[0];
+      if (file) {
+        // Crear una URL temporal para ver/descargar el archivo seleccionado
+        const blobUrl = URL.createObjectURL(file);
+        
+        // Agregar a la lista de la marca seleccionada
+        reportes[marcaActual][categoria].push({
+          nombre: file.name,
+          url: blobUrl
+        });
+
+        actualizarListas();
+      }
+    }
+
+    // Inicializar con Juguetimax
     cambiarMarca('juguetimax');
   </script>
 </body>
