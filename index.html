@@ -19,15 +19,15 @@
   <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 min-h-screen">
     <div>
       <!-- LOGO Y TÍTULO DE MARCA -->
-<div class="p-6 border-b border-slate-100 flex items-center space-x-3">
-  <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-    E
-  </div>
-  <div>
-    <h1 class="font-bold text-slate-900 text-lg leading-tight">Evolve</h1>
-    <p class="text-[10px] uppercase font-bold tracking-wider text-slate-400">JUGUETIMAX · MULTIMARCA</p>
-  </div>
-</div> 
+      <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+          E
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-900 text-lg leading-tight">Evolve</h1>
+          <p class="text-[10px] uppercase font-bold tracking-wider text-slate-400">JUGUETIMAX · MULTIMARCA</p>
+        </div>
+      </div>
 
       <!-- NAVEGACIÓN PRINCIPAL -->
       <nav class="p-4 space-y-6">
@@ -72,35 +72,33 @@
       </nav>
     </div>
 
-    <!-- PIE DEL SIDEBAR / MARCA PRINCIPAL -->
+    <!-- PIE DEL SIDEBAR -->
     <div class="p-4 border-t border-slate-100 bg-slate-50">
-      <p class="text-xs text-slate-400 font-semibold mb-2">MARCA PRINCIPAL</p>
+      <p class="text-[11px] text-slate-400 font-bold uppercase mb-2">SELECCIÓN DE MARCA</p>
       <div class="flex rounded-lg bg-slate-200 p-1">
-        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="flex-1 py-1.5 text-xs font-semibold rounded-md bg-white text-blue-600 shadow-sm transition-all">
-          Juguetimax
+        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all">
+          Juguetimax (Fijo)
         </button>
-        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="flex-1 py-1.5 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition-all">
+        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all">
           Multimarca
         </button>
       </div>
     </div>
   </aside>
 
-
-  <!-- ================= ÁREA DE CONTENIDO PRINCIPAL (DERECHA) ================= -->
+  <!-- ================= ÁREA DE CONTENIDO PRINCIPAL ================= -->
   <main class="flex-1 p-8 space-y-6 overflow-y-auto">
     
-    <!-- BARRA SUPERIOR DE FILTROS (SUBMARCA, AÑO, MES) -->
+    <!-- BARRA SUPERIOR DE FILTROS -->
     <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-2 text-slate-700 font-semibold text-base">
         <span>Filtro activo:</span>
         <span id="label-filtro" class="uppercase tracking-wide text-blue-700 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100 text-xs font-bold">
-          JUGUETIMAX | 2026 - ENERO
+          JUGUETIMAX (FIJO) | 2026 - ENERO
         </span>
       </div>
 
       <div class="flex items-center gap-3 flex-wrap">
-        <!-- Selector de Sub-marca (Solo visible en Multimarca) -->
         <div id="contenedor-submarca" class="hidden flex items-center space-x-2">
           <label for="select-submarca" class="text-xs font-bold text-slate-400 uppercase">Sub-Marca:</label>
           <select id="select-submarca" onchange="cambiarSubMarca()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:border-blue-500">
@@ -116,7 +114,6 @@
           </select>
         </div>
 
-        <!-- Selector de Año -->
         <div class="flex items-center space-x-2">
           <label for="select-anio" class="text-xs font-bold text-slate-400 uppercase">Año:</label>
           <select id="select-anio" onchange="cambiarFecha()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:border-blue-500">
@@ -126,7 +123,6 @@
           </select>
         </div>
 
-        <!-- Selector de Mes -->
         <div class="flex items-center space-x-2">
           <label for="select-mes" class="text-xs font-bold text-slate-400 uppercase">Mes:</label>
           <select id="select-mes" onchange="cambiarFecha()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:border-blue-500">
@@ -147,9 +143,8 @@
       </div>
     </div>
 
-    <!-- VISTA 1: DESCARGA Y GUARDA DE DOCUMENTOS -->
+    <!-- VISTA 1: DESCARGA -->
     <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Tarjeta Cobertura -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <div class="flex items-center space-x-3 mb-3">
@@ -166,7 +161,6 @@
         </label>
       </div>
 
-      <!-- Tarjeta Soportes -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <div class="flex items-center space-x-3 mb-3">
@@ -183,7 +177,6 @@
         </label>
       </div>
 
-      <!-- Tarjeta Facturación -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <div class="flex items-center space-x-3 mb-3">
@@ -201,7 +194,7 @@
       </div>
     </div>
 
-    <!-- VISTA 2: REPORTE DE COBERTURA -->
+    <!-- VISTA 2: COBERTURA -->
     <div id="vista-cobertura" class="hidden space-y-6">
       <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <h2 class="text-lg font-bold text-slate-900 mb-1">📊 Analítica de Cobertura</h2>
@@ -263,7 +256,7 @@
 
     function obtenerEstructura() {
       if (!reportes[marcaPrincipal]) reportes[marcaPrincipal] = {};
-      const claveSub = (marcaPrincipal === 'multimarca') ? subMarcaActual : 'general';
+      const claveSub = (marcaPrincipal === 'multimarca') ? subMarcaActual : 'fijo';
       if (!reportes[marcaPrincipal][claveSub]) reportes[marcaPrincipal][claveSub] = {};
       if (!reportes[marcaPrincipal][claveSub][anioActual]) reportes[marcaPrincipal][claveSub][anioActual] = {};
       if (!reportes[marcaPrincipal][claveSub][anioActual][mesActual]) {
@@ -279,12 +272,12 @@
       const contenedorSubmarca = document.getElementById('contenedor-submarca');
 
       if (marca === 'juguetimax') {
-        btnJ.className = "flex-1 py-1.5 text-xs font-semibold rounded-md bg-white text-blue-600 shadow-sm transition-all";
-        btnM.className = "flex-1 py-1.5 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition-all";
+        btnJ.className = "flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all";
+        btnM.className = "flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all";
         contenedorSubmarca.classList.add('hidden');
       } else {
-        btnM.className = "flex-1 py-1.5 text-xs font-semibold rounded-md bg-white text-blue-600 shadow-sm transition-all";
-        btnJ.className = "flex-1 py-1.5 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition-all";
+        btnM.className = "flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all";
+        btnJ.className = "flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all";
         contenedorSubmarca.classList.remove('hidden');
         subMarcaActual = document.getElementById('select-submarca').value;
       }
@@ -327,7 +320,7 @@
       if (marcaPrincipal === 'multimarca') {
         label.innerText = `MULTIMARCA (${subMarcaActual}) | ${anioActual} - ${mesActual}`;
       } else {
-        label.innerText = `JUGUETIMAX | ${anioActual} - ${mesActual}`;
+        label.innerText = `JUGUETIMAX (FIJO) | ${anioActual} - ${mesActual}`;
       }
 
       const datos = obtenerEstructura();
@@ -422,20 +415,26 @@
       }
     }
 
+    // Extracción silenciosa sin aviso flotante
     function extraerMontoSinIVA(texto) {
       const textoLimpio = texto.replace(/\s+/g, ' ');
-      const regexSubtotal = /Subtotal\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i;
-      const coincidencia = textoLimpio.match(regexSubtotal);
 
-      if (coincidencia && coincidencia[1]) {
-        let numeroStr = coincidencia[1].replace(/,/g, '');
-        let valor = parseFloat(numeroStr);
-        if (!isNaN(valor) && valor > 0) return valor;
+      const patrones = [
+        /Subtotal\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
+        /Importe\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
+        /Base\s*Imponible\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i
+      ];
+
+      for (let patron of patrones) {
+        const coincidencia = textoLimpio.match(patron);
+        if (coincidencia && coincidencia[1]) {
+          let numeroStr = coincidencia[1].replace(/,/g, '');
+          let valor = parseFloat(numeroStr);
+          if (!isNaN(valor) && valor > 0) return valor;
+        }
       }
 
-      const entradaManual = prompt('No se detectó automáticamente el Subtotal del PDF.\nPor favor ingresa el monto sin IVA:', '0.00');
-      let valorManual = parseFloat(entradaManual);
-      return isNaN(valorManual) ? 0 : valorManual;
+      return 0;
     }
 
     function renderFacturacionModulo(listaFacturas) {
