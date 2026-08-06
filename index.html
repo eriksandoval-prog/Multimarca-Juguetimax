@@ -3,59 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal de Reportes - Multimarca & Juguetimax</title>
+  <title>Evolve - Portal de Reportes</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Librería para procesar Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Librería para lectura y extracción de texto en PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script>
-    // Configurar worker de PDF.js
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
   </script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-6 font-sans">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex font-sans">
 
-  <div class="max-w-6xl mx-auto space-y-6">
-    <!-- Encabezado -->
-    <header class="border-b border-slate-700 pb-4 flex justify-between items-center flex-wrap gap-4">
-      <div>
-        <h1 class="text-2xl font-bold text-white">Portal de Reportes Integrado</h1>
-        <p class="text-slate-400 text-sm">Carga, gestión y analítica de datos por marca y periodo</p>
+  <!-- ================= BARRA LATERAL (SIDEBAR IZQUIERDO) ================= -->
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 min-h-screen">
+    <div>
+      <!-- LOGO Y TÍTULO DE MARCA -->
+      <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+          E
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-900 text-lg leading-tight">Evolve</h1>
+          <p class="text-[10px] uppercase font-bold tracking-wider text-slate-400">PROMOTORÍA · VISITA</p>
+        </div>
       </div>
 
-      <!-- Selector Principal de Marca -->
-      <div class="inline-flex rounded-lg bg-slate-800 p-1 border border-slate-700">
-        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="px-4 py-2 text-sm font-medium rounded-md transition-all bg-indigo-600 text-white">
+      <!-- NAVEGACIÓN PRINCIPAL -->
+      <nav class="p-4 space-y-6">
+        
+        <!-- SECCIÓN GENERAL -->
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">GENERAL</p>
+          <div class="space-y-1">
+            <button onclick="cambiarVista('descarga')" id="nav-descarga" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-blue-600 bg-blue-50 transition-all">
+              <span class="text-base">📥</span>
+              <span>Descarga de Docs</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECCIÓN OPERACIÓN -->
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">OPERACIÓN</p>
+          <div class="space-y-1">
+            <button onclick="cambiarVista('cobertura')" id="nav-cobertura" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all">
+              <span class="text-base">📊</span>
+              <span>Cobertura</span>
+            </button>
+            <button onclick="cambiarVista('soporte')" id="nav-soporte" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all">
+              <span class="text-base">📁</span>
+              <span>Soporte de factura</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECCIÓN FINANZAS -->
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">FINANZAS</p>
+          <div class="space-y-1">
+            <button onclick="cambiarVista('facturacion')" id="nav-facturacion" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all">
+              <span class="text-base">🧾</span>
+              <span>Pagos y facturación</span>
+            </button>
+          </div>
+        </div>
+
+      </nav>
+    </div>
+
+    <!-- PIE DEL SIDEBAR / MARCA PRINCIPAL -->
+    <div class="p-4 border-t border-slate-100 bg-slate-50">
+      <p class="text-xs text-slate-400 font-semibold mb-2">MARCA PRINCIPAL</p>
+      <div class="flex rounded-lg bg-slate-200 p-1">
+        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="flex-1 py-1.5 text-xs font-semibold rounded-md bg-white text-blue-600 shadow-sm transition-all">
           Juguetimax
         </button>
-        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="px-4 py-2 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-white">
+        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="flex-1 py-1.5 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition-all">
           Multimarca
         </button>
       </div>
-    </header>
+    </div>
+  </aside>
 
-    <!-- Menú de Navegación por Apartados -->
-    <nav class="flex border-b border-slate-700 space-x-2 overflow-x-auto pb-1">
-      <button id="tab-descarga" onclick="cambiarVista('descarga')" class="py-2 px-4 text-sm font-medium text-white border-b-2 border-indigo-500 whitespace-nowrap">
-        📥 Descarga de Documentos
-      </button>
-      <button id="tab-cobertura" onclick="cambiarVista('cobertura')" class="py-2 px-4 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap">
-        📊 Reporte de Cobertura
-      </button>
-      <button id="tab-soporte" onclick="cambiarVista('soporte')" class="py-2 px-4 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap">
-        📁 Soporte de Factura
-      </button>
-      <button id="tab-facturacion" onclick="cambiarVista('facturacion')" class="py-2 px-4 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap">
-        🧾 Facturación
-      </button>
-    </nav>
 
-    <!-- Barra de Filtros (Común para todas las vistas) -->
-    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center space-x-2 text-indigo-400 font-semibold text-lg">
+  <!-- ================= ÁREA DE CONTENIDO PRINCIPAL (DERECHA) ================= -->
+  <main class="flex-1 p-8 space-y-6 overflow-y-auto">
+    
+    <!-- BARRA SUPERIOR DE FILTROS (SUBMARCA, AÑO, MES) -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-2 text-slate-700 font-semibold text-base">
         <span>Filtro activo:</span>
-        <span id="label-filtro" class="uppercase tracking-wide text-white bg-slate-900 px-3 py-1 rounded-md border border-slate-700 text-sm">
+        <span id="label-filtro" class="uppercase tracking-wide text-blue-700 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100 text-xs font-bold">
           JUGUETIMAX | 2026 - ENERO
         </span>
       </div>
@@ -63,8 +102,8 @@
       <div class="flex items-center gap-3 flex-wrap">
         <!-- Selector de Sub-marca (Solo visible en Multimarca) -->
         <div id="contenedor-submarca" class="hidden flex items-center space-x-2">
-          <label for="select-submarca" class="text-xs font-semibold text-slate-400 uppercase">Marca:</label>
-          <select id="select-submarca" onchange="cambiarSubMarca()" class="bg-slate-900 text-white text-sm rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-indigo-500">
+          <label for="select-submarca" class="text-xs font-bold text-slate-400 uppercase">Sub-Marca:</label>
+          <select id="select-submarca" onchange="cambiarSubMarca()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:border-blue-500">
             <option value="Juguetimax">Juguetimax</option>
             <option value="Moose Toys">Moose Toys</option>
             <option value="Just Play">Just Play</option>
@@ -79,8 +118,8 @@
 
         <!-- Selector de Año -->
         <div class="flex items-center space-x-2">
-          <label for="select-anio" class="text-xs font-semibold text-slate-400 uppercase">Año:</label>
-          <select id="select-anio" onchange="cambiarFecha()" class="bg-slate-900 text-white text-sm rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-indigo-500">
+          <label for="select-anio" class="text-xs font-bold text-slate-400 uppercase">Año:</label>
+          <select id="select-anio" onchange="cambiarFecha()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:border-blue-500">
             <option value="2026">2026</option>
             <option value="2025">2025</option>
             <option value="2024">2024</option>
@@ -89,8 +128,8 @@
 
         <!-- Selector de Mes -->
         <div class="flex items-center space-x-2">
-          <label for="select-mes" class="text-xs font-semibold text-slate-400 uppercase">Mes:</label>
-          <select id="select-mes" onchange="cambiarFecha()" class="bg-slate-900 text-white text-sm rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-indigo-500">
+          <label for="select-mes" class="text-xs font-bold text-slate-400 uppercase">Mes:</label>
+          <select id="select-mes" onchange="cambiarFecha()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:border-blue-500">
             <option value="enero">Enero</option>
             <option value="febrero">Febrero</option>
             <option value="marzo">Marzo</option>
@@ -110,52 +149,52 @@
 
     <!-- VISTA 1: DESCARGA Y GUARDA DE DOCUMENTOS -->
     <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Tarjeta 1: Cobertura -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-slate-500 transition-all">
+      <!-- Tarjeta Cobertura -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <div class="flex items-center space-x-3 mb-3">
-            <span class="p-2 bg-blue-500/10 text-blue-400 rounded-lg text-xl">📊</span>
-            <h2 class="font-semibold text-lg text-white">Reportes de Cobertura</h2>
+            <span class="p-2.5 bg-blue-50 text-blue-600 rounded-xl text-xl">📊</span>
+            <h2 class="font-bold text-slate-900">Reportes de Cobertura</h2>
           </div>
-          <p class="text-slate-400 text-sm mb-4">Archivos de inventario y cobertura regional.</p>
+          <p class="text-slate-500 text-xs mb-4">Archivos de inventario y disponibilidad regional.</p>
           <ul id="lista-cobertura" class="space-y-2 text-sm mb-4"></ul>
         </div>
         
-        <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-indigo-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex items-center justify-center space-x-2 transition-colors">
+        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
           <span>💾 Subir Excel / PDF</span>
           <input type="file" accept=".pdf, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
         </label>
       </div>
 
-      <!-- Tarjeta 2: Soportes -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-slate-500 transition-all">
+      <!-- Tarjeta Soportes -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <div class="flex items-center space-x-3 mb-3">
-            <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg text-xl">📁</span>
-            <h2 class="font-semibold text-lg text-white">Soportes de Factura</h2>
+            <span class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl text-xl">📁</span>
+            <h2 class="font-bold text-slate-900">Soportes de Factura</h2>
           </div>
-          <p class="text-slate-400 text-sm mb-4">Comprobantes de entrega, acuses y notas.</p>
+          <p class="text-slate-500 text-xs mb-4">Comprobantes de entrega, acuses y notas.</p>
           <ul id="lista-soportes" class="space-y-2 text-sm mb-4"></ul>
         </div>
 
-        <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-emerald-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex items-center justify-center space-x-2 transition-colors">
+        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
           <span>💾 Subir Excel / PDF</span>
           <input type="file" accept=".pdf, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'soportes')">
         </label>
       </div>
 
-      <!-- Tarjeta 3: Facturación (Solo admite PDF) -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-slate-500 transition-all">
+      <!-- Tarjeta Facturación -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <div class="flex items-center space-x-3 mb-3">
-            <span class="p-2 bg-purple-500/10 text-purple-400 rounded-lg text-xl">🧾</span>
-            <h2 class="font-semibold text-lg text-white">Facturación</h2>
+            <span class="p-2.5 bg-purple-50 text-purple-600 rounded-xl text-xl">🧾</span>
+            <h2 class="font-bold text-slate-900">Facturación</h2>
           </div>
-          <p class="text-slate-400 text-sm mb-4">Facturas emitidas exclusivamente en PDF.</p>
+          <p class="text-slate-500 text-xs mb-4">Facturas emitidas en formato PDF.</p>
           <ul id="lista-facturacion" class="space-y-2 text-sm mb-4"></ul>
         </div>
 
-        <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-purple-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex items-center justify-center space-x-2 transition-colors">
+        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
           <span>📄 Subir Factura PDF</span>
           <input type="file" accept=".pdf" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
         </label>
@@ -164,60 +203,55 @@
 
     <!-- VISTA 2: REPORTE DE COBERTURA -->
     <div id="vista-cobertura" class="hidden space-y-6">
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
-        <h2 class="text-xl font-bold text-white mb-2">📊 Analítica de Cobertura</h2>
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-900 mb-1">📊 Analítica de Cobertura</h2>
+        <p class="text-slate-500 text-xs mb-6">Métricas obtenidas de los reportes cargados.</p>
         <div id="metricas-cobertura" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
-        <div id="grafica-cobertura" class="p-6 bg-slate-900/50 border border-slate-700 rounded-lg"></div>
+        <div id="grafica-cobertura" class="p-6 bg-slate-50 border border-slate-200 rounded-xl"></div>
       </div>
     </div>
 
     <!-- VISTA 3: SOPORTE DE FACTURA -->
     <div id="vista-soporte" class="hidden space-y-6">
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
-        <h2 class="text-xl font-bold text-white mb-2">📁 Control de Soportes de Factura</h2>
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-900 mb-1">📁 Control de Soportes de Factura</h2>
+        <p class="text-slate-500 text-xs mb-6">Estatus y acuses registrados.</p>
         <div id="metricas-soportes" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
-        <div id="grafica-soportes" class="p-6 bg-slate-900/50 border border-slate-700 rounded-lg"></div>
+        <div id="grafica-soportes" class="p-6 bg-slate-50 border border-slate-200 rounded-xl"></div>
       </div>
     </div>
 
-    <!-- VISTA 4: FACTURACIÓN CON EXTRACCIÓN DE MONTO SIN IVA -->
+    <!-- VISTA 4: FACTURACIÓN -->
     <div id="vista-facturacion" class="hidden space-y-6">
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
-        <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-          <div>
-            <h2 class="text-xl font-bold text-white">🧾 Desglose e Informes de Facturación</h2>
-            <p class="text-slate-400 text-sm">Registro de facturas PDF cargadas y cálculo automático de montos acumulados sin IVA.</p>
-          </div>
-        </div>
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-900 mb-1">🧾 Desglose y Pagos de Facturación</h2>
+        <p class="text-slate-500 text-xs mb-6">Registro de facturas PDF cargadas y cálculo automático de subtotales sin IVA.</p>
 
-        <!-- Tarjetas de Resumen Financiero -->
         <div id="metricas-facturacion" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
 
-        <!-- Tabla de Facturas Cargadas con Montos -->
-        <div class="bg-slate-900/60 border border-slate-700 rounded-lg overflow-hidden mb-6">
-          <div class="p-4 border-b border-slate-700 font-semibold text-white">Facturas Procesadas</div>
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden mb-6">
+          <div class="p-4 border-b border-slate-100 font-bold text-slate-800 text-sm">Facturas Procesadas</div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-300">
-              <thead class="bg-slate-800 text-slate-400 text-xs uppercase border-b border-slate-700">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50 text-slate-400 text-xs font-bold uppercase border-b border-slate-100">
                 <tr>
                   <th class="p-3">Archivo PDF</th>
                   <th class="p-3">Monto Sin IVA (Subtotal)</th>
                   <th class="p-3 text-right">Acción</th>
                 </tr>
               </thead>
-              <tbody id="tabla-facturas-body" class="divide-y divide-slate-800">
-                <!-- Se llena dinámicamente -->
-              </tbody>
+              <tbody id="tabla-facturas-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
             </table>
           </div>
         </div>
 
-        <div id="grafica-facturacion" class="p-6 bg-slate-900/50 border border-slate-700 rounded-lg"></div>
+        <div id="grafica-facturacion" class="p-6 bg-slate-50 border border-slate-200 rounded-xl"></div>
       </div>
     </div>
 
-  </div>
+  </main>
 
+  <!-- LÓGICA JAVASCRIPT -->
   <script>
     let marcaPrincipal = 'juguetimax';
     let subMarcaActual = 'Juguetimax';
@@ -233,11 +267,7 @@
       if (!reportes[marcaPrincipal][claveSub]) reportes[marcaPrincipal][claveSub] = {};
       if (!reportes[marcaPrincipal][claveSub][anioActual]) reportes[marcaPrincipal][claveSub][anioActual] = {};
       if (!reportes[marcaPrincipal][claveSub][anioActual][mesActual]) {
-        reportes[marcaPrincipal][claveSub][anioActual][mesActual] = { 
-          cobertura: [], 
-          soportes: [], 
-          facturacion: [] 
-        };
+        reportes[marcaPrincipal][claveSub][anioActual][mesActual] = { cobertura: [], soportes: [], facturacion: [] };
       }
       return reportes[marcaPrincipal][claveSub][anioActual][mesActual];
     }
@@ -249,12 +279,12 @@
       const contenedorSubmarca = document.getElementById('contenedor-submarca');
 
       if (marca === 'juguetimax') {
-        btnJ.className = "px-4 py-2 text-sm font-medium rounded-md transition-all bg-indigo-600 text-white";
-        btnM.className = "px-4 py-2 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-white";
+        btnJ.className = "flex-1 py-1.5 text-xs font-semibold rounded-md bg-white text-blue-600 shadow-sm transition-all";
+        btnM.className = "flex-1 py-1.5 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition-all";
         contenedorSubmarca.classList.add('hidden');
       } else {
-        btnM.className = "px-4 py-2 text-sm font-medium rounded-md transition-all bg-indigo-600 text-white";
-        btnJ.className = "px-4 py-2 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-white";
+        btnM.className = "flex-1 py-1.5 text-xs font-semibold rounded-md bg-white text-blue-600 shadow-sm transition-all";
+        btnJ.className = "flex-1 py-1.5 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition-all";
         contenedorSubmarca.classList.remove('hidden');
         subMarcaActual = document.getElementById('select-submarca').value;
       }
@@ -279,14 +309,14 @@
       
       vistas.forEach(v => {
         const contenedor = document.getElementById(`vista-${v}`);
-        const tab = document.getElementById(`tab-${v}`);
+        const navBtn = document.getElementById(`nav-${v}`);
         
         if (v === vista) {
           contenedor.classList.remove('hidden');
-          tab.className = "py-2 px-4 text-sm font-medium text-white border-b-2 border-indigo-500 whitespace-nowrap";
+          navBtn.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-blue-600 bg-blue-50 transition-all";
         } else {
           contenedor.classList.add('hidden');
-          tab.className = "py-2 px-4 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap";
+          navBtn.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all";
         }
       });
     }
@@ -314,13 +344,13 @@
     function renderLista(elementId, items) {
       const container = document.getElementById(elementId);
       if (!items || items.length === 0) {
-        container.innerHTML = `<li class="text-slate-500 italic">Sin archivos guardados</li>`;
+        container.innerHTML = `<li class="text-slate-400 text-xs italic">Sin archivos guardados</li>`;
         return;
       }
       container.innerHTML = items.map(item => `
-        <li class="flex items-center justify-between p-2 rounded bg-slate-900/60 border border-slate-700/50">
-          <span class="truncate pr-2 text-indigo-300 text-xs font-mono">${item.nombre}</span>
-          <a href="${item.url}" target="_blank" download="${item.nombre}" class="text-xs bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 px-2 py-1 rounded transition-colors">
+        <li class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
+          <span class="truncate pr-2 text-slate-700 text-xs font-medium">${item.nombre}</span>
+          <a href="${item.url}" target="_blank" download="${item.nombre}" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold px-2 py-1 rounded-lg transition-colors">
             Descargar ↗
           </a>
         </li>
@@ -343,11 +373,10 @@
 
       if (categoria === 'facturacion') {
         if (!file.name.toLowerCase().endsWith('.pdf')) {
-          alert('Por favor selecciona únicamente archivos en formato PDF para Facturación.');
+          alert('Selecciona únicamente archivos PDF para Facturación.');
           return;
         }
 
-        // Extraer texto del PDF usando PDF.js para ubicar el Subtotal / Monto sin IVA
         try {
           const arrayBuffer = await file.arrayBuffer();
           const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -356,13 +385,12 @@
           for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
-            const pageText = textContent.items.map(item => item.str).join(' ');
-            textoCompleto += pageText + ' ';
+            textoCompleto += textContent.items.map(item => item.str).join(' ') + ' ';
           }
 
           nuevoArchivo.montoSinIVA = extraerMontoSinIVA(textoCompleto);
         } catch (e) {
-          console.error('Error procesando texto del PDF:', e);
+          console.error('Error procesando el PDF:', e);
         }
 
         datosPeriodo.facturacion.push(nuevoArchivo);
@@ -394,25 +422,18 @@
       }
     }
 
-    // Función de extracción inteligente del Subtotal / Monto sin IVA mediante expresiones regulares
     function extraerMontoSinIVA(texto) {
-      // Buscar patrones comunes como "Subtotal", "Base Imponible", "Sin IVA", etc.
-      const patrones = [
-        /(?:subtotal|sub-total|base\s+imponible|monto\s+sin\s+iva|importe\s+sin\s+iva)\s*[:\$]?\s*([\d,]+\.?\d*)/i,
-        /\$\s*([\d,]+\.\d{2})/
-      ];
+      const textoLimpio = texto.replace(/\s+/g, ' ');
+      const regexSubtotal = /Subtotal\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i;
+      const coincidencia = textoLimpio.match(regexSubtotal);
 
-      for (let patron of patrones) {
-        const coincidencia = texto.match(patron);
-        if (coincidencia && coincidencia[1]) {
-          let numeroLimpio = coincidencia[1].replace(/,/g, '');
-          let valor = parseFloat(numeroLimpio);
-          if (!isNaN(valor) && valor > 0) return valor;
-        }
+      if (coincidencia && coincidencia[1]) {
+        let numeroStr = coincidencia[1].replace(/,/g, '');
+        let valor = parseFloat(numeroStr);
+        if (!isNaN(valor) && valor > 0) return valor;
       }
 
-      // Si no encuentra una etiqueta explícita, solicita/asigna un valor por defecto
-      const entradaManual = prompt(`No se detectó automáticamente el Subtotal en "${texto.slice(0, 30)}...". Por favor ingresa el Monto sin IVA ($):`, "0.00");
+      const entradaManual = prompt('No se detectó automáticamente el Subtotal del PDF.\nPor favor ingresa el monto sin IVA:', '0.00');
       let valorManual = parseFloat(entradaManual);
       return isNaN(valorManual) ? 0 : valorManual;
     }
@@ -425,74 +446,63 @@
       const totalFacturas = listaFacturas.length;
       let sumaSubtotalSinIVA = 0;
 
-      listaFacturas.forEach(f => {
-        sumaSubtotalSinIVA += (f.montoSinIVA || 0);
-      });
+      listaFacturas.forEach(f => { sumaSubtotalSinIVA += (f.montoSinIVA || 0); });
 
-      // Formateador de moneda en pesos (MXN)
       const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 
       contenedorMetricas.innerHTML = `
-        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
-          <p class="text-xs text-slate-400 uppercase font-semibold">Facturas PDF Cargadas</p>
-          <p class="text-2xl font-bold text-purple-400 mt-1">${totalFacturas}</p>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Facturas PDF Cargadas</p>
+          <p class="text-2xl font-bold text-slate-800 mt-1">${totalFacturas}</p>
         </div>
-        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
-          <p class="text-xs text-slate-400 uppercase font-semibold">Monto Total Sin IVA (Subtotal)</p>
-          <p class="text-2xl font-bold text-emerald-400 mt-1">${formatoMoneda.format(sumaSubtotalSinIVA)}</p>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Monto Total Sin IVA (Subtotal)</p>
+          <p class="text-2xl font-bold text-blue-600 mt-1">${formatoMoneda.format(sumaSubtotalSinIVA)}</p>
         </div>
-        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
-          <p class="text-xs text-slate-400 uppercase font-semibold">Promedio por Factura</p>
-          <p class="text-2xl font-bold text-indigo-400 mt-1">${formatoMoneda.format(totalFacturas > 0 ? (sumaSubtotalSinIVA / totalFacturas) : 0)}</p>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Promedio por Factura</p>
+          <p class="text-2xl font-bold text-slate-800 mt-1">${formatoMoneda.format(totalFacturas > 0 ? (sumaSubtotalSinIVA / totalFacturas) : 0)}</p>
         </div>
       `;
 
-      // Renderizar filas de la tabla
       if (totalFacturas === 0) {
         tablaBody.innerHTML = `
           <tr>
-            <td colspan="3" class="p-4 text-center text-slate-500 italic">No hay facturas PDF registradas para este periodo.</td>
+            <td colspan="3" class="p-4 text-center text-slate-400 italic text-xs">No hay facturas PDF registradas para este periodo.</td>
           </tr>
         `;
       } else {
         tablaBody.innerHTML = listaFacturas.map(f => `
-          <tr class="hover:bg-slate-800/50">
-            <td class="p-3 font-mono text-purple-300 text-xs">${f.nombre}</td>
-            <td class="p-3 font-semibold text-emerald-400">${formatoMoneda.format(f.montoSinIVA || 0)}</td>
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-medium text-slate-800 text-xs">${f.nombre}</td>
+            <td class="p-3 font-bold text-blue-600">${formatoMoneda.format(f.montoSinIVA || 0)}</td>
             <td class="p-3 text-right">
-              <a href="${f.url}" target="_blank" download="${f.nombre}" class="text-xs text-indigo-400 hover:text-indigo-300">Descargar ↗</a>
+              <a href="${f.url}" target="_blank" download="${f.nombre}" class="text-xs text-blue-600 font-semibold hover:underline">Descargar ↗</a>
             </td>
           </tr>
         `).join('');
       }
 
-      // Visualización gráfica en barras
       if (totalFacturas === 0) {
-        contenedorGrafica.innerHTML = `
-          <div class="text-center py-6 text-slate-500">
-            Sin datos financieros para mostrar en la gráfica.
-          </div>
-        `;
+        contenedorGrafica.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">Sin datos financieros para mostrar en la gráfica.</div>`;
       } else {
         let maxMonto = Math.max(...listaFacturas.map(f => f.montoSinIVA || 1));
         let barrasHTML = listaFacturas.map(f => {
           let alturaPorcentaje = Math.min(Math.max(((f.montoSinIVA || 0) / maxMonto) * 100, 15), 100);
           return `
             <div class="flex flex-col items-center flex-1 max-w-[120px]">
-              <span class="text-[11px] font-semibold text-emerald-400 mb-1">${formatoMoneda.format(f.montoSinIVA || 0)}</span>
-              <div class="w-full bg-slate-800 rounded-t h-32 flex items-end p-1 border border-slate-700">
-                <div class="w-full bg-purple-500 rounded-t transition-all hover:bg-purple-400" style="height: ${alturaPorcentaje}%;"></div>
+              <span class="text-[11px] font-bold text-blue-600 mb-1">${formatoMoneda.format(f.montoSinIVA || 0)}</span>
+              <div class="w-full bg-slate-200 rounded-t h-32 flex items-end p-1">
+                <div class="w-full bg-blue-600 rounded-t transition-all hover:bg-blue-500" style="height: ${alturaPorcentaje}%;"></div>
               </div>
-              <span class="text-[10px] text-slate-400 truncate w-full text-center mt-2" title="${f.nombre}">${f.nombre}</span>
+              <span class="text-[10px] text-slate-500 truncate w-full text-center mt-2" title="${f.nombre}">${f.nombre}</span>
             </div>
           `;
         }).join('');
 
         contenedorGrafica.innerHTML = `
-          <h3 class="text-sm font-semibold text-white mb-4">Gráfica de Montos Sin IVA por Factura</h3>
-          <div class="flex items-end justify-start gap-4 overflow-x-auto pb-2">
-            ${barrasHTML}
-          </div>
+          <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Gráfica de Montos Sin IVA por Factura</h3>
+          <div class="flex items-end justify-start gap-4 overflow-x-auto pb-2">${barrasHTML}</div>
         `;
       }
     }
@@ -506,45 +516,39 @@
       listaArchivos.forEach(a => { totalFilas += (a.filas || 0); });
 
       contenedorMetricas.innerHTML = `
-        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
-          <p class="text-xs text-slate-400 uppercase font-semibold">Archivos Guardados</p>
-          <p class="text-2xl font-bold text-indigo-400 mt-1">${totalArchivos}</p>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Archivos Guardados</p>
+          <p class="text-2xl font-bold text-slate-800 mt-1">${totalArchivos}</p>
         </div>
-        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
-          <p class="text-xs text-slate-400 uppercase font-semibold">Registros/Filas Analizadas</p>
-          <p class="text-2xl font-bold text-emerald-400 mt-1">${totalFilas}</p>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Registros / Filas</p>
+          <p class="text-2xl font-bold text-blue-600 mt-1">${totalFilas}</p>
         </div>
-        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
-          <p class="text-xs text-slate-400 uppercase font-semibold">Estatus</p>
-          <p class="text-2xl font-bold text-purple-400 mt-1">${totalArchivos > 0 ? 'Sincronizado' : 'Sin datos'}</p>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Estatus</p>
+          <p class="text-2xl font-bold text-emerald-600 mt-1">${totalArchivos > 0 ? 'Sincronizado' : 'Sin datos'}</p>
         </div>
       `;
 
       if (totalArchivos === 0) {
-        contenedorGrafica.innerHTML = `
-          <div class="text-center py-8 text-slate-500">
-            No se han subido archivos para este periodo. Sube un archivo desde la pestaña <strong>Descarga de Documentos</strong>.
-          </div>
-        `;
+        contenedorGrafica.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No hay archivos guardados para este periodo.</div>`;
       } else {
         let barrasHTML = listaArchivos.map(arch => {
           const alturaPorcentaje = Math.min(Math.max((arch.filas || 10) * 5, 15), 100);
           return `
             <div class="flex flex-col items-center flex-1 max-w-[100px]">
-              <span class="text-xs font-mono text-indigo-300 mb-1">${arch.filas || 'PDF'} reg</span>
-              <div class="w-full bg-slate-800 rounded-t h-32 flex items-end p-1 border border-slate-700">
-                <div class="w-full bg-indigo-500 rounded-t transition-all hover:bg-indigo-400" style="height: ${alturaPorcentaje}%;"></div>
+              <span class="text-xs font-bold text-blue-600 mb-1">${arch.filas || 'PDF'} reg</span>
+              <div class="w-full bg-slate-200 rounded-t h-32 flex items-end p-1">
+                <div class="w-full bg-blue-600 rounded-t transition-all hover:bg-blue-500" style="height: ${alturaPorcentaje}%;"></div>
               </div>
-              <span class="text-[10px] text-slate-400 truncate w-full text-center mt-2" title="${arch.nombre}">${arch.nombre}</span>
+              <span class="text-[10px] text-slate-500 truncate w-full text-center mt-2" title="${arch.nombre}">${arch.nombre}</span>
             </div>
           `;
         }).join('');
 
         contenedorGrafica.innerHTML = `
-          <h3 class="text-sm font-semibold text-white mb-4">Gráfica Comparativa de Archivos</h3>
-          <div class="flex items-end justify-start gap-4 overflow-x-auto pb-2">
-            ${barrasHTML}
-          </div>
+          <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Gráfica Comparativa de Archivos</h3>
+          <div class="flex items-end justify-start gap-4 overflow-x-auto pb-2">${barrasHTML}</div>
         `;
       }
     }
