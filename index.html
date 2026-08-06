@@ -73,16 +73,23 @@
     </div>
 
     <!-- PIE DEL SIDEBAR -->
-    <div class="p-4 border-t border-slate-100 bg-slate-50">
-      <p class="text-[11px] text-slate-400 font-bold uppercase mb-2">SELECCIÓN DE MARCA</p>
-      <div class="flex rounded-lg bg-slate-200 p-1">
-        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all">
-          Juguetimax (Fijo)
-        </button>
-        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all">
-          Multimarca
-        </button>
+    <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
+      <div>
+        <p class="text-[11px] text-slate-400 font-bold uppercase mb-2">SELECCIÓN DE MARCA</p>
+        <div class="flex rounded-lg bg-slate-200 p-1">
+          <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all">
+            Juguetimax (Fijo)
+          </button>
+          <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all">
+            Multimarca
+          </button>
+        </div>
       </div>
+
+      <!-- BOTÓN PARA GUARDAR PERSISTENCIA EN EL NAVEGADOR -->
+      <button onclick="guardarEnMemoria()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-2">
+        <span>💾 Guardar Datos</span>
+      </button>
     </div>
   </aside>
 
@@ -156,7 +163,7 @@
         </div>
         
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>💾 Subir Excel / PDF</span>
+          <span>➕ Seleccionar Excel / PDF</span>
           <input type="file" accept=".pdf, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
         </label>
       </div>
@@ -172,7 +179,7 @@
         </div>
 
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>💾 Subir Excel / PDF</span>
+          <span>➕ Seleccionar Excel / PDF</span>
           <input type="file" accept=".pdf, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'soportes')">
         </label>
       </div>
@@ -188,7 +195,7 @@
         </div>
 
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>📄 Subir Factura PDF</span>
+          <span>📄 Seleccionar Factura PDF</span>
           <input type="file" accept=".pdf" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
         </label>
       </div>
@@ -244,7 +251,7 @@
 
   </main>
 
-  <!-- LÓGICA JAVASCRIPT -->
+  <!-- LÓGICA JAVASCRIPT CON MEMORIA GUARDADA -->
   <script>
     let marcaPrincipal = 'juguetimax';
     let subMarcaActual = 'Juguetimax';
@@ -252,7 +259,13 @@
     let mesActual = 'enero';
     let vistaActiva = 'descarga';
 
-    const reportes = {};
+    // Cargar desde localStorage si ya existen datos guardados
+    let reportes = JSON.parse(localStorage.getItem('evolve_reportes_datos')) || {};
+
+    function guardarEnMemoria() {
+      localStorage.setItem('evolve_reportes_datos', JSON.stringify(reportes));
+      alert('¡Datos guardados correctamente! Permanecerán registrados aunque recargues la página.');
+    }
 
     function obtenerEstructura() {
       if (!reportes[marcaPrincipal]) reportes[marcaPrincipal] = {};
@@ -343,7 +356,7 @@
       container.innerHTML = items.map(item => `
         <li class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
           <span class="truncate pr-2 text-slate-700 text-xs font-medium">${item.nombre}</span>
-          <a href="${item.url}" target="_blank" download="${item.nombre}" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold px-2 py-1 rounded-lg transition-colors">
+          <a href="${item.url || '#'}" target="_blank" download="${item.nombre}" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold px-2 py-1 rounded-lg transition-colors">
             Descargar ↗
           </a>
         </li>
@@ -415,7 +428,6 @@
       }
     }
 
-    // Extracción silenciosa sin aviso flotante
     function extraerMontoSinIVA(texto) {
       const textoLimpio = texto.replace(/\s+/g, ' ');
 
@@ -476,7 +488,7 @@
             <td class="p-3 font-medium text-slate-800 text-xs">${f.nombre}</td>
             <td class="p-3 font-bold text-blue-600">${formatoMoneda.format(f.montoSinIVA || 0)}</td>
             <td class="p-3 text-right">
-              <a href="${f.url}" target="_blank" download="${f.nombre}" class="text-xs text-blue-600 font-semibold hover:underline">Descargar ↗</a>
+              <a href="${f.url || '#'}" target="_blank" download="${f.nombre}" class="text-xs text-blue-600 font-semibold hover:underline">Descargar ↗</a>
             </td>
           </tr>
         `).join('');
