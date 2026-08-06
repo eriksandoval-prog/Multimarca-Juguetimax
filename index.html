@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Reportes - Multimarca & Juguetimax</title>
+  <title>Portal de Reportes - Multimarca & Juguetimax</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-6 font-sans">
@@ -12,11 +12,11 @@
     <!-- Encabezado -->
     <header class="border-b border-slate-700 pb-4 flex justify-between items-center flex-wrap gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-white">Panel de Reportes</h1>
+        <h1 class="text-2xl font-bold text-white">Portal de Reportes</h1>
         <p class="text-slate-400 text-sm">Gestión de cobertura, soportes y facturación por marca y periodo</p>
       </div>
 
-      <!-- Selector Principal -->
+      <!-- Selector Principal de Marca -->
       <div class="inline-flex rounded-lg bg-slate-800 p-1 border border-slate-700">
         <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="px-4 py-2 text-sm font-medium rounded-md transition-all bg-indigo-600 text-white">
           Juguetimax
@@ -27,7 +27,23 @@
       </div>
     </header>
 
-    <!-- Barra de Filtros (Sub-marca, Año, Mes e Indicador) -->
+    <!-- Menú de Navegación por Apartados -->
+    <nav class="flex border-b border-slate-700 space-x-2 overflow-x-auto pb-1">
+      <button id="tab-descarga" onclick="cambiarVista('descarga')" class="py-2 px-4 text-sm font-medium text-white border-b-2 border-indigo-500 whitespace-nowrap">
+        📥 Descarga de Documentos
+      </button>
+      <button id="tab-cobertura" onclick="cambiarVista('cobertura')" class="py-2 px-4 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap">
+        📊 Reporte de Cobertura
+      </button>
+      <button id="tab-soporte" onclick="cambiarVista('soporte')" class="py-2 px-4 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap">
+        📁 Soporte de Factura
+      </button>
+      <button id="tab-facturacion" onclick="cambiarVista('facturacion')" class="py-2 px-4 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap">
+        🧾 Facturación
+      </button>
+    </nav>
+
+    <!-- Barra de Filtros (Común para las vistas) -->
     <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-2 text-indigo-400 font-semibold text-lg">
         <span>Filtro activo:</span>
@@ -84,10 +100,9 @@
       </div>
     </div>
 
-    <!-- Contenedor de Tarjetas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-      <!-- 1. Reportes de Cobertura -->
+    <!-- VISTA 1: DESCARGA DE DOCUMENTOS -->
+    <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Tarjeta 1: Cobertura -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-slate-500 transition-all">
         <div>
           <div class="flex items-center space-x-3 mb-3">
@@ -104,7 +119,7 @@
         </label>
       </div>
 
-      <!-- 2. Soportes de Factura -->
+      <!-- Tarjeta 2: Soportes -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-slate-500 transition-all">
         <div>
           <div class="flex items-center space-x-3 mb-3">
@@ -121,7 +136,7 @@
         </label>
       </div>
 
-      <!-- 3. Facturación -->
+      <!-- Tarjeta 3: Facturación -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-slate-500 transition-all">
         <div>
           <div class="flex items-center space-x-3 mb-3">
@@ -137,8 +152,35 @@
           <input type="file" accept=".pdf, .xls, .xlsx" class="hidden" onchange="subirArchivo(event, 'facturacion')">
         </label>
       </div>
-
     </div>
+
+    <!-- VISTA 2: REPORTE DE COBERTURA -->
+    <div id="vista-cobertura" class="hidden bg-slate-800 border border-slate-700 rounded-xl p-6">
+      <h2 class="text-xl font-bold text-white mb-2">📊 Panel de Reporte de Cobertura</h2>
+      <p class="text-slate-400 text-sm mb-4">Visualización detallada de la cobertura de inventario para la marca y periodo seleccionado.</p>
+      <div class="p-8 border border-dashed border-slate-700 rounded-lg text-center text-slate-500">
+        Espacio asignado para visualización directa de indicadores o tablas de cobertura.
+      </div>
+    </div>
+
+    <!-- VISTA 3: SOPORTE DE FACTURA -->
+    <div id="vista-soporte" class="hidden bg-slate-800 border border-slate-700 rounded-xl p-6">
+      <h2 class="text-xl font-bold text-white mb-2">📁 Panel de Soporte de Factura</h2>
+      <p class="text-slate-400 text-sm mb-4">Registro y validación de acuses y comprobantes de recepción.</p>
+      <div class="p-8 border border-dashed border-slate-700 rounded-lg text-center text-slate-500">
+        Espacio asignado para la revisión de acuses y documentos de entrega.
+      </div>
+    </div>
+
+    <!-- VISTA 4: FACTURACIÓN -->
+    <div id="vista-facturacion" class="hidden bg-slate-800 border border-slate-700 rounded-xl p-6">
+      <h2 class="text-xl font-bold text-white mb-2">🧾 Panel de Facturación</h2>
+      <p class="text-slate-400 text-sm mb-4">Resumen de facturas emitidas y estatus de cobranza.</p>
+      <div class="p-8 border border-dashed border-slate-700 rounded-lg text-center text-slate-500">
+        Espacio asignado para consultas e informes detallados de facturación.
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -146,8 +188,8 @@
     let subMarcaActual = 'Juguetimax';
     let anioActual = '2026';
     let mesActual = 'enero';
+    let vistaActiva = 'descarga';
 
-    // Objeto global de almacenamiento
     const reportes = {};
 
     function obtenerLista(categoria) {
@@ -192,6 +234,24 @@
       anioActual = document.getElementById('select-anio').value;
       mesActual = document.getElementById('select-mes').value;
       actualizarPantalla();
+    }
+
+    function cambiarVista(vista) {
+      vistaActiva = vista;
+      const vistas = ['descarga', 'cobertura', 'soporte', 'facturacion'];
+      
+      vistas.forEach(v => {
+        const contenedor = document.getElementById(`vista-${v}`);
+        const tab = document.getElementById(`tab-${v}`);
+        
+        if (v === vista) {
+          contenedor.classList.remove('hidden');
+          tab.className = "py-2 px-4 text-sm font-medium text-white border-b-2 border-indigo-500 whitespace-nowrap";
+        } else {
+          contenedor.classList.add('hidden');
+          tab.className = "py-2 px-4 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap";
+        }
+      });
     }
 
     function actualizarPantalla() {
