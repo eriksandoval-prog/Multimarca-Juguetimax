@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal de Reportes - Multimarca & Juguetimax</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Librería para procesar archivos Excel (.xlsx/.xls) y CSV -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-6 font-sans">
 
@@ -12,8 +14,8 @@
     <!-- Encabezado -->
     <header class="border-b border-slate-700 pb-4 flex justify-between items-center flex-wrap gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-white">Portal de Reportes</h1>
-        <p class="text-slate-400 text-sm">Gestión de cobertura, soportes y facturación por marca y periodo</p>
+        <h1 class="text-2xl font-bold text-white">Portal de Reportes Integrado</h1>
+        <p class="text-slate-400 text-sm">Carga, gestión y analítica de datos por marca y periodo</p>
       </div>
 
       <!-- Selector Principal de Marca -->
@@ -43,7 +45,7 @@
       </button>
     </nav>
 
-    <!-- Barra de Filtros (Común para las vistas) -->
+    <!-- Barra de Filtros (Común para todas las vistas) -->
     <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-2 text-indigo-400 font-semibold text-lg">
         <span>Filtro activo:</span>
@@ -100,7 +102,7 @@
       </div>
     </div>
 
-    <!-- VISTA 1: DESCARGA DE DOCUMENTOS -->
+    <!-- VISTA 1: DESCARGA Y GUARDA DE DOCUMENTOS -->
     <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Tarjeta 1: Cobertura -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-slate-500 transition-all">
@@ -114,8 +116,8 @@
         </div>
         
         <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-indigo-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex items-center justify-center space-x-2 transition-colors">
-          <span>➕ Subir Excel / PDF</span>
-          <input type="file" accept=".pdf, .xls, .xlsx" class="hidden" onchange="subirArchivo(event, 'cobertura')">
+          <span>💾 Guardar y Procesar Excel/PDF</span>
+          <input type="file" accept=".pdf, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
         </label>
       </div>
 
@@ -131,8 +133,8 @@
         </div>
 
         <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-emerald-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex items-center justify-center space-x-2 transition-colors">
-          <span>➕ Subir Excel / PDF</span>
-          <input type="file" accept=".pdf, .xls, .xlsx" class="hidden" onchange="subirArchivo(event, 'soportes')">
+          <span>💾 Guardar y Procesar Excel/PDF</span>
+          <input type="file" accept=".pdf, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'soportes')">
         </label>
       </div>
 
@@ -148,36 +150,39 @@
         </div>
 
         <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-purple-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex items-center justify-center space-x-2 transition-colors">
-          <span>➕ Subir Excel / PDF</span>
-          <input type="file" accept=".pdf, .xls, .xlsx" class="hidden" onchange="subirArchivo(event, 'facturacion')">
+          <span>💾 Guardar y Procesar Excel/PDF</span>
+          <input type="file" accept=".pdf, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
         </label>
       </div>
     </div>
 
-    <!-- VISTA 2: REPORTE DE COBERTURA -->
-    <div id="vista-cobertura" class="hidden bg-slate-800 border border-slate-700 rounded-xl p-6">
-      <h2 class="text-xl font-bold text-white mb-2">📊 Panel de Reporte de Cobertura</h2>
-      <p class="text-slate-400 text-sm mb-4">Visualización detallada de la cobertura de inventario para la marca y periodo seleccionado.</p>
-      <div class="p-8 border border-dashed border-slate-700 rounded-lg text-center text-slate-500">
-        Espacio asignado para visualización directa de indicadores o tablas de cobertura.
+    <!-- VISTA 2: REPORTE DE COBERTURA Y GRÁFICAS -->
+    <div id="vista-cobertura" class="hidden space-y-6">
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+        <h2 class="text-xl font-bold text-white mb-2">📊 Análitica de Cobertura</h2>
+        <p class="text-slate-400 text-sm mb-4">Resumen y métricas generadas a partir de los archivos guardados.</p>
+        <div id="metricas-cobertura" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+        <div id="grafica-cobertura" class="p-6 bg-slate-900/50 border border-slate-700 rounded-lg"></div>
       </div>
     </div>
 
-    <!-- VISTA 3: SOPORTE DE FACTURA -->
-    <div id="vista-soporte" class="hidden bg-slate-800 border border-slate-700 rounded-xl p-6">
-      <h2 class="text-xl font-bold text-white mb-2">📁 Panel de Soporte de Factura</h2>
-      <p class="text-slate-400 text-sm mb-4">Registro y validación de acuses y comprobantes de recepción.</p>
-      <div class="p-8 border border-dashed border-slate-700 rounded-lg text-center text-slate-500">
-        Espacio asignado para la revisión de acuses y documentos de entrega.
+    <!-- VISTA 3: SOPORTE DE FACTURA Y ANALÍTICA -->
+    <div id="vista-soporte" class="hidden space-y-6">
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+        <h2 class="text-xl font-bold text-white mb-2">📁 Control de Soportes de Factura</h2>
+        <p class="text-slate-400 text-sm mb-4">Estatus de comprobantes de entrega y acuses registrados.</p>
+        <div id="metricas-soportes" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+        <div id="grafica-soportes" class="p-6 bg-slate-900/50 border border-slate-700 rounded-lg"></div>
       </div>
     </div>
 
-    <!-- VISTA 4: FACTURACIÓN -->
-    <div id="vista-facturacion" class="hidden bg-slate-800 border border-slate-700 rounded-xl p-6">
-      <h2 class="text-xl font-bold text-white mb-2">🧾 Panel de Facturación</h2>
-      <p class="text-slate-400 text-sm mb-4">Resumen de facturas emitidas y estatus de cobranza.</p>
-      <div class="p-8 border border-dashed border-slate-700 rounded-lg text-center text-slate-500">
-        Espacio asignado para consultas e informes detallados de facturación.
+    <!-- VISTA 4: FACTURACIÓN Y ANALÍTICA -->
+    <div id="vista-facturacion" class="hidden space-y-6">
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+        <h2 class="text-xl font-bold text-white mb-2">🧾 Resumen de Facturación</h2>
+        <p class="text-slate-400 text-sm mb-4">Consolidado e informes financieros extraídos de las facturas.</p>
+        <div id="metricas-facturacion" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+        <div id="grafica-facturacion" class="p-6 bg-slate-900/50 border border-slate-700 rounded-lg"></div>
       </div>
     </div>
 
@@ -192,17 +197,19 @@
 
     const reportes = {};
 
-    function obtenerLista(categoria) {
+    function obtenerEstructura() {
       if (!reportes[marcaPrincipal]) reportes[marcaPrincipal] = {};
-      
       const claveSub = (marcaPrincipal === 'multimarca') ? subMarcaActual : 'general';
       if (!reportes[marcaPrincipal][claveSub]) reportes[marcaPrincipal][claveSub] = {};
       if (!reportes[marcaPrincipal][claveSub][anioActual]) reportes[marcaPrincipal][claveSub][anioActual] = {};
       if (!reportes[marcaPrincipal][claveSub][anioActual][mesActual]) {
-        reportes[marcaPrincipal][claveSub][anioActual][mesActual] = { cobertura: [], soportes: [], facturacion: [] };
+        reportes[marcaPrincipal][claveSub][anioActual][mesActual] = { 
+          cobertura: [], 
+          soportes: [], 
+          facturacion: [] 
+        };
       }
-      
-      return reportes[marcaPrincipal][claveSub][anioActual][mesActual][categoria];
+      return reportes[marcaPrincipal][claveSub][anioActual][mesActual];
     }
 
     function cambiarMarca(marca) {
@@ -263,42 +270,136 @@
         label.innerText = `JUGUETIMAX | ${anioActual} - ${mesActual}`;
       }
 
-      renderLista('lista-cobertura', obtenerLista('cobertura'));
-      renderLista('lista-soportes', obtenerLista('soportes'));
-      renderLista('lista-facturacion', obtenerLista('facturacion'));
+      const datos = obtenerEstructura();
+
+      // Actualizar listas de archivos en la pestaña de descarga
+      renderLista('lista-cobertura', datos.cobertura);
+      renderLista('lista-soportes', datos.soportes);
+      renderLista('lista-facturacion', datos.facturacion);
+
+      // Renderizar reportes y gráficas dinámicas
+      renderModulo('cobertura', datos.cobertura);
+      renderModulo('soportes', datos.soportes);
+      renderModulo('facturacion', datos.facturacion);
     }
 
     function renderLista(elementId, items) {
       const container = document.getElementById(elementId);
       if (!items || items.length === 0) {
-        container.innerHTML = `<li class="text-slate-500 italic">Sin archivos para este periodo</li>`;
+        container.innerHTML = `<li class="text-slate-500 italic">Sin archivos guardados</li>`;
         return;
       }
       container.innerHTML = items.map(item => `
-        <li>
-          <a href="${item.url}" target="_blank" download="${item.nombre}" class="flex items-center justify-between p-2 rounded bg-slate-900/60 hover:bg-indigo-600/20 text-indigo-300 hover:text-indigo-200 transition-colors">
-            <span class="truncate pr-2">${item.nombre}</span>
-            <span class="text-xs">↗</span>
+        <li class="flex items-center justify-between p-2 rounded bg-slate-900/60 border border-slate-700/50">
+          <span class="truncate pr-2 text-indigo-300 text-xs font-mono">${item.nombre}</span>
+          <a href="${item.url}" target="_blank" download="${item.nombre}" class="text-xs bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 px-2 py-1 rounded transition-colors">
+            Descargar ↗
           </a>
         </li>
       `).join('');
     }
 
-    function subirArchivo(event, categoria) {
+    function subirYProcesarArchivo(event, categoria) {
       const file = event.target.files[0];
-      if (file) {
-        const blobUrl = URL.createObjectURL(file);
-        const lista = obtenerLista(categoria);
-        
-        lista.push({
-          nombre: file.name,
-          url: blobUrl
-        });
+      if (!file) return;
 
+      const blobUrl = URL.createObjectURL(file);
+      const datosPeriodo = obtenerEstructura();
+
+      const nuevoArchivo = {
+        nombre: file.name,
+        url: blobUrl,
+        filas: 0,
+        datosProcesados: []
+      };
+
+      // Si es Excel o CSV, leemos las filas para armar las gráficas
+      if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+            nuevoArchivo.filas = json.length;
+            nuevoArchivo.datosProcesados = json;
+
+            datosPeriodo[categoria].push(nuevoArchivo);
+            actualizarPantalla();
+          } catch (err) {
+            console.error("Error al leer el archivo Excel:", err);
+            datosPeriodo[categoria].push(nuevoArchivo);
+            actualizarPantalla();
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        // En caso de ser PDF u otros formatos
+        datosPeriodo[categoria].push(nuevoArchivo);
         actualizarPantalla();
       }
     }
 
+    function renderModulo(categoria, listaArchivos) {
+      const contenedorMetricas = document.getElementById(`metricas-${categoria}`);
+      const contenedorGrafica = document.getElementById(`grafica-${categoria}`);
+
+      const totalArchivos = listaArchivos.length;
+      let totalFilasRegistradas = 0;
+
+      listaArchivos.forEach(a => {
+        totalFilasRegistradas += (a.filas || 0);
+      });
+
+      // Render de métricas clave
+      contenedorMetricas.innerHTML = `
+        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
+          <p class="text-xs text-slate-400 uppercase font-semibold">Archivos Guardados</p>
+          <p class="text-2xl font-bold text-indigo-400 mt-1">${totalArchivos}</p>
+        </div>
+        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
+          <p class="text-xs text-slate-400 uppercase font-semibold">Registros/Filas Analizadas</p>
+          <p class="text-2xl font-bold text-emerald-400 mt-1">${totalFilasRegistradas}</p>
+        </div>
+        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
+          <p class="text-xs text-slate-400 uppercase font-semibold">Estatus de Integración</p>
+          <p class="text-2xl font-bold text-purple-400 mt-1">${totalArchivos > 0 ? 'Sincronizado' : 'Sin datos'}</p>
+        </div>
+      `;
+
+      // Render de visualización gráfica simétrica usando HTML/CSS
+      if (totalArchivos === 0) {
+        contenedorGrafica.innerHTML = `
+          <div class="text-center py-8 text-slate-500">
+            No se han subido archivos para este periodo. Sube un archivo desde la pestaña <strong>Descarga de Documentos</strong> para ver las gráficas automáticas.
+          </div>
+        `;
+      } else {
+        let barrasHTML = listaArchivos.map(arch => {
+          const alturaPorcentaje = Math.min(Math.max((arch.filas || 10) * 5, 15), 100);
+          return `
+            <div class="flex flex-col items-center flex-1 max-w-[100px]">
+              <span class="text-xs font-mono text-indigo-300 mb-1">${arch.filas || 'PDF'} reg</span>
+              <div class="w-full bg-slate-800 rounded-t h-32 flex items-end p-1 border border-slate-700">
+                <div class="w-full bg-indigo-500 rounded-t transition-all hover:bg-indigo-400" style="height: ${alturaPorcentaje}%;"></div>
+              </div>
+              <span class="text-[10px] text-slate-400 truncate w-full text-center mt-2" title="${arch.nombre}">${arch.nombre}</span>
+            </div>
+          `;
+        }).join('');
+
+        contenedorGrafica.innerHTML = `
+          <h3 class="text-sm font-semibold text-white mb-4">Gráfica Comparativa de Archivos Registrados</h3>
+          <div class="flex items-end justify-start gap-4 overflow-x-auto pb-2">
+            ${barrasHTML}
+          </div>
+        `;
+      }
+    }
+
+    // Inicializar la interfaz
     actualizarPantalla();
   </script>
 </body>
