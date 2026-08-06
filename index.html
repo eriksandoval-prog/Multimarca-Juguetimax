@@ -13,10 +13,10 @@
     <header class="border-b border-slate-700 pb-4 flex justify-between items-center flex-wrap gap-4">
       <div>
         <h1 class="text-2xl font-bold text-white">Panel de Reportes</h1>
-        <p class="text-slate-400 text-sm">Gestión de cobertura, soportes y facturación por periodo</p>
+        <p class="text-slate-400 text-sm">Gestión de cobertura, soportes y facturación por marca y periodo</p>
       </div>
 
-      <!-- Selector de Marca -->
+      <!-- Selector Principal -->
       <div class="inline-flex rounded-lg bg-slate-800 p-1 border border-slate-700">
         <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="px-4 py-2 text-sm font-medium rounded-md transition-all bg-indigo-600 text-white">
           Juguetimax
@@ -27,7 +27,7 @@
       </div>
     </header>
 
-    <!-- Barra de Filtros (Año, Mes e Indicador) -->
+    <!-- Barra de Filtros (Sub-marca, Año, Mes e Indicador) -->
     <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-2 text-indigo-400 font-semibold text-lg">
         <span>Filtro activo:</span>
@@ -37,6 +37,22 @@
       </div>
 
       <div class="flex items-center gap-3 flex-wrap">
+        <!-- Selector de Sub-marca (Solo visible en Multimarca) -->
+        <div id="contenedor-submarca" class="hidden flex items-center space-x-2">
+          <label for="select-submarca" class="text-xs font-semibold text-slate-400 uppercase">Marca:</label>
+          <select id="select-submarca" onchange="cambiarSubMarca()" class="bg-slate-900 text-white text-sm rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-indigo-500">
+            <option value="Juguetimax">Juguetimax</option>
+            <option value="Moose Toys">Moose Toys</option>
+            <option value="Just Play">Just Play</option>
+            <option value="Clarios">Clarios</option>
+            <option value="Bondy Fiesta">Bondy Fiesta</option>
+            <option value="Ambientair">Ambientair</option>
+            <option value="Blink Solutions">Blink Solutions</option>
+            <option value="Kiss">Kiss</option>
+            <option value="Preslow">Preslow</option>
+          </select>
+        </div>
+
         <!-- Selector de Año -->
         <div class="flex items-center space-x-2">
           <label for="select-anio" class="text-xs font-semibold text-slate-400 uppercase">Año:</label>
@@ -126,35 +142,49 @@
   </div>
 
   <script>
-    let marcaActual = 'juguetimax';
+    let marcaPrincipal = 'juguetimax';
+    let subMarcaActual = 'Juguetimax';
     let anioActual = '2026';
     let mesActual = 'enero';
 
-    // Almacenamiento organizado por Marca -> Año -> Mes -> Categoría
+    // Objeto global de almacenamiento
     const reportes = {};
 
-    function obtenerCategoria(marca, anio, mes, categoria) {
-      if (!reportes[marca]) reportes[marca] = {};
-      if (!reportes[marca][anio]) reportes[marca][anio] = {};
-      if (!reportes[marca][anio][mes]) {
-        reportes[marca][anio][mes] = { cobertura: [], soportes: [], facturacion: [] };
+    function obtenerLista(categoria) {
+      if (!reportes[marcaPrincipal]) reportes[marcaPrincipal] = {};
+      
+      const claveSub = (marcaPrincipal === 'multimarca') ? subMarcaActual : 'general';
+      if (!reportes[marcaPrincipal][claveSub]) reportes[marcaPrincipal][claveSub] = {};
+      if (!reportes[marcaPrincipal][claveSub][anioActual]) reportes[marcaPrincipal][claveSub][anioActual] = {};
+      if (!reportes[marcaPrincipal][claveSub][anioActual][mesActual]) {
+        reportes[marcaPrincipal][claveSub][anioActual][mesActual] = { cobertura: [], soportes: [], facturacion: [] };
       }
-      return reportes[marca][anio][mes][categoria];
+      
+      return reportes[marcaPrincipal][claveSub][anioActual][mesActual][categoria];
     }
 
     function cambiarMarca(marca) {
-      marcaActual = marca;
+      marcaPrincipal = marca;
       const btnJ = document.getElementById('btn-juguetimax');
       const btnM = document.getElementById('btn-multimarca');
+      const contenedorSubmarca = document.getElementById('contenedor-submarca');
 
       if (marca === 'juguetimax') {
         btnJ.className = "px-4 py-2 text-sm font-medium rounded-md transition-all bg-indigo-600 text-white";
         btnM.className = "px-4 py-2 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-white";
+        contenedorSubmarca.classList.add('hidden');
       } else {
         btnM.className = "px-4 py-2 text-sm font-medium rounded-md transition-all bg-indigo-600 text-white";
         btnJ.className = "px-4 py-2 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-white";
+        contenedorSubmarca.classList.remove('hidden');
+        subMarcaActual = document.getElementById('select-submarca').value;
       }
 
+      actualizarPantalla();
+    }
+
+    function cambiarSubMarca() {
+      subMarcaActual = document.getElementById('select-submarca').value;
       actualizarPantalla();
     }
 
@@ -165,13 +195,17 @@
     }
 
     function actualizarPantalla() {
-      // Actualizar etiqueta del filtro
-      document.getElementById('label-filtro').innerText = `${marcaActual} | ${anioActual} - ${mesActual}`;
+      const label = document.getElementById('label-filtro');
+      
+      if (marcaPrincipal === 'multimarca') {
+        label.innerText = `MULTIMARCA (${subMarcaActual}) | ${anioActual} - ${mesActual}`;
+      } else {
+        label.innerText = `JUGUETIMAX | ${anioActual} - ${mesActual}`;
+      }
 
-      // Renderizar listas
-      renderLista('lista-cobertura', obtenerCategoria(marcaActual, anioActual, mesActual, 'cobertura'));
-      renderLista('lista-soportes', obtenerCategoria(marcaActual, anioActual, mesActual, 'soportes'));
-      renderLista('lista-facturacion', obtenerCategoria(marcaActual, anioActual, mesActual, 'facturacion'));
+      renderLista('lista-cobertura', obtenerLista('cobertura'));
+      renderLista('lista-soportes', obtenerLista('soportes'));
+      renderLista('lista-facturacion', obtenerLista('facturacion'));
     }
 
     function renderLista(elementId, items) {
@@ -194,7 +228,7 @@
       const file = event.target.files[0];
       if (file) {
         const blobUrl = URL.createObjectURL(file);
-        const lista = obtenerCategoria(marcaActual, anioActual, mesActual, categoria);
+        const lista = obtenerLista(categoria);
         
         lista.push({
           nombre: file.name,
@@ -205,7 +239,6 @@
       }
     }
 
-    // Inicializar vista
     actualizarPantalla();
   </script>
 </body>
