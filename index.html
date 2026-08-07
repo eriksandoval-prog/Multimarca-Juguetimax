@@ -69,14 +69,18 @@
       </nav>
     </div>
 
+    <!-- SELECCIÓN DE LAS 3 CUENTAS -->
     <div class="p-4 border-t border-slate-100 bg-slate-50">
       <p class="text-[11px] text-slate-400 font-bold uppercase mb-2">SELECCIÓN DE MARCA</p>
-      <div class="flex rounded-lg bg-slate-200 p-1">
-        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all">
+      <div class="flex flex-col gap-1 rounded-lg bg-slate-200 p-1">
+        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all text-center">
           Juguetimax (Fijo)
         </button>
-        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 transition-all">
+        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all text-center">
           Multimarca
+        </button>
+        <button id="btn-promotoria" onclick="cambiarMarca('promotoria')" class="py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all text-center">
+          Promotoría por visita
         </button>
       </div>
     </div>
@@ -141,6 +145,8 @@
 
     <!-- VISTA 1: DESCARGA DE DOCUMENTOS -->
     <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- 1. Cobertura -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <h2 class="font-bold text-slate-900 mb-1">📊 Reportes de Cobertura</h2>
@@ -154,6 +160,7 @@
         </label>
       </div>
 
+      <!-- 2. Facturación -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <h2 class="font-bold text-slate-900 mb-1">🧾 Facturación</h2>
@@ -166,6 +173,35 @@
           <input type="file" accept=".xml, .xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'facturacion')">
         </label>
       </div>
+
+      <!-- 3. Bonos Mensuales (Exclusivo de Juguetimax Fijo) -->
+      <div id="card-bonos" class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+        <div>
+          <h2 class="font-bold text-slate-900 mb-1">🎁 Bonos Mensuales</h2>
+          <p class="text-slate-500 text-xs mb-4">Archivos y reportes de incentivos y bonos.</p>
+          <ul id="lista-bonos" class="space-y-2 text-sm mb-4"></ul>
+        </div>
+
+        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center transition-colors">
+          <span>📁 Subir Archivo de Bonos</span>
+          <input type="file" class="hidden" onchange="subirArchivoNube(event, 'bonos')">
+        </label>
+      </div>
+
+      <!-- 4. Plan de Trabajo (Exclusivo de Juguetimax Fijo) -->
+      <div id="card-plan" class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+        <div>
+          <h2 class="font-bold text-slate-900 mb-1">📅 Plan de Trabajo</h2>
+          <p class="text-slate-500 text-xs mb-4">Cronogramas y planes operativos mensuales.</p>
+          <ul id="lista-plan" class="space-y-2 text-sm mb-4"></ul>
+        </div>
+
+        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center transition-colors">
+          <span>📋 Subir Plan de Trabajo</span>
+          <input type="file" class="hidden" onchange="subirArchivoNube(event, 'plan')">
+        </label>
+      </div>
+
     </div>
 
     <!-- VISTA 2: COBERTURA -->
@@ -211,7 +247,25 @@
 
     function cambiarMarca(marca) {
       marcaPrincipal = marca;
-      document.getElementById('contenedor-submarca').classList.toggle('hidden', marca === 'juguetimax');
+      
+      const btnJ = document.getElementById('btn-juguetimax');
+      const btnM = document.getElementById('btn-multimarca');
+      const btnP = document.getElementById('btn-promotoria');
+
+      const estiloActivo = "py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all text-center";
+      const estiloInactivo = "py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all text-center";
+
+      btnJ.className = (marca === 'juguetimax') ? estiloActivo : estiloInactivo;
+      btnM.className = (marca === 'multimarca') ? estiloActivo : estiloInactivo;
+      btnP.className = (marca === 'promotoria') ? estiloActivo : estiloInactivo;
+
+      document.getElementById('contenedor-submarca').classList.toggle('hidden', marca !== 'multimarca');
+      
+      // Mostrar u ocultar las tarjetas exclusivas de Juguetimax Fijo
+      const esFijo = (marca === 'juguetimax');
+      document.getElementById('card-bonos').style.display = esFijo ? 'flex' : 'none';
+      document.getElementById('card-plan').style.display = esFijo ? 'flex' : 'none';
+
       escucharCambiosNube();
     }
 
@@ -221,16 +275,16 @@
       });
     }
 
-    // Clave interna única para distinguir la sub-marca de Multimarca
     function obtenerClaveMarcaActiva() {
       if (marcaPrincipal === 'juguetimax') {
         return 'Juguetimax-Fijo';
-      } else {
+      } else if (marcaPrincipal === 'multimarca') {
         return `Multimarca-${subMarcaActual}`;
+      } else {
+        return 'Promotoria-Visita';
       }
     }
 
-    // Escucha en tiempo real de Firebase
     function escucharCambiosNube() {
       anioActual = document.getElementById('select-anio').value;
       mesActual = document.getElementById('select-mes').value;
@@ -238,9 +292,10 @@
 
       const claveMarca = obtenerClaveMarcaActiva();
       
-      const textoLabel = (marcaPrincipal === 'multimarca') 
-        ? `MULTIMARCA (${subMarcaActual.toUpperCase()}) | ${anioActual} - ${mesActual}`
-        : `JUGUETIMAX (FIJO) | ${anioActual} - ${mesActual}`;
+      let textoLabel = '';
+      if (marcaPrincipal === 'juguetimax') textoLabel = `JUGUETIMAX (FIJO) | ${anioActual} - ${mesActual}`;
+      else if (marcaPrincipal === 'multimarca') textoLabel = `MULTIMARCA (${subMarcaActual.toUpperCase()}) | ${anioActual} - ${mesActual}`;
+      else textoLabel = `PROMOTORÍA POR VISITA | ${anioActual} - ${mesActual}`;
         
       document.getElementById('label-filtro').innerText = textoLabel;
 
@@ -294,15 +349,21 @@
       }
     }
 
+    function renderizarListaHTML(archivos) {
+      if (archivos.length === 0) return '<li class="text-slate-400 text-xs italic">Sin archivos guardados</li>';
+      return archivos.map(a => `<li class="flex justify-between items-center p-2 bg-slate-50 border rounded-xl text-xs"><span class="truncate pr-2">${a.nombre}</span><button onclick="eliminarArchivoNube('${a.idDoc}')" class="text-rose-600 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">🗑️ Eliminar</button></li>`).join('');
+    }
+
     function renderizarPantalla(archivos) {
       const cobertura = archivos.filter(a => a.categoria === 'cobertura');
       const facturacion = archivos.filter(a => a.categoria === 'facturacion');
+      const bonos = archivos.filter(a => a.categoria === 'bonos');
+      const plan = archivos.filter(a => a.categoria === 'plan');
 
-      document.getElementById('lista-cobertura').innerHTML = cobertura.length === 0 ? '<li class="text-slate-400 text-xs italic">Sin archivos guardados</li>' :
-        cobertura.map(a => `<li class="flex justify-between items-center p-2 bg-slate-50 border rounded-xl text-xs"><span>${a.nombre}</span><button onclick="eliminarArchivoNube('${a.idDoc}')" class="text-rose-600 font-bold px-2 py-1 bg-rose-50 rounded-lg">🗑️ Eliminar</button></li>`).join('');
-
-      document.getElementById('lista-facturacion').innerHTML = facturacion.length === 0 ? '<li class="text-slate-400 text-xs italic">Sin archivos guardados</li>' :
-        facturacion.map(a => `<li class="flex justify-between items-center p-2 bg-slate-50 border rounded-xl text-xs"><span>${a.nombre}</span><button onclick="eliminarArchivoNube('${a.idDoc}')" class="text-rose-600 font-bold px-2 py-1 bg-rose-50 rounded-lg">🗑️ Eliminar</button></li>`).join('');
+      document.getElementById('lista-cobertura').innerHTML = renderizarListaHTML(cobertura);
+      document.getElementById('lista-facturacion').innerHTML = renderizarListaHTML(facturacion);
+      document.getElementById('lista-bonos').innerHTML = renderizarListaHTML(bonos);
+      document.getElementById('lista-plan').innerHTML = renderizarListaHTML(plan);
 
       const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
       let totalMonto = 0;
@@ -317,8 +378,7 @@
         facturacion.map(f => `<tr class="hover:bg-slate-50"><td class="p-3 text-xs font-medium">${f.nombre}</td><td class="p-3 font-bold text-blue-600">${formatoMoneda.format(f.montoSinIVA)}</td><td class="p-3 text-right"><button onclick="eliminarArchivoNube('${f.idDoc}')" class="text-rose-600 font-bold text-xs bg-rose-50 px-2 py-1 rounded-lg">🗑️ Eliminar</button></td></tr>`).join('');
     }
 
-    // Inicializar conexión
-    setTimeout(() => { escucharCambiosNube(); }, 800);
+    setTimeout(() => { cambiarMarca('juguetimax'); }, 800);
   </script>
 </body>
 </html>
