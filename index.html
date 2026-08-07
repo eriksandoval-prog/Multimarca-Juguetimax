@@ -7,11 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Librería para procesar Excel / CSV -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- Librería para lectura de texto en PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-  </script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex font-sans">
 
@@ -50,10 +45,6 @@
             <button onclick="cambiarVista('cobertura')" id="nav-cobertura" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all">
               <span class="text-base">📊</span>
               <span>Cobertura</span>
-            </button>
-            <button onclick="cambiarVista('soporte')" id="nav-soporte" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all">
-              <span class="text-base">📁</span>
-              <span>Soporte de factura</span>
             </button>
           </div>
         </div>
@@ -150,52 +141,38 @@
     </div>
 
     <!-- VISTA 1: DESCARGA -->
-    <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- 1. Reportes de Cobertura (Solo Excel) -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <div class="flex items-center space-x-3 mb-3">
             <span class="p-2.5 bg-blue-50 text-blue-600 rounded-xl text-xl">📊</span>
             <h2 class="font-bold text-slate-900">Reportes de Cobertura</h2>
           </div>
-          <p class="text-slate-500 text-xs mb-4">Archivos de inventario y disponibilidad regional.</p>
+          <p class="text-slate-500 text-xs mb-4">Archivos de inventario y disponibilidad regional (Solo Excel).</p>
           <ul id="lista-cobertura" class="space-y-2 text-sm mb-4"></ul>
         </div>
         
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>➕ Seleccionar Excel / PDF / XML</span>
-          <input type="file" accept=".pdf, .xls, .xlsx, .csv, .html, .htm, .xml" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
+          <span>📊 Seleccionar Excel (.xlsx / .xls / .csv)</span>
+          <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
         </label>
       </div>
 
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-        <div>
-          <div class="flex items-center space-x-3 mb-3">
-            <span class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl text-xl">📁</span>
-            <h2 class="font-bold text-slate-900">Soportes de Factura</h2>
-          </div>
-          <p class="text-slate-500 text-xs mb-4">Comprobantes de entrega, acuses y notas.</p>
-          <ul id="lista-soportes" class="space-y-2 text-sm mb-4"></ul>
-        </div>
-
-        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>➕ Seleccionar Excel / PDF / XML</span>
-          <input type="file" accept=".pdf, .xls, .xlsx, .csv, .html, .htm, .xml" class="hidden" onchange="subirYProcesarArchivo(event, 'soportes')">
-        </label>
-      </div>
-
+      <!-- 2. Facturación (Solo XML y Excel) -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <div class="flex items-center space-x-3 mb-3">
             <span class="p-2.5 bg-purple-50 text-purple-600 rounded-xl text-xl">🧾</span>
             <h2 class="font-bold text-slate-900">Facturación</h2>
           </div>
-          <p class="text-slate-500 text-xs mb-4">Facturas en formato XML, PDF, HTML o Excel.</p>
+          <p class="text-slate-500 text-xs mb-4">Facturas en formato XML o Excel.</p>
           <ul id="lista-facturacion" class="space-y-2 text-sm mb-4"></ul>
         </div>
 
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>📄 Subir Factura (XML / PDF / HTML)</span>
-          <input type="file" accept=".xml, .pdf, .html, .htm, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
+          <span>📄 Subir Factura (XML / Excel)</span>
+          <input type="file" accept=".xml, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
         </label>
       </div>
     </div>
@@ -209,16 +186,7 @@
       </div>
     </div>
 
-    <!-- VISTA 3: SOPORTE DE FACTURA -->
-    <div id="vista-soporte" class="hidden space-y-6">
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-        <h2 class="text-lg font-bold text-slate-900 mb-1">📁 Control de Soportes de Factura</h2>
-        <p class="text-slate-500 text-xs mb-6">Estatus y acuses registrados.</p>
-        <div id="metricas-soportes" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
-      </div>
-    </div>
-
-    <!-- VISTA 4: FACTURACIÓN -->
+    <!-- VISTA 3: FACTURACIÓN -->
     <div id="vista-facturacion" class="hidden space-y-6">
       <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <h2 class="text-lg font-bold text-slate-900 mb-1">🧾 Desglose y Pagos de Facturación</h2>
@@ -267,7 +235,7 @@
       if (!reportes[marcaPrincipal][claveSub]) reportes[marcaPrincipal][claveSub] = {};
       if (!reportes[marcaPrincipal][claveSub][anioActual]) reportes[marcaPrincipal][claveSub][anioActual] = {};
       if (!reportes[marcaPrincipal][claveSub][anioActual][mesActual]) {
-        reportes[marcaPrincipal][claveSub][anioActual][mesActual] = { cobertura: [], soportes: [], facturacion: [] };
+        reportes[marcaPrincipal][claveSub][anioActual][mesActual] = { cobertura: [], facturacion: [] };
       }
       return reportes[marcaPrincipal][claveSub][anioActual][mesActual];
     }
@@ -305,7 +273,7 @@
 
     function cambiarVista(vista) {
       vistaActiva = vista;
-      const vistas = ['descarga', 'cobertura', 'soporte', 'facturacion'];
+      const vistas = ['descarga', 'cobertura', 'facturacion'];
       
       vistas.forEach(v => {
         const contenedor = document.getElementById(`vista-${v}`);
@@ -333,11 +301,9 @@
       const datos = obtenerEstructura();
 
       renderLista('lista-cobertura', datos.cobertura);
-      renderLista('lista-soportes', datos.soportes);
       renderLista('lista-facturacion', datos.facturacion);
 
       renderModulo('cobertura', datos.cobertura);
-      renderModulo('soportes', datos.soportes);
       renderFacturacionModulo(datos.facturacion);
     }
 
@@ -383,44 +349,11 @@
             const coincidencia = textoXML.match(/SubTotal=["']([\d.]+)\b["']/i);
             if (coincidencia && coincidencia[1]) {
               nuevoArchivo.montoSinIVA = parseFloat(coincidencia[1]);
-            } else {
-              nuevoArchivo.montoSinIVA = extraerMontoSinIVA(textoXML);
             }
             datosPeriodo.facturacion.push(nuevoArchivo);
             actualizarPantalla();
           };
           reader.readAsText(file);
-        }
-        // Procesar HTML
-        else if (extension === 'html' || extension === 'htm') {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const textoHTML = e.target.result;
-            nuevoArchivo.montoSinIVA = extraerMontoSinIVA(textoHTML);
-            datosPeriodo.facturacion.push(nuevoArchivo);
-            actualizarPantalla();
-          };
-          reader.readAsText(file);
-        } 
-        // Procesar PDF
-        else if (extension === 'pdf') {
-          try {
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            let textoCompleto = '';
-
-            for (let i = 1; i <= pdf.numPages; i++) {
-              const page = await pdf.getPage(i);
-              const textContent = await page.getTextContent();
-              textoCompleto += textContent.items.map(item => item.str).join(' ') + ' ';
-            }
-
-            nuevoArchivo.montoSinIVA = extraerMontoSinIVA(textoCompleto);
-          } catch (e) {
-            console.error('Error procesando el PDF:', e);
-          }
-          datosPeriodo.facturacion.push(nuevoArchivo);
-          actualizarPantalla();
         } 
         // Procesar Excel / CSV
         else if (['xlsx', 'xls', 'csv'].includes(extension)) {
@@ -450,12 +383,10 @@
             actualizarPantalla();
           };
           reader.readAsArrayBuffer(file);
-        } else {
-          datosPeriodo.facturacion.push(nuevoArchivo);
-          actualizarPantalla();
         }
 
-      } else {
+      } else if (categoria === 'cobertura') {
+        // Solo Excel
         if (['xlsx', 'xls', 'csv'].includes(extension)) {
           const reader = new FileReader();
           reader.onload = function(e) {
@@ -467,37 +398,14 @@
 
               nuevoArchivo.filas = json.length;
             } catch (err) {}
-            datosPeriodo[categoria].push(nuevoArchivo);
+            datosPeriodo.cobertura.push(nuevoArchivo);
             actualizarPantalla();
           };
           reader.readAsArrayBuffer(file);
         } else {
-          datosPeriodo[categoria].push(nuevoArchivo);
-          actualizarPantalla();
+          alert('Para Reportes de Cobertura solo se permiten archivos Excel (.xlsx, .xls, .csv).');
         }
       }
-    }
-
-    function extraerMontoSinIVA(texto) {
-      const textoLimpio = texto.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
-
-      const patrones = [
-        /Subtotal\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
-        /Importe\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
-        /Base\s*Imponible\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
-        /Total\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i
-      ];
-
-      for (let patron of patrones) {
-        const coincidencia = textoLimpio.match(patron);
-        if (coincidencia && coincidencia[1]) {
-          let numeroStr = coincidencia[1].replace(/,/g, '');
-          let valor = parseFloat(numeroStr);
-          if (!isNaN(valor) && valor > 0) return valor;
-        }
-      }
-
-      return 0;
     }
 
     function editarMontoFactura(idFactura) {
