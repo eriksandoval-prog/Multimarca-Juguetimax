@@ -99,6 +99,7 @@
       </div>
 
       <div class="flex items-center gap-3 flex-wrap">
+        <!-- SELECTOR DE SUB-MARCA (VISIBLE EN MULTIMARCA Y PROMOTORÍA POR VISITA) -->
         <div id="contenedor-submarca" class="hidden flex items-center space-x-2">
           <label for="select-submarca" class="text-xs font-bold text-slate-400 uppercase">Sub-Marca:</label>
           <select id="select-submarca" onchange="escucharCambiosNube()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200">
@@ -174,7 +175,7 @@
         </label>
       </div>
 
-      <!-- 3. Bonos Mensuales (Disponibles en Juguetimax Fijo y Multimarca) -->
+      <!-- 3. Bonos Mensuales -->
       <div id="card-bonos" class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <h2 class="font-bold text-slate-900 mb-1">🎁 Bonos Mensuales</h2>
@@ -188,7 +189,7 @@
         </label>
       </div>
 
-      <!-- 4. Plan de Trabajo (Disponibles en Juguetimax Fijo y Multimarca) -->
+      <!-- 4. Plan de Trabajo -->
       <div id="card-plan" class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <h2 class="font-bold text-slate-900 mb-1">📅 Plan de Trabajo</h2>
@@ -259,13 +260,9 @@
       btnM.className = (marca === 'multimarca') ? estiloActivo : estiloInactivo;
       btnP.className = (marca === 'promotoria') ? estiloActivo : estiloInactivo;
 
-      document.getElementById('contenedor-submarca').classList.toggle('hidden', marca !== 'multimarca');
+      // El selector de Sub-Marca ahora se muestra tanto en Multimarca como en Promotoría por Visita
+      document.getElementById('contenedor-submarca').classList.toggle('hidden', marca === 'juguetimax');
       
-      // Habilitar las tarjetas de Bonos y Plan de Trabajo en Juguetimax Fijo y en Multimarca
-      const mostrarExtras = (marca === 'juguetimax' || marca === 'multimarca');
-      document.getElementById('card-bonos').style.display = mostrarExtras ? 'flex' : 'none';
-      document.getElementById('card-plan').style.display = mostrarExtras ? 'flex' : 'none';
-
       escucharCambiosNube();
     }
 
@@ -281,7 +278,7 @@
       } else if (marcaPrincipal === 'multimarca') {
         return `Multimarca-${subMarcaActual}`;
       } else {
-        return 'Promotoria-Visita';
+        return `Promotoria-${subMarcaActual}`;
       }
     }
 
@@ -293,9 +290,13 @@
       const claveMarca = obtenerClaveMarcaActiva();
       
       let textoLabel = '';
-      if (marcaPrincipal === 'juguetimax') textoLabel = `JUGUETIMAX (FIJO) | ${anioActual} - ${mesActual}`;
-      else if (marcaPrincipal === 'multimarca') textoLabel = `MULTIMARCA (${subMarcaActual.toUpperCase()}) | ${anioActual} - ${mesActual}`;
-      else textoLabel = `PROMOTORÍA POR VISITA | ${anioActual} - ${mesActual}`;
+      if (marcaPrincipal === 'juguetimax') {
+        textoLabel = `JUGUETIMAX (FIJO) | ${anioActual} - ${mesActual}`;
+      } else if (marcaPrincipal === 'multimarca') {
+        textoLabel = `MULTIMARCA (${subMarcaActual.toUpperCase()}) | ${anioActual} - ${mesActual}`;
+      } else {
+        textoLabel = `PROMOTORÍA POR VISITA (${subMarcaActual.toUpperCase()}) | ${anioActual} - ${mesActual}`;
+      }
         
       document.getElementById('label-filtro').innerText = textoLabel;
 
