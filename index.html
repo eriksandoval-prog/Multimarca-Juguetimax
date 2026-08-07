@@ -174,7 +174,7 @@
         </label>
       </div>
 
-      <!-- 3. Bonos Mensuales (Exclusivo de Juguetimax Fijo) -->
+      <!-- 3. Bonos Mensuales (Disponibles en Juguetimax Fijo y Multimarca) -->
       <div id="card-bonos" class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <h2 class="font-bold text-slate-900 mb-1">🎁 Bonos Mensuales</h2>
@@ -188,7 +188,7 @@
         </label>
       </div>
 
-      <!-- 4. Plan de Trabajo (Exclusivo de Juguetimax Fijo) -->
+      <!-- 4. Plan de Trabajo (Disponibles en Juguetimax Fijo y Multimarca) -->
       <div id="card-plan" class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
           <h2 class="font-bold text-slate-900 mb-1">📅 Plan de Trabajo</h2>
@@ -261,10 +261,10 @@
 
       document.getElementById('contenedor-submarca').classList.toggle('hidden', marca !== 'multimarca');
       
-      // Mostrar u ocultar las tarjetas exclusivas de Juguetimax Fijo
-      const esFijo = (marca === 'juguetimax');
-      document.getElementById('card-bonos').style.display = esFijo ? 'flex' : 'none';
-      document.getElementById('card-plan').style.display = esFijo ? 'flex' : 'none';
+      // Habilitar las tarjetas de Bonos y Plan de Trabajo en Juguetimax Fijo y en Multimarca
+      const mostrarExtras = (marca === 'juguetimax' || marca === 'multimarca');
+      document.getElementById('card-bonos').style.display = mostrarExtras ? 'flex' : 'none';
+      document.getElementById('card-plan').style.display = mostrarExtras ? 'flex' : 'none';
 
       escucharCambiosNube();
     }
