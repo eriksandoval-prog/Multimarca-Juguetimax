@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Librería para procesar Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- Librería para lectura y extracción de texto en PDF -->
+  <!-- Librería para lectura de texto en PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -86,7 +86,6 @@
         </div>
       </div>
 
-      <!-- BOTÓN PARA GUARDAR PERSISTENCIA EN EL NAVEGADOR -->
       <button onclick="guardarEnMemoria()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-2">
         <span>💾 Guardar Datos</span>
       </button>
@@ -207,7 +206,6 @@
         <h2 class="text-lg font-bold text-slate-900 mb-1">📊 Analítica de Cobertura</h2>
         <p class="text-slate-500 text-xs mb-6">Métricas obtenidas de los reportes cargados.</p>
         <div id="metricas-cobertura" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
-        <div id="grafica-cobertura" class="p-6 bg-slate-50 border border-slate-200 rounded-xl"></div>
       </div>
     </div>
 
@@ -217,19 +215,18 @@
         <h2 class="text-lg font-bold text-slate-900 mb-1">📁 Control de Soportes de Factura</h2>
         <p class="text-slate-500 text-xs mb-6">Estatus y acuses registrados.</p>
         <div id="metricas-soportes" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
-        <div id="grafica-soportes" class="p-6 bg-slate-50 border border-slate-200 rounded-xl"></div>
       </div>
     </div>
 
-    <!-- VISTA 4: FACTURACIÓN -->
+    <!-- VISTA 4: FACTURACIÓN (SIN GRÁFICA Y CON EDICIÓN DIRECTA DE MONTO) -->
     <div id="vista-facturacion" class="hidden space-y-6">
       <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <h2 class="text-lg font-bold text-slate-900 mb-1">🧾 Desglose y Pagos de Facturación</h2>
-        <p class="text-slate-500 text-xs mb-6">Registro de facturas PDF cargadas y cálculo automático de subtotales sin IVA.</p>
+        <p class="text-slate-500 text-xs mb-6">Registro de facturas PDF cargadas y subtotales sin IVA.</p>
 
         <div id="metricas-facturacion" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
 
-        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden mb-6">
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
           <div class="p-4 border-b border-slate-100 font-bold text-slate-800 text-sm">Facturas Procesadas</div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
@@ -237,21 +234,19 @@
                 <tr>
                   <th class="p-3">Archivo PDF</th>
                   <th class="p-3">Monto Sin IVA (Subtotal)</th>
-                  <th class="p-3 text-right">Acción</th>
+                  <th class="p-3 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-facturas-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
             </table>
           </div>
         </div>
-
-        <div id="grafica-facturacion" class="p-6 bg-slate-50 border border-slate-200 rounded-xl"></div>
       </div>
     </div>
 
   </main>
 
-  <!-- LÓGICA JAVASCRIPT CON MEMORIA GUARDADA -->
+  <!-- LÓGICA JAVASCRIPT -->
   <script>
     let marcaPrincipal = 'juguetimax';
     let subMarcaActual = 'Juguetimax';
@@ -259,12 +254,11 @@
     let mesActual = 'enero';
     let vistaActiva = 'descarga';
 
-    // Cargar desde localStorage si ya existen datos guardados
     let reportes = JSON.parse(localStorage.getItem('evolve_reportes_datos')) || {};
 
     function guardarEnMemoria() {
       localStorage.setItem('evolve_reportes_datos', JSON.stringify(reportes));
-      alert('¡Datos guardados correctamente! Permanecerán registrados aunque recargues la página.');
+      alert('¡Datos guardados correctamente!');
     }
 
     function obtenerEstructura() {
@@ -371,6 +365,7 @@
       const datosPeriodo = obtenerEstructura();
 
       const nuevoArchivo = {
+        id: Date.now(),
         nombre: file.name,
         url: blobUrl,
         filas: 0,
@@ -431,10 +426,12 @@
     function extraerMontoSinIVA(texto) {
       const textoLimpio = texto.replace(/\s+/g, ' ');
 
+      // Múltiples patrones para detectar Subtotal/Importe/Neto
       const patrones = [
         /Subtotal\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
         /Importe\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
-        /Base\s*Imponible\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i
+        /Base\s*Imponible\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
+        /Total\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i
       ];
 
       for (let patron of patrones) {
@@ -449,9 +446,21 @@
       return 0;
     }
 
+    function editarMontoFactura(idFactura) {
+      const datos = obtenerEstructura();
+      const factura = datos.facturacion.find(f => f.id === idFactura);
+      if (!factura) return;
+
+      const nuevoMonto = prompt(`Ingresa el Monto Sin IVA (Subtotal) para "${factura.nombre}":`, factura.montoSinIVA || '0.00');
+      if (nuevoMonto !== null) {
+        const valor = parseFloat(nuevoMonto.replace(/,/g, ''));
+        factura.montoSinIVA = isNaN(valor) ? 0 : valor;
+        actualizarPantalla();
+      }
+    }
+
     function renderFacturacionModulo(listaFacturas) {
       const contenedorMetricas = document.getElementById('metricas-facturacion');
-      const contenedorGrafica = document.getElementById('grafica-facturacion');
       const tablaBody = document.getElementById('tabla-facturas-body');
 
       const totalFacturas = listaFacturas.length;
@@ -487,41 +496,19 @@
           <tr class="hover:bg-slate-50">
             <td class="p-3 font-medium text-slate-800 text-xs">${f.nombre}</td>
             <td class="p-3 font-bold text-blue-600">${formatoMoneda.format(f.montoSinIVA || 0)}</td>
-            <td class="p-3 text-right">
+            <td class="p-3 text-right space-x-3">
+              <button onclick="editarMontoFactura(${f.id})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2 py-1 rounded-md transition-colors">
+                ✏️ Editar Monto
+              </button>
               <a href="${f.url || '#'}" target="_blank" download="${f.nombre}" class="text-xs text-blue-600 font-semibold hover:underline">Descargar ↗</a>
             </td>
           </tr>
         `).join('');
       }
-
-      if (totalFacturas === 0) {
-        contenedorGrafica.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">Sin datos financieros para mostrar en la gráfica.</div>`;
-      } else {
-        let maxMonto = Math.max(...listaFacturas.map(f => f.montoSinIVA || 1));
-        let barrasHTML = listaFacturas.map(f => {
-          let alturaPorcentaje = Math.min(Math.max(((f.montoSinIVA || 0) / maxMonto) * 100, 15), 100);
-          return `
-            <div class="flex flex-col items-center flex-1 max-w-[120px]">
-              <span class="text-[11px] font-bold text-blue-600 mb-1">${formatoMoneda.format(f.montoSinIVA || 0)}</span>
-              <div class="w-full bg-slate-200 rounded-t h-32 flex items-end p-1">
-                <div class="w-full bg-blue-600 rounded-t transition-all hover:bg-blue-500" style="height: ${alturaPorcentaje}%;"></div>
-              </div>
-              <span class="text-[10px] text-slate-500 truncate w-full text-center mt-2" title="${f.nombre}">${f.nombre}</span>
-            </div>
-          `;
-        }).join('');
-
-        contenedorGrafica.innerHTML = `
-          <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Gráfica de Montos Sin IVA por Factura</h3>
-          <div class="flex items-end justify-start gap-4 overflow-x-auto pb-2">${barrasHTML}</div>
-        `;
-      }
     }
 
     function renderModulo(categoria, listaArchivos) {
       const contenedorMetricas = document.getElementById(`metricas-${categoria}`);
-      const contenedorGrafica = document.getElementById(`grafica-${categoria}`);
-
       const totalArchivos = listaArchivos.length;
       let totalFilas = 0;
       listaArchivos.forEach(a => { totalFilas += (a.filas || 0); });
@@ -540,28 +527,6 @@
           <p class="text-2xl font-bold text-emerald-600 mt-1">${totalArchivos > 0 ? 'Sincronizado' : 'Sin datos'}</p>
         </div>
       `;
-
-      if (totalArchivos === 0) {
-        contenedorGrafica.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No hay archivos guardados para este periodo.</div>`;
-      } else {
-        let barrasHTML = listaArchivos.map(arch => {
-          const alturaPorcentaje = Math.min(Math.max((arch.filas || 10) * 5, 15), 100);
-          return `
-            <div class="flex flex-col items-center flex-1 max-w-[100px]">
-              <span class="text-xs font-bold text-blue-600 mb-1">${arch.filas || 'PDF'} reg</span>
-              <div class="w-full bg-slate-200 rounded-t h-32 flex items-end p-1">
-                <div class="w-full bg-blue-600 rounded-t transition-all hover:bg-blue-500" style="height: ${alturaPorcentaje}%;"></div>
-              </div>
-              <span class="text-[10px] text-slate-500 truncate w-full text-center mt-2" title="${arch.nombre}">${arch.nombre}</span>
-            </div>
-          `;
-        }).join('');
-
-        contenedorGrafica.innerHTML = `
-          <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Gráfica Comparativa de Archivos</h3>
-          <div class="flex items-end justify-start gap-4 overflow-x-auto pb-2">${barrasHTML}</div>
-        `;
-      }
     }
 
     actualizarPantalla();
