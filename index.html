@@ -300,14 +300,14 @@
 
       const datos = obtenerEstructura();
 
-      renderLista('lista-cobertura', datos.cobertura);
-      renderLista('lista-facturacion', datos.facturacion);
+      renderLista('lista-cobertura', datos.cobertura, 'cobertura');
+      renderLista('lista-facturacion', datos.facturacion, 'facturacion');
 
       renderModulo('cobertura', datos.cobertura);
       renderFacturacionModulo(datos.facturacion);
     }
 
-    function renderLista(elementId, items) {
+    function renderLista(elementId, items, categoria) {
       const container = document.getElementById(elementId);
       if (!items || items.length === 0) {
         container.innerHTML = `<li class="text-slate-400 text-xs italic">Sin archivos guardados</li>`;
@@ -315,12 +315,25 @@
       }
       container.innerHTML = items.map(item => `
         <li class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
-          <span class="truncate pr-2 text-slate-700 text-xs font-medium">${item.nombre}</span>
-          <a href="${item.url || '#'}" target="_blank" download="${item.nombre}" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold px-2 py-1 rounded-lg transition-colors">
-            Descargar ↗
-          </a>
+          <span class="truncate pr-2 text-slate-700 text-xs font-medium" title="${item.nombre}">${item.nombre}</span>
+          <div class="flex items-center space-x-2 shrink-0">
+            <a href="${item.url || '#'}" target="_blank" download="${item.nombre}" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold px-2 py-1 rounded-lg transition-colors">
+              Descargar ↗
+            </a>
+            <button onclick="eliminarArchivo('${categoria}', ${item.id})" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-2 py-1 rounded-lg transition-colors border border-rose-100">
+              🗑️ Eliminar
+            </button>
+          </div>
         </li>
       `).join('');
+    }
+
+    function eliminarArchivo(categoria, id) {
+      const datos = obtenerEstructura();
+      if (confirm('¿Estás seguro de que deseas eliminar este archivo?')) {
+        datos[categoria] = datos[categoria].filter(item => item.id !== id);
+        actualizarPantalla();
+      }
     }
 
     async function subirYProcesarArchivo(event, categoria) {
@@ -406,6 +419,9 @@
           alert('Para Reportes de Cobertura solo se permiten archivos Excel (.xlsx, .xls, .csv).');
         }
       }
+
+      // Limpiar input
+      event.target.value = '';
     }
 
     function editarMontoFactura(idFactura) {
@@ -458,11 +474,14 @@
           <tr class="hover:bg-slate-50">
             <td class="p-3 font-medium text-slate-800 text-xs">${f.nombre}</td>
             <td class="p-3 font-bold text-blue-600">${formatoMoneda.format(f.montoSinIVA || 0)}</td>
-            <td class="p-3 text-right space-x-3">
+            <td class="p-3 text-right space-x-2">
               <button onclick="editarMontoFactura(${f.id})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2 py-1 rounded-md transition-colors">
                 ✏️ Editar Monto
               </button>
               <a href="${f.url || '#'}" target="_blank" download="${f.nombre}" class="text-xs text-blue-600 font-semibold hover:underline">Descargar ↗</a>
+              <button onclick="eliminarArchivo('facturacion', ${f.id})" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-2 py-1 rounded-md transition-colors border border-rose-100">
+                🗑️ Eliminar
+              </button>
             </td>
           </tr>
         `).join('');
