@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Evolve - Portal de Reportes</title>
+  <title>Evolve - Agencia de Promotoría</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Librería para procesar Excel / CSV -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -33,16 +33,34 @@
     window.deleteDoc = deleteDoc;
     window.doc = doc;
   </script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.15);
+    }
+    .glow-accent {
+      background: linear-gradient(135deg, #0091FF 0%, #7C3AED 100%);
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex font-sans">
+<body class="bg-[#0B0F19] text-slate-100 min-h-screen flex font-sans antialiased selection:bg-cyan-500 selection:text-white">
 
-  <!-- ================= BARRA LATERAL (SIDEBAR IZQUIERDO) ================= -->
-  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 min-h-screen">
+  <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
+  <aside class="w-72 bg-[#0F172A]/90 border-r border-slate-800/80 flex flex-col justify-between shrink-0 min-h-screen z-20">
     <div>
-      <!-- LOGO NUEVO Y TÍTULO DE MARCA -->
-      <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
-        <div class="w-9 h-9 shrink-0 flex items-center justify-center">
-          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-sm">
+      <!-- LOGO Y BRANDING -->
+      <div class="p-6 border-b border-slate-800/80 flex items-center space-x-3.5">
+        <div class="w-10 h-10 shrink-0 flex items-center justify-center relative">
+          <div class="absolute inset-0 bg-cyan-500/20 rounded-full blur-md"></div>
+          <svg viewBox="0 0 100 100" class="w-full h-full relative z-10">
             <circle cx="50" cy="50" r="48" fill="#0091FF" />
             <g fill="#FFFFFF">
               <path d="M 28 35 C 28 33 29 32 31 31 L 52 22 C 54 21 56 22 55 24 L 29 44 C 28 45 28 44 28 42 Z" />
@@ -52,67 +70,75 @@
           </svg>
         </div>
         <div>
-          <h1 class="font-bold text-slate-900 text-lg leading-tight">Evolve</h1>
-          <p class="text-[10px] uppercase font-bold tracking-wider text-slate-400">JUGUETIMAX · MULTIMARCA</p>
+          <div class="flex items-center space-x-2">
+            <h1 class="font-extrabold text-white text-xl tracking-tight">Evolve</h1>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE</span>
+          </div>
+          <p class="text-[10px] font-bold tracking-widest text-cyan-400 uppercase">Agencia de Promotoría</p>
         </div>
       </div>
 
+      <!-- NAVEGACIÓN PRINCIPAL -->
       <nav class="p-4 space-y-6">
         <div>
-          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">GENERAL</p>
-          <button onclick="cambiarVista('descarga')" id="nav-descarga" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-blue-600 bg-blue-50 transition-all">
-            <span>📥 Descarga de Docs</span>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-3">PANEL GENERAL</p>
+          <button onclick="cambiarVista('descarga')" id="nav-descarga" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <span>Descarga de Docs</span>
           </button>
         </div>
         <div>
-          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">OPERACIÓN</p>
-          <button onclick="cambiarVista('cobertura')" id="nav-cobertura" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 transition-all">
-            <span>📊 Cobertura</span>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-3">INTELIGENCIA DE CAMPO</p>
+          <button onclick="cambiarVista('cobertura')" id="nav-cobertura" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span>Cobertura y Análisis</span>
           </button>
         </div>
         <div>
-          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">FINANZAS</p>
-          <button onclick="cambiarVista('facturacion')" id="nav-facturacion" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 transition-all">
-            <span>🧾 Pagos y facturación</span>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-3">ADMINISTRACIÓN</p>
+          <button onclick="cambiarVista('facturacion')" id="nav-facturacion" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            <span>Pagos y Facturación</span>
           </button>
         </div>
       </nav>
     </div>
 
-    <!-- SELECCIÓN DE LAS 3 CUENTAS -->
-    <div class="p-4 border-t border-slate-100 bg-slate-50">
-      <p class="text-[11px] text-slate-400 font-bold uppercase mb-2">SELECCIÓN DE MARCA</p>
-      <div class="flex flex-col gap-1 rounded-lg bg-slate-200 p-1">
-        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all text-center">
+    <!-- SELECCIÓN DE CUENTA / MARCA -->
+    <div class="p-4 border-t border-slate-800/80 bg-[#0B0F19]/50">
+      <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2.5">SELECCIÓN DE CUENTA</p>
+      <div class="flex flex-col gap-1.5 rounded-xl bg-slate-900/90 p-1.5 border border-slate-800">
+        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="py-2 text-xs font-bold rounded-lg bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 transition-all text-center">
           Juguetimax (Fijo)
         </button>
-        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all text-center">
+        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all text-center">
           Multimarca
         </button>
-        <button id="btn-promotoria" onclick="cambiarMarca('promotoria')" class="py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all text-center">
-          Promotoría por visita
+        <button id="btn-promotoria" onclick="cambiarMarca('promotoria')" class="py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all text-center">
+          Promotoría por Visita
         </button>
       </div>
     </div>
   </aside>
 
   <!-- ================= ÁREA PRINCIPAL ================= -->
-  <main class="flex-1 p-8 space-y-6 overflow-y-auto">
+  <main class="flex-1 p-8 space-y-8 overflow-y-auto">
     
-    <!-- BARRA DE FILTROS -->
-    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center space-x-2 text-slate-700 font-semibold text-base">
-        <span>Filtro activo:</span>
-        <span id="label-filtro" class="uppercase tracking-wide text-blue-700 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100 text-xs font-bold">
+    <!-- BARRA DE FILTROS HIGH-TECH -->
+    <div class="glass-card p-5 rounded-2xl shadow-2xl flex flex-wrap items-center justify-between gap-4 relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="flex items-center space-x-3">
+        <span class="text-slate-400 font-medium text-sm">Filtro Activo:</span>
+        <span id="label-filtro" class="uppercase tracking-wider text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-inner">
           JUGUETIMAX (FIJO) | 2026 - ENERO
         </span>
       </div>
 
       <div class="flex items-center gap-3 flex-wrap">
-        <!-- SELECTOR DE SUB-MARCA (VISIBLE EN MULTIMARCA Y PROMOTORÍA POR VISITA) -->
         <div id="contenedor-submarca" class="hidden flex items-center space-x-2">
           <label for="select-submarca" class="text-xs font-bold text-slate-400 uppercase">Sub-Marca:</label>
-          <select id="select-submarca" onchange="escucharCambiosNube()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200">
+          <select id="select-submarca" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
             <option value="Juguetimax por visita">Juguetimax por visita</option>
             <option value="Moose Toys">Moose Toys</option>
             <option value="Just Play">Just Play</option>
@@ -127,7 +153,7 @@
 
         <div class="flex items-center space-x-2">
           <label for="select-anio" class="text-xs font-bold text-slate-400 uppercase">Año:</label>
-          <select id="select-anio" onchange="escucharCambiosNube()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200">
+          <select id="select-anio" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
             <option value="2026">2026</option>
             <option value="2025">2025</option>
             <option value="2024">2024</option>
@@ -136,7 +162,7 @@
 
         <div class="flex items-center space-x-2">
           <label for="select-mes" class="text-xs font-bold text-slate-400 uppercase">Mes:</label>
-          <select id="select-mes" onchange="escucharCambiosNube()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200">
+          <select id="select-mes" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
             <option value="enero">Enero</option>
             <option value="febrero">Febrero</option>
             <option value="marzo">Marzo</option>
@@ -158,57 +184,81 @@
     <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-2 gap-6">
       
       <!-- 1. Cobertura -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+      <div class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
         <div>
-          <h2 class="font-bold text-slate-900 mb-1">📊 Reportes de Cobertura</h2>
-          <p class="text-slate-500 text-xs mb-4">Archivos de inventario regional (Solo Excel).</p>
-          <ul id="lista-cobertura" class="space-y-2 text-sm mb-4"></ul>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h2 class="font-bold text-white text-lg">Reportes de Cobertura</h2>
+          </div>
+          <p class="text-slate-400 text-xs mb-5">Archivos de inventario y disponibilidad en PDV (Excel/CSV).</p>
+          <ul id="lista-cobertura" class="space-y-2.5 text-xs mb-6"></ul>
         </div>
         
-        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center transition-colors">
-          <span>➕ Subir Excel (.xlsx / .xls / .csv)</span>
+        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-cyan-400 hover:text-cyan-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-cyan-500/50 flex items-center justify-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Excel (.xlsx / .xls / .csv)</span>
           <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'cobertura')">
         </label>
       </div>
 
       <!-- 2. Facturación -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+      <div class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
         <div>
-          <h2 class="font-bold text-slate-900 mb-1">🧾 Facturación</h2>
-          <p class="text-slate-500 text-xs mb-4">Facturas públicas en formato XML o Excel.</p>
-          <ul id="lista-facturacion" class="space-y-2 text-sm mb-4"></ul>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h2 class="font-bold text-white text-lg">Facturación</h2>
+          </div>
+          <p class="text-slate-400 text-xs mb-5">Facturas electrónicas y comprobantes públicos (XML/Excel).</p>
+          <ul id="lista-facturacion" class="space-y-2.5 text-xs mb-6"></ul>
         </div>
 
-        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center transition-colors">
-          <span>📄 Subir Factura (XML / Excel)</span>
+        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-purple-400 hover:text-purple-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-purple-500/50 flex items-center justify-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Factura (XML / Excel)</span>
           <input type="file" accept=".xml, .xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'facturacion')">
         </label>
       </div>
 
       <!-- 3. Bonos Mensuales -->
-      <div id="card-bonos" class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+      <div id="card-bonos" class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
         <div>
-          <h2 class="font-bold text-slate-900 mb-1">🎁 Bonos Mensuales</h2>
-          <p class="text-slate-500 text-xs mb-4">Archivos y reportes de incentivos y bonos.</p>
-          <ul id="lista-bonos" class="space-y-2 text-sm mb-4"></ul>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h2 class="font-bold text-white text-lg">Bonos Mensuales</h2>
+          </div>
+          <p class="text-slate-400 text-xs mb-5">Reportes de incentivos y métricas de desempeño.</p>
+          <ul id="lista-bonos" class="space-y-2.5 text-xs mb-6"></ul>
         </div>
 
-        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center transition-colors">
-          <span>📁 Subir Archivo de Bonos</span>
+        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-amber-500/50 flex items-center justify-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Archivo de Bonos</span>
           <input type="file" class="hidden" onchange="subirArchivoNube(event, 'bonos')">
         </label>
       </div>
 
       <!-- 4. Plan de Trabajo -->
-      <div id="card-plan" class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+      <div id="card-plan" class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
         <div>
-          <h2 class="font-bold text-slate-900 mb-1">📅 Plan de Trabajo</h2>
-          <p class="text-slate-500 text-xs mb-4">Cronogramas y planes operativos mensuales.</p>
-          <ul id="lista-plan" class="space-y-2 text-sm mb-4"></ul>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            </div>
+            <h2 class="font-bold text-white text-lg">Plan de Trabajo</h2>
+          </div>
+          <p class="text-slate-400 text-xs mb-5">Cronogramas de ruta y planes operativos de promotores.</p>
+          <ul id="lista-plan" class="space-y-2.5 text-xs mb-6"></ul>
         </div>
 
-        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center transition-colors">
-          <span>📋 Subir Plan de Trabajo</span>
+        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-emerald-400 hover:text-emerald-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Plan de Trabajo</span>
           <input type="file" class="hidden" onchange="subirArchivoNube(event, 'plan')">
         </label>
       </div>
@@ -217,30 +267,32 @@
 
     <!-- VISTA 2: COBERTURA -->
     <div id="vista-cobertura" class="hidden space-y-6">
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-        <h2 class="text-lg font-bold text-slate-900 mb-1">📊 Analítica de Cobertura</h2>
+      <div class="glass-card rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-white mb-1">📊 Analítica de Cobertura</h2>
+        <p class="text-slate-400 text-xs mb-6">Resumen operativo generado automáticamente desde la nube.</p>
         <div id="metricas-cobertura" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
       </div>
     </div>
 
     <!-- VISTA 3: FACTURACIÓN -->
     <div id="vista-facturacion" class="hidden space-y-6">
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-        <h2 class="text-lg font-bold text-slate-900 mb-1">🧾 Desglose y Pagos de Facturación</h2>
+      <div class="glass-card rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-white mb-1">🧾 Desglose y Pagos de Facturación</h2>
+        <p class="text-slate-400 text-xs mb-6">Auditoría financiera y subtotal de CFDI cargados.</p>
         <div id="metricas-facturacion" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
 
-        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-          <div class="p-4 border-b border-slate-100 font-bold text-slate-800 text-sm">Facturas Registradas en la Nube</div>
+        <div class="glass-card rounded-xl overflow-hidden border border-slate-800">
+          <div class="p-4 border-b border-slate-800 font-bold text-slate-200 text-sm bg-slate-900/50">Facturas Registradas en la Nube</div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-              <thead class="bg-slate-50 text-slate-400 text-xs font-bold uppercase border-b border-slate-100">
+              <thead class="bg-slate-900/80 text-slate-400 text-xs font-bold uppercase border-b border-slate-800">
                 <tr>
-                  <th class="p-3">Archivo Factura</th>
-                  <th class="p-3">Monto Sin IVA (Subtotal)</th>
-                  <th class="p-3 text-right">Acciones</th>
+                  <th class="p-3.5">Archivo Factura</th>
+                  <th class="p-3.5">Monto Sin IVA (Subtotal)</th>
+                  <th class="p-3.5 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody id="tabla-facturas-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+              <tbody id="tabla-facturas-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
             </table>
           </div>
         </div>
@@ -263,14 +315,13 @@
       const btnM = document.getElementById('btn-multimarca');
       const btnP = document.getElementById('btn-promotoria');
 
-      const estiloActivo = "py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all text-center";
-      const estiloInactivo = "py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all text-center";
+      const estiloActivo = "py-2 text-xs font-bold rounded-lg bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 transition-all text-center";
+      const estiloInactivo = "py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all text-center";
 
       btnJ.className = (marca === 'juguetimax') ? estiloActivo : estiloInactivo;
       btnM.className = (marca === 'multimarca') ? estiloActivo : estiloInactivo;
       btnP.className = (marca === 'promotoria') ? estiloActivo : estiloInactivo;
 
-      // El selector de Sub-Marca se muestra tanto en Multimarca como en Promotoría por Visita
       document.getElementById('contenedor-submarca').classList.toggle('hidden', marca === 'juguetimax');
       
       escucharCambiosNube();
@@ -361,8 +412,8 @@
     }
 
     function renderizarListaHTML(archivos) {
-      if (archivos.length === 0) return '<li class="text-slate-400 text-xs italic">Sin archivos guardados</li>';
-      return archivos.map(a => `<li class="flex justify-between items-center p-2 bg-slate-50 border rounded-xl text-xs"><span class="truncate pr-2">${a.nombre}</span><button onclick="eliminarArchivoNube('${a.idDoc}')" class="text-rose-600 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">🗑️ Eliminar</button></li>`).join('');
+      if (archivos.length === 0) return '<li class="text-slate-500 text-xs italic">Sin archivos guardados</li>';
+      return archivos.map(a => `<li class="flex justify-between items-center p-2.5 bg-slate-900/80 border border-slate-800 rounded-xl text-xs text-slate-300"><span class="truncate pr-2">${a.nombre}</span><button onclick="eliminarArchivoNube('${a.idDoc}')" class="text-rose-400 hover:text-rose-300 font-bold px-2 py-1 bg-rose-500/10 rounded-lg shrink-0 transition-colors">🗑️ Eliminar</button></li>`).join('');
     }
 
     function renderizarPantalla(archivos) {
@@ -381,12 +432,12 @@
       facturacion.forEach(f => totalMonto += f.montoSinIVA);
 
       document.getElementById('metricas-facturacion').innerHTML = `
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">Archivos Cargados</p><p class="text-2xl font-bold mt-1">${facturacion.length}</p></div>
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">Monto Total Sin IVA</p><p class="text-2xl font-bold text-blue-600 mt-1">${formatoMoneda.format(totalMonto)}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Archivos Cargados</p><p class="text-2xl font-bold text-white mt-1">${facturacion.length}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Monto Total Sin IVA</p><p class="text-2xl font-bold text-cyan-400 mt-1">${formatoMoneda.format(totalMonto)}</p></div>
       `;
 
-      document.getElementById('tabla-facturas-body').innerHTML = facturacion.length === 0 ? '<tr><td colspan="3" class="p-4 text-center text-slate-400 text-xs">Sin facturas registradas</td></tr>' :
-        facturacion.map(f => `<tr class="hover:bg-slate-50"><td class="p-3 text-xs font-medium">${f.nombre}</td><td class="p-3 font-bold text-blue-600">${formatoMoneda.format(f.montoSinIVA)}</td><td class="p-3 text-right"><button onclick="eliminarArchivoNube('${f.idDoc}')" class="text-rose-600 font-bold text-xs bg-rose-50 px-2 py-1 rounded-lg">🗑️ Eliminar</button></td></tr>`).join('');
+      document.getElementById('tabla-facturas-body').innerHTML = facturacion.length === 0 ? '<tr><td colspan="3" class="p-4 text-center text-slate-500 text-xs italic">Sin facturas registradas en este periodo</td></tr>' :
+        facturacion.map(f => `<tr class="hover:bg-slate-800/40 transition-colors"><td class="p-3.5 text-xs font-medium text-slate-200">${f.nombre}</td><td class="p-3.5 font-bold text-cyan-400">${formatoMoneda.format(f.montoSinIVA)}</td><td class="p-3.5 text-right"><button onclick="eliminarArchivoNube('${f.idDoc}')" class="text-rose-400 hover:text-rose-300 font-bold text-xs bg-rose-500/10 px-2.5 py-1 rounded-lg transition-colors">🗑️ Eliminar</button></td></tr>`).join('');
     }
 
     setTimeout(() => { cambiarMarca('juguetimax'); }, 800);
