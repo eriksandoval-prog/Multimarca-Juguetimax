@@ -8,12 +8,11 @@
   <!-- Librería para procesar Excel / CSV -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- CONEXIÓN DIRECTA Y REAL CON TU PROYECTO DE FIREBASE -->
+  <!-- CONEXIÓN DIRECTA CON FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Tus claves reales de Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBXddmuE57qC-UvunpYzft8rxHo12hvJfY",
       authDomain: "juguetimax---multimarca.firebaseapp.com",
@@ -27,7 +26,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Exportar variables al ámbito global del navegador
     window.db = db;
     window.addDoc = addDoc;
     window.collection = collection;
@@ -100,7 +98,7 @@
         <div id="contenedor-submarca" class="hidden flex items-center space-x-2">
           <label for="select-submarca" class="text-xs font-bold text-slate-400 uppercase">Sub-Marca:</label>
           <select id="select-submarca" onchange="escucharCambiosNube()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200">
-            <option value="Juguetimax">Juguetimax</option>
+            <option value="Juguetimax por visita">Juguetimax por visita</option>
             <option value="Moose Toys">Moose Toys</option>
             <option value="Just Play">Just Play</option>
             <option value="Clarios">Clarios</option>
@@ -206,7 +204,7 @@
 
   <script>
     let marcaPrincipal = 'juguetimax';
-    let subMarcaActual = 'Juguetimax';
+    let subMarcaActual = 'Juguetimax por visita';
     let anioActual = '2026';
     let mesActual = 'enero';
     let unsubscribe = null;
@@ -223,14 +221,28 @@
       });
     }
 
+    // Clave interna única para distinguir la sub-marca de Multimarca
+    function obtenerClaveMarcaActiva() {
+      if (marcaPrincipal === 'juguetimax') {
+        return 'Juguetimax-Fijo';
+      } else {
+        return `Multimarca-${subMarcaActual}`;
+      }
+    }
+
     // Escucha en tiempo real de Firebase
     function escucharCambiosNube() {
       anioActual = document.getElementById('select-anio').value;
       mesActual = document.getElementById('select-mes').value;
       subMarcaActual = document.getElementById('select-submarca').value;
 
-      const claveMarca = (marcaPrincipal === 'multimarca') ? subMarcaActual : 'Juguetimax';
-      document.getElementById('label-filtro').innerText = `${claveMarca.toUpperCase()} | ${anioActual} - ${mesActual}`;
+      const claveMarca = obtenerClaveMarcaActiva();
+      
+      const textoLabel = (marcaPrincipal === 'multimarca') 
+        ? `MULTIMARCA (${subMarcaActual.toUpperCase()}) | ${anioActual} - ${mesActual}`
+        : `JUGUETIMAX (FIJO) | ${anioActual} - ${mesActual}`;
+        
+      document.getElementById('label-filtro').innerText = textoLabel;
 
       if (unsubscribe) unsubscribe();
 
@@ -253,7 +265,7 @@
       const file = event.target.files[0];
       if (!file) return;
 
-      const claveMarca = (marcaPrincipal === 'multimarca') ? subMarcaActual : 'Juguetimax';
+      const claveMarca = obtenerClaveMarcaActiva();
       const extension = file.name.split('.').pop().toLowerCase();
       let montoSubtotal = 0;
 
