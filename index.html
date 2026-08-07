@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Evolve - Portal de Reportes</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Librería para procesar Excel -->
+  <!-- Librería para procesar Excel / CSV / HTML -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Librería para lectura de texto en PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -162,8 +162,8 @@
         </div>
         
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>➕ Seleccionar Excel / PDF</span>
-          <input type="file" accept=".pdf, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
+          <span>➕ Seleccionar Excel / PDF / HTML</span>
+          <input type="file" accept=".pdf, .xls, .xlsx, .csv, .html, .htm" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
         </label>
       </div>
 
@@ -178,8 +178,8 @@
         </div>
 
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>➕ Seleccionar Excel / PDF</span>
-          <input type="file" accept=".pdf, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'soportes')">
+          <span>➕ Seleccionar Excel / PDF / HTML</span>
+          <input type="file" accept=".pdf, .xls, .xlsx, .csv, .html, .htm" class="hidden" onchange="subirYProcesarArchivo(event, 'soportes')">
         </label>
       </div>
 
@@ -189,13 +189,13 @@
             <span class="p-2.5 bg-purple-50 text-purple-600 rounded-xl text-xl">🧾</span>
             <h2 class="font-bold text-slate-900">Facturación</h2>
           </div>
-          <p class="text-slate-500 text-xs mb-4">Facturas emitidas en formato PDF.</p>
+          <p class="text-slate-500 text-xs mb-4">Facturas en formato PDF, HTML o Excel.</p>
           <ul id="lista-facturacion" class="space-y-2 text-sm mb-4"></ul>
         </div>
 
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>📄 Seleccionar Factura PDF</span>
-          <input type="file" accept=".pdf" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
+          <span>📄 Subir Factura (PDF / HTML / Excel)</span>
+          <input type="file" accept=".pdf, .html, .htm, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
         </label>
       </div>
     </div>
@@ -218,11 +218,11 @@
       </div>
     </div>
 
-    <!-- VISTA 4: FACTURACIÓN (SIN GRÁFICA Y CON EDICIÓN DIRECTA DE MONTO) -->
+    <!-- VISTA 4: FACTURACIÓN -->
     <div id="vista-facturacion" class="hidden space-y-6">
       <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <h2 class="text-lg font-bold text-slate-900 mb-1">🧾 Desglose y Pagos de Facturación</h2>
-        <p class="text-slate-500 text-xs mb-6">Registro de facturas PDF cargadas y subtotales sin IVA.</p>
+        <p class="text-slate-500 text-xs mb-6">Registro de facturas cargadas y subtotales sin IVA.</p>
 
         <div id="metricas-facturacion" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
 
@@ -232,7 +232,7 @@
             <table class="w-full text-left text-sm">
               <thead class="bg-slate-50 text-slate-400 text-xs font-bold uppercase border-b border-slate-100">
                 <tr>
-                  <th class="p-3">Archivo PDF</th>
+                  <th class="p-3">Archivo Factura</th>
                   <th class="p-3">Monto Sin IVA (Subtotal)</th>
                   <th class="p-3 text-right">Acciones</th>
                 </tr>
@@ -372,33 +372,42 @@
         montoSinIVA: 0
       };
 
+      const extension = file.name.split('.').pop().toLowerCase();
+
       if (categoria === 'facturacion') {
-        if (!file.name.toLowerCase().endsWith('.pdf')) {
-          alert('Selecciona únicamente archivos PDF para Facturación.');
-          return;
-        }
+        // Procesar HTML
+        if (extension === 'html' || extension === 'htm') {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const textoHTML = e.target.result;
+            nuevoArchivo.montoSinIVA = extraerMontoSinIVA(textoHTML);
+            datosPeriodo.facturacion.push(nuevoArchivo);
+            actualizarPantalla();
+          };
+          reader.readAsText(file);
+        } 
+        // Procesar PDF
+        else if (extension === 'pdf') {
+          try {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let textoCompleto = '';
 
-        try {
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          let textoCompleto = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const textContent = await page.getTextContent();
+              textoCompleto += textContent.items.map(item => item.str).join(' ') + ' ';
+            }
 
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            textoCompleto += textContent.items.map(item => item.str).join(' ') + ' ';
+            nuevoArchivo.montoSinIVA = extraerMontoSinIVA(textoCompleto);
+          } catch (e) {
+            console.error('Error procesando el PDF:', e);
           }
-
-          nuevoArchivo.montoSinIVA = extraerMontoSinIVA(textoCompleto);
-        } catch (e) {
-          console.error('Error procesando el PDF:', e);
-        }
-
-        datosPeriodo.facturacion.push(nuevoArchivo);
-        actualizarPantalla();
-
-      } else {
-        if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')) {
+          datosPeriodo.facturacion.push(nuevoArchivo);
+          actualizarPantalla();
+        } 
+        // Procesar Excel o CSV
+        else if (['xlsx', 'xls', 'csv'].includes(extension)) {
           const reader = new FileReader();
           reader.onload = function(e) {
             try {
@@ -408,12 +417,43 @@
               const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
               nuevoArchivo.filas = json.length;
-              datosPeriodo[categoria].push(nuevoArchivo);
-              actualizarPantalla();
-            } catch (err) {
-              datosPeriodo[categoria].push(nuevoArchivo);
-              actualizarPantalla();
-            }
+              // Intentar buscar columna Subtotal o Monto
+              if (json.length > 0) {
+                let suma = 0;
+                json.forEach(row => {
+                  for (let key in row) {
+                    if (/subtotal|importe|monto|neto/i.test(key)) {
+                      let val = parseFloat(String(row[key]).replace(/,/g, ''));
+                      if (!isNaN(val)) suma += val;
+                    }
+                  }
+                });
+                nuevoArchivo.montoSinIVA = suma;
+              }
+            } catch (err) {}
+            datosPeriodo.facturacion.push(nuevoArchivo);
+            actualizarPantalla();
+          };
+          reader.readAsArrayBuffer(file);
+        } else {
+          datosPeriodo.facturacion.push(nuevoArchivo);
+          actualizarPantalla();
+        }
+
+      } else {
+        if (['xlsx', 'xls', 'csv'].includes(extension)) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const workbook = XLSX.read(data, { type: 'array' });
+              const sheetName = workbook.SheetNames[0];
+              const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+              nuevoArchivo.filas = json.length;
+            } catch (err) {}
+            datosPeriodo[categoria].push(nuevoArchivo);
+            actualizarPantalla();
           };
           reader.readAsArrayBuffer(file);
         } else {
@@ -424,9 +464,9 @@
     }
 
     function extraerMontoSinIVA(texto) {
-      const textoLimpio = texto.replace(/\s+/g, ' ');
+      // Remover etiquetas HTML si es un archivo .html para analizar el texto puro
+      const textoLimpio = texto.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
 
-      // Múltiples patrones para detectar Subtotal/Importe/Neto
       const patrones = [
         /Subtotal\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
         /Importe\s*[:\$]?\s*([\d{1,3}(?:,\d{3})*]+(?:\.\d{2})?)/i,
@@ -472,7 +512,7 @@
 
       contenedorMetricas.innerHTML = `
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-          <p class="text-xs text-slate-400 uppercase font-bold">Facturas PDF Cargadas</p>
+          <p class="text-xs text-slate-400 uppercase font-bold">Facturas Cargadas</p>
           <p class="text-2xl font-bold text-slate-800 mt-1">${totalFacturas}</p>
         </div>
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
@@ -488,7 +528,7 @@
       if (totalFacturas === 0) {
         tablaBody.innerHTML = `
           <tr>
-            <td colspan="3" class="p-4 text-center text-slate-400 italic text-xs">No hay facturas PDF registradas para este periodo.</td>
+            <td colspan="3" class="p-4 text-center text-slate-400 italic text-xs">No hay facturas registradas para este periodo.</td>
           </tr>
         `;
       } else {
