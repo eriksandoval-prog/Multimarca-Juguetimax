@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Evolve - Portal de Reportes</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Librería para procesar Excel / CSV / HTML -->
+  <!-- Librería para procesar Excel / CSV -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Librería para lectura de texto en PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -162,8 +162,8 @@
         </div>
         
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>➕ Seleccionar Excel / PDF / HTML</span>
-          <input type="file" accept=".pdf, .xls, .xlsx, .csv, .html, .htm" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
+          <span>➕ Seleccionar Excel / PDF / XML</span>
+          <input type="file" accept=".pdf, .xls, .xlsx, .csv, .html, .htm, .xml" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
         </label>
       </div>
 
@@ -178,8 +178,8 @@
         </div>
 
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>➕ Seleccionar Excel / PDF / HTML</span>
-          <input type="file" accept=".pdf, .xls, .xlsx, .csv, .html, .htm" class="hidden" onchange="subirYProcesarArchivo(event, 'soportes')">
+          <span>➕ Seleccionar Excel / PDF / XML</span>
+          <input type="file" accept=".pdf, .xls, .xlsx, .csv, .html, .htm, .xml" class="hidden" onchange="subirYProcesarArchivo(event, 'soportes')">
         </label>
       </div>
 
@@ -189,13 +189,13 @@
             <span class="p-2.5 bg-purple-50 text-purple-600 rounded-xl text-xl">🧾</span>
             <h2 class="font-bold text-slate-900">Facturación</h2>
           </div>
-          <p class="text-slate-500 text-xs mb-4">Facturas en formato PDF, HTML o Excel.</p>
+          <p class="text-slate-500 text-xs mb-4">Facturas en formato XML, PDF, HTML o Excel.</p>
           <ul id="lista-facturacion" class="space-y-2 text-sm mb-4"></ul>
         </div>
 
         <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
-          <span>📄 Subir Factura (PDF / HTML / Excel)</span>
-          <input type="file" accept=".pdf, .html, .htm, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
+          <span>📄 Subir Factura (XML / PDF / HTML)</span>
+          <input type="file" accept=".xml, .pdf, .html, .htm, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
         </label>
       </div>
     </div>
@@ -375,8 +375,24 @@
       const extension = file.name.split('.').pop().toLowerCase();
 
       if (categoria === 'facturacion') {
+        // Procesar XML CFDI (SAT)
+        if (extension === 'xml') {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const textoXML = e.target.result;
+            const coincidencia = textoXML.match(/SubTotal=["']([\d.]+)\b["']/i);
+            if (coincidencia && coincidencia[1]) {
+              nuevoArchivo.montoSinIVA = parseFloat(coincidencia[1]);
+            } else {
+              nuevoArchivo.montoSinIVA = extraerMontoSinIVA(textoXML);
+            }
+            datosPeriodo.facturacion.push(nuevoArchivo);
+            actualizarPantalla();
+          };
+          reader.readAsText(file);
+        }
         // Procesar HTML
-        if (extension === 'html' || extension === 'htm') {
+        else if (extension === 'html' || extension === 'htm') {
           const reader = new FileReader();
           reader.onload = function(e) {
             const textoHTML = e.target.result;
@@ -406,7 +422,7 @@
           datosPeriodo.facturacion.push(nuevoArchivo);
           actualizarPantalla();
         } 
-        // Procesar Excel o CSV
+        // Procesar Excel / CSV
         else if (['xlsx', 'xls', 'csv'].includes(extension)) {
           const reader = new FileReader();
           reader.onload = function(e) {
@@ -417,7 +433,6 @@
               const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
               nuevoArchivo.filas = json.length;
-              // Intentar buscar columna Subtotal o Monto
               if (json.length > 0) {
                 let suma = 0;
                 json.forEach(row => {
@@ -464,7 +479,6 @@
     }
 
     function extraerMontoSinIVA(texto) {
-      // Remover etiquetas HTML si es un archivo .html para analizar el texto puro
       const textoLimpio = texto.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
 
       const patrones = [
