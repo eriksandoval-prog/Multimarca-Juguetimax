@@ -7,86 +7,82 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Librería para procesar Excel / CSV -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  
-  <!-- CONEXIÓN AUTOMÁTICA CON FIREBASE NUBE -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // ⚠️ REEMPLAZA ESTAS CLAVES CON LAS DE TU PROYECTO DE FIREBASE
-    const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_PROJECT_ID.firebaseapp.com",
-      projectId: "TU_PROJECT_ID",
-      storageBucket: "TU_PROJECT_ID.appspot.com",
-      messagingSenderId: "TU_SENDER_ID",
-      appId: "TU_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Variables de control globales
-    window.db = db;
-    window.addDoc = addDoc;
-    window.collection = collection;
-    window.onSnapshot = onSnapshot;
-    window.deleteDoc = deleteDoc;
-    window.doc = doc;
-  </script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex font-sans">
 
   <!-- ================= BARRA LATERAL (SIDEBAR IZQUIERDO) ================= -->
   <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 min-h-screen">
     <div>
+      <!-- LOGO Y TÍTULO DE MARCA -->
       <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
-        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">E</div>
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+          E
+        </div>
         <div>
           <h1 class="font-bold text-slate-900 text-lg leading-tight">Evolve</h1>
           <p class="text-[10px] uppercase font-bold tracking-wider text-slate-400">JUGUETIMAX · MULTIMARCA</p>
         </div>
       </div>
 
+      <!-- NAVEGACIÓN PRINCIPAL -->
       <nav class="p-4 space-y-6">
         <div>
           <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">GENERAL</p>
-          <button onclick="cambiarVista('descarga')" id="nav-descarga" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-blue-600 bg-blue-50 transition-all">
-            <span>📥 Descarga de Docs</span>
-          </button>
+          <div class="space-y-1">
+            <button onclick="cambiarVista('descarga')" id="nav-descarga" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-blue-600 bg-blue-50 transition-all">
+              <span class="text-base">📥</span>
+              <span>Descarga de Docs</span>
+            </button>
+          </div>
         </div>
+
         <div>
           <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">OPERACIÓN</p>
-          <button onclick="cambiarVista('cobertura')" id="nav-cobertura" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 transition-all">
-            <span>📊 Cobertura</span>
-          </button>
+          <div class="space-y-1">
+            <button onclick="cambiarVista('cobertura')" id="nav-cobertura" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all">
+              <span class="text-base">📊</span>
+              <span>Cobertura</span>
+            </button>
+          </div>
         </div>
+
         <div>
           <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">FINANZAS</p>
-          <button onclick="cambiarVista('facturacion')" id="nav-facturacion" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 transition-all">
-            <span>🧾 Pagos y facturación</span>
-          </button>
+          <div class="space-y-1">
+            <button onclick="cambiarVista('facturacion')" id="nav-facturacion" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all">
+              <span class="text-base">🧾</span>
+              <span>Pagos y facturación</span>
+            </button>
+          </div>
         </div>
       </nav>
     </div>
 
-    <div class="p-4 border-t border-slate-100 bg-slate-50">
-      <p class="text-[11px] text-slate-400 font-bold uppercase mb-2">SELECCIÓN DE MARCA</p>
-      <div class="flex rounded-lg bg-slate-200 p-1">
-        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all">
-          Juguetimax (Fijo)
-        </button>
-        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 transition-all">
-          Multimarca
-        </button>
+    <!-- PIE DEL SIDEBAR Y BOTÓN DE GUARDADO -->
+    <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
+      <div>
+        <p class="text-[11px] text-slate-400 font-bold uppercase mb-2">SELECCIÓN DE MARCA</p>
+        <div class="flex rounded-lg bg-slate-200 p-1">
+          <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all">
+            Juguetimax (Fijo)
+          </button>
+          <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all">
+            Multimarca
+          </button>
+        </div>
       </div>
+
+      <!-- BOTÓN PARA GUARDAR TODOS LOS CAMBIOS -->
+      <button onclick="guardarEnMemoria()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-2">
+        <span>💾 Guardar Datos</span>
+      </button>
     </div>
   </aside>
 
-  <!-- ================= ÁREA PRINCIPAL ================= -->
+  <!-- ================= ÁREA DE CONTENIDO PRINCIPAL ================= -->
   <main class="flex-1 p-8 space-y-6 overflow-y-auto">
     
-    <!-- BARRA DE FILTROS -->
+    <!-- BARRA SUPERIOR DE FILTROS -->
     <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-2 text-slate-700 font-semibold text-base">
         <span>Filtro activo:</span>
@@ -98,7 +94,7 @@
       <div class="flex items-center gap-3 flex-wrap">
         <div id="contenedor-submarca" class="hidden flex items-center space-x-2">
           <label for="select-submarca" class="text-xs font-bold text-slate-400 uppercase">Sub-Marca:</label>
-          <select id="select-submarca" onchange="escucharCambiosNube()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200">
+          <select id="select-submarca" onchange="cambiarSubMarca()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:border-blue-500">
             <option value="Juguetimax">Juguetimax</option>
             <option value="Moose Toys">Moose Toys</option>
             <option value="Just Play">Just Play</option>
@@ -113,7 +109,7 @@
 
         <div class="flex items-center space-x-2">
           <label for="select-anio" class="text-xs font-bold text-slate-400 uppercase">Año:</label>
-          <select id="select-anio" onchange="escucharCambiosNube()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200">
+          <select id="select-anio" onchange="cambiarFecha()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:border-blue-500">
             <option value="2026">2026</option>
             <option value="2025">2025</option>
             <option value="2024">2024</option>
@@ -122,7 +118,7 @@
 
         <div class="flex items-center space-x-2">
           <label for="select-mes" class="text-xs font-bold text-slate-400 uppercase">Mes:</label>
-          <select id="select-mes" onchange="escucharCambiosNube()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200">
+          <select id="select-mes" onchange="cambiarFecha()" class="bg-slate-50 text-slate-800 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:border-blue-500">
             <option value="enero">Enero</option>
             <option value="febrero">Febrero</option>
             <option value="marzo">Marzo</option>
@@ -142,29 +138,37 @@
 
     <!-- VISTA 1: DESCARGA DE DOCUMENTOS -->
     <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- 1. Reportes de Cobertura -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
-          <h2 class="font-bold text-slate-900 mb-1">📊 Reportes de Cobertura</h2>
-          <p class="text-slate-500 text-xs mb-4">Archivos de inventario regional (Solo Excel).</p>
+          <div class="flex items-center space-x-3 mb-3">
+            <span class="p-2.5 bg-blue-50 text-blue-600 rounded-xl text-xl">📊</span>
+            <h2 class="font-bold text-slate-900">Reportes de Cobertura</h2>
+          </div>
+          <p class="text-slate-500 text-xs mb-4">Archivos de inventario y disponibilidad regional (Solo Excel).</p>
           <ul id="lista-cobertura" class="space-y-2 text-sm mb-4"></ul>
         </div>
         
-        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center transition-colors">
-          <span>➕ Subir Excel (.xlsx / .xls / .csv)</span>
-          <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'cobertura')">
+        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
+          <span>📊 Seleccionar Excel (.xlsx / .xls / .csv)</span>
+          <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'cobertura')">
         </label>
       </div>
 
+      <!-- 2. Facturación -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div>
-          <h2 class="font-bold text-slate-900 mb-1">🧾 Facturación</h2>
-          <p class="text-slate-500 text-xs mb-4">Facturas públicas en formato XML o Excel.</p>
+          <div class="flex items-center space-x-3 mb-3">
+            <span class="p-2.5 bg-purple-50 text-purple-600 rounded-xl text-xl">🧾</span>
+            <h2 class="font-bold text-slate-900">Facturación</h2>
+          </div>
+          <p class="text-slate-500 text-xs mb-4">Facturas en formato XML o Excel.</p>
           <ul id="lista-facturacion" class="space-y-2 text-sm mb-4"></ul>
         </div>
 
-        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center transition-colors">
+        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-center space-x-2 transition-colors">
           <span>📄 Subir Factura (XML / Excel)</span>
-          <input type="file" accept=".xml, .xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'facturacion')">
+          <input type="file" accept=".xml, .xls, .xlsx, .csv" class="hidden" onchange="subirYProcesarArchivo(event, 'facturacion')">
         </label>
       </div>
     </div>
@@ -173,6 +177,7 @@
     <div id="vista-cobertura" class="hidden space-y-6">
       <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <h2 class="text-lg font-bold text-slate-900 mb-1">📊 Analítica de Cobertura</h2>
+        <p class="text-slate-500 text-xs mb-6">Métricas obtenidas de los reportes cargados.</p>
         <div id="metricas-cobertura" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
       </div>
     </div>
@@ -181,10 +186,12 @@
     <div id="vista-facturacion" class="hidden space-y-6">
       <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <h2 class="text-lg font-bold text-slate-900 mb-1">🧾 Desglose y Pagos de Facturación</h2>
+        <p class="text-slate-500 text-xs mb-6">Registro de facturas cargadas y subtotales sin IVA.</p>
+
         <div id="metricas-facturacion" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
 
         <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-          <div class="p-4 border-b border-slate-100 font-bold text-slate-800 text-sm">Facturas Registradas en la Nube</div>
+          <div class="p-4 border-b border-slate-100 font-bold text-slate-800 text-sm">Facturas Procesadas</div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
               <thead class="bg-slate-50 text-slate-400 text-xs font-bold uppercase border-b border-slate-100">
@@ -203,111 +210,302 @@
 
   </main>
 
+  <!-- LÓGICA JAVASCRIPT -->
   <script>
     let marcaPrincipal = 'juguetimax';
     let subMarcaActual = 'Juguetimax';
     let anioActual = '2026';
     let mesActual = 'enero';
-    let unsubscribe = null;
+    let vistaActiva = 'descarga';
+
+    let reportes = JSON.parse(localStorage.getItem('evolve_reportes_datos')) || {};
+
+    function guardarEnMemoria() {
+      localStorage.setItem('evolve_reportes_datos', JSON.stringify(reportes));
+      alert('¡Datos guardados correctamente!');
+    }
+
+    function obtenerEstructura() {
+      if (!reportes[marcaPrincipal]) reportes[marcaPrincipal] = {};
+      const claveSub = (marcaPrincipal === 'multimarca') ? subMarcaActual : 'fijo';
+      if (!reportes[marcaPrincipal][claveSub]) reportes[marcaPrincipal][claveSub] = {};
+      if (!reportes[marcaPrincipal][claveSub][anioActual]) reportes[marcaPrincipal][claveSub][anioActual] = {};
+      if (!reportes[marcaPrincipal][claveSub][anioActual][mesActual]) {
+        reportes[marcaPrincipal][claveSub][anioActual][mesActual] = { cobertura: [], facturacion: [] };
+      }
+      return reportes[marcaPrincipal][claveSub][anioActual][mesActual];
+    }
 
     function cambiarMarca(marca) {
       marcaPrincipal = marca;
-      document.getElementById('contenedor-submarca').classList.toggle('hidden', marca === 'juguetimax');
-      escucharCambiosNube();
+      const btnJ = document.getElementById('btn-juguetimax');
+      const btnM = document.getElementById('btn-multimarca');
+      const contenedorSubmarca = document.getElementById('contenedor-submarca');
+
+      if (marca === 'juguetimax') {
+        btnJ.className = "flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all";
+        btnM.className = "flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all";
+        contenedorSubmarca.classList.add('hidden');
+      } else {
+        btnM.className = "flex-1 py-1.5 text-[11px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all";
+        btnJ.className = "flex-1 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-slate-900 transition-all";
+        contenedorSubmarca.classList.remove('hidden');
+        subMarcaActual = document.getElementById('select-submarca').value;
+      }
+
+      actualizarPantalla();
+    }
+
+    function cambiarSubMarca() {
+      subMarcaActual = document.getElementById('select-submarca').value;
+      actualizarPantalla();
+    }
+
+    function cambiarFecha() {
+      anioActual = document.getElementById('select-anio').value;
+      mesActual = document.getElementById('select-mes').value;
+      actualizarPantalla();
     }
 
     function cambiarVista(vista) {
-      ['descarga', 'cobertura', 'facturacion'].forEach(v => {
-        document.getElementById(`vista-${v}`).classList.toggle('hidden', v !== vista);
+      vistaActiva = vista;
+      const vistas = ['descarga', 'cobertura', 'facturacion'];
+      
+      vistas.forEach(v => {
+        const contenedor = document.getElementById(`vista-${v}`);
+        const navBtn = document.getElementById(`nav-${v}`);
+        
+        if (v === vista) {
+          contenedor.classList.remove('hidden');
+          navBtn.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-blue-600 bg-blue-50 transition-all";
+        } else {
+          contenedor.classList.add('hidden');
+          navBtn.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all";
+        }
       });
     }
 
-    // Sincronización en tiempo real con Firebase para todos los usuarios
-    function escucharCambiosNube() {
-      anioActual = document.getElementById('select-anio').value;
-      mesActual = document.getElementById('select-mes').value;
-      subMarcaActual = document.getElementById('select-submarca').value;
+    function actualizarPantalla() {
+      const label = document.getElementById('label-filtro');
+      
+      if (marcaPrincipal === 'multimarca') {
+        label.innerText = `MULTIMARCA (${subMarcaActual}) | ${anioActual} - ${mesActual}`;
+      } else {
+        label.innerText = `JUGUETIMAX (FIJO) | ${anioActual} - ${mesActual}`;
+      }
 
-      const claveMarca = (marcaPrincipal === 'multimarca') ? subMarcaActual : 'Juguetimax';
-      document.getElementById('label-filtro').innerText = `${claveMarca.toUpperCase()} | ${anioActual} - ${mesActual}`;
+      const datos = obtenerEstructura();
 
-      if (unsubscribe) unsubscribe();
+      renderLista('lista-cobertura', datos.cobertura, 'cobertura');
+      renderLista('lista-facturacion', datos.facturacion, 'facturacion');
 
-      // Escuchar cambios en la base de datos central de Firebase
-      window.unsubscribe = window.onSnapshot(window.collection(window.db, "archivos_evolve"), (snapshot) => {
-        const archivosNube = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.marca === claveMarca && data.anio === anioActual && data.mes === mesActual) {
-            archivosNube.push({ idDoc: doc.id, ...data });
-          }
-        });
-
-        renderizarPantalla(archivosNube);
-      });
+      renderModulo('cobertura', datos.cobertura);
+      renderFacturacionModulo(datos.facturacion);
     }
 
-    async function subirArchivoNube(event, categoria) {
+    function renderLista(elementId, items, categoria) {
+      const container = document.getElementById(elementId);
+      if (!items || items.length === 0) {
+        container.innerHTML = `<li class="text-slate-400 text-xs italic">Sin archivos guardados</li>`;
+        return;
+      }
+      container.innerHTML = items.map(item => `
+        <li class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
+          <span class="truncate pr-2 text-slate-700 text-xs font-medium" title="${item.nombre}">${item.nombre}</span>
+          <div class="flex items-center space-x-2 shrink-0">
+            <a href="${item.url || '#'}" target="_blank" download="${item.nombre}" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold px-2 py-1 rounded-lg transition-colors">
+              Descargar ↗
+            </a>
+            <button onclick="eliminarArchivo('${categoria}', ${item.id})" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-2 py-1 rounded-lg transition-colors border border-rose-100">
+              🗑️ Eliminar
+            </button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    function eliminarArchivo(categoria, id) {
+      const datos = obtenerEstructura();
+      if (confirm('¿Estás seguro de que deseas eliminar este archivo?')) {
+        datos[categoria] = datos[categoria].filter(item => item.id !== id);
+        actualizarPantalla();
+      }
+    }
+
+    async function subirYProcesarArchivo(event, categoria) {
       const file = event.target.files[0];
       if (!file) return;
 
-      const claveMarca = (marcaPrincipal === 'multimarca') ? subMarcaActual : 'Juguetimax';
-      const extension = file.name.split('.').pop().toLowerCase();
-      let montoSubtotal = 0;
+      const blobUrl = URL.createObjectURL(file);
+      const datosPeriodo = obtenerEstructura();
 
-      if (categoria === 'facturacion' && extension === 'xml') {
-        const textoXML = await file.text();
-        const coincidencia = textoXML.match(/SubTotal=["']([\d.]+)\b["']/i);
-        if (coincidencia && coincidencia[1]) montoSubtotal = parseFloat(coincidencia[1]);
-      }
-
-      // Guardar directamente en la nube
-      await window.addDoc(window.collection(window.db, "archivos_evolve"), {
+      const nuevoArchivo = {
+        id: Date.now(),
         nombre: file.name,
-        categoria: categoria,
-        marca: claveMarca,
-        anio: anioActual,
-        mes: mesActual,
-        montoSinIVA: montoSubtotal,
-        fechaSubida: new Date().toISOString()
-      });
+        url: blobUrl,
+        filas: 0,
+        montoSinIVA: 0
+      };
+
+      const extension = file.name.split('.').pop().toLowerCase();
+
+      if (categoria === 'facturacion') {
+        // Procesar XML CFDI (SAT)
+        if (extension === 'xml') {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const textoXML = e.target.result;
+            const coincidencia = textoXML.match(/SubTotal=["']([\d.]+)\b["']/i);
+            if (coincidencia && coincidencia[1]) {
+              nuevoArchivo.montoSinIVA = parseFloat(coincidencia[1]);
+            }
+            datosPeriodo.facturacion.push(nuevoArchivo);
+            actualizarPantalla();
+          };
+          reader.readAsText(file);
+        } 
+        // Procesar Excel / CSV
+        else if (['xlsx', 'xls', 'csv'].includes(extension)) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const workbook = XLSX.read(data, { type: 'array' });
+              const sheetName = workbook.SheetNames[0];
+              const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+              nuevoArchivo.filas = json.length;
+              if (json.length > 0) {
+                let suma = 0;
+                json.forEach(row => {
+                  for (let key in row) {
+                    if (/subtotal|importe|monto|neto/i.test(key)) {
+                      let val = parseFloat(String(row[key]).replace(/,/g, ''));
+                      if (!isNaN(val)) suma += val;
+                    }
+                  }
+                });
+                nuevoArchivo.montoSinIVA = suma;
+              }
+            } catch (err) {}
+            datosPeriodo.facturacion.push(nuevoArchivo);
+            actualizarPantalla();
+          };
+          reader.readAsArrayBuffer(file);
+        }
+
+      } else if (categoria === 'cobertura') {
+        // Solo Excel
+        if (['xlsx', 'xls', 'csv'].includes(extension)) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const workbook = XLSX.read(data, { type: 'array' });
+              const sheetName = workbook.SheetNames[0];
+              const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+              nuevoArchivo.filas = json.length;
+            } catch (err) {}
+            datosPeriodo.cobertura.push(nuevoArchivo);
+            actualizarPantalla();
+          };
+          reader.readAsArrayBuffer(file);
+        } else {
+          alert('Para Reportes de Cobertura solo se permiten archivos Excel (.xlsx, .xls, .csv).');
+        }
+      }
 
       event.target.value = '';
-      alert("¡Archivo subido exitosamente! Todos los usuarios ya pueden verlo.");
     }
 
-    async function eliminarArchivoNube(idDoc) {
-      if (confirm("¿Deseas eliminar este archivo para todos los usuarios?")) {
-        await window.deleteDoc(window.doc(window.db, "archivos_evolve", idDoc));
+    function editarMontoFactura(idFactura) {
+      const datos = obtenerEstructura();
+      const factura = datos.facturacion.find(f => f.id === idFactura);
+      if (!factura) return;
+
+      const nuevoMonto = prompt(`Ingresa el Monto Sin IVA (Subtotal) para "${factura.nombre}":`, factura.montoSinIVA || '0.00');
+      if (nuevoMonto !== null) {
+        const valor = parseFloat(nuevoMonto.replace(/,/g, ''));
+        factura.montoSinIVA = isNaN(valor) ? 0 : valor;
+        actualizarPantalla();
       }
     }
 
-    function renderizarPantalla(archivos) {
-      const cobertura = archivos.filter(a => a.categoria === 'cobertura');
-      const facturacion = archivos.filter(a => a.categoria === 'facturacion');
+    function renderFacturacionModulo(listaFacturas) {
+      const contenedorMetricas = document.getElementById('metricas-facturacion');
+      const tablaBody = document.getElementById('tabla-facturas-body');
 
-      // Renderizar Listas
-      document.getElementById('lista-cobertura').innerHTML = cobertura.length === 0 ? '<li class="text-slate-400 text-xs italic">Sin archivos</li>' :
-        cobertura.map(a => `<li class="flex justify-between items-center p-2 bg-slate-50 border rounded-xl text-xs"><span>${a.nombre}</span><button onclick="eliminarArchivoNube('${a.idDoc}')" class="text-rose-600 font-bold">🗑️</button></li>`).join('');
+      const totalFacturas = listaFacturas.length;
+      let sumaSubtotalSinIVA = 0;
 
-      document.getElementById('lista-facturacion').innerHTML = facturacion.length === 0 ? '<li class="text-slate-400 text-xs italic">Sin archivos</li>' :
-        facturacion.map(a => `<li class="flex justify-between items-center p-2 bg-slate-50 border rounded-xl text-xs"><span>${a.nombre}</span><button onclick="eliminarArchivoNube('${a.idDoc}')" class="text-rose-600 font-bold">🗑️</button></li>`).join('');
+      listaFacturas.forEach(f => { sumaSubtotalSinIVA += (f.montoSinIVA || 0); });
 
-      // Tabla Facturación
       const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
-      let totalMonto = 0;
-      facturacion.forEach(f => totalMonto += f.montoSinIVA);
 
-      document.getElementById('metricas-facturacion').innerHTML = `
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">Archivos Cargados</p><p class="text-2xl font-bold mt-1">${facturacion.length}</p></div>
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">Monto Total Sin IVA</p><p class="text-2xl font-bold text-blue-600 mt-1">${formatoMoneda.format(totalMonto)}</p></div>
+      contenedorMetricas.innerHTML = `
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Facturas Cargadas</p>
+          <p class="text-2xl font-bold text-slate-800 mt-1">${totalFacturas}</p>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Monto Total Sin IVA (Subtotal)</p>
+          <p class="text-2xl font-bold text-blue-600 mt-1">${formatoMoneda.format(sumaSubtotalSinIVA)}</p>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Promedio por Factura</p>
+          <p class="text-2xl font-bold text-slate-800 mt-1">${formatoMoneda.format(totalFacturas > 0 ? (sumaSubtotalSinIVA / totalFacturas) : 0)}</p>
+        </div>
       `;
 
-      document.getElementById('tabla-facturas-body').innerHTML = facturacion.length === 0 ? '<tr><td colspan="3" class="p-4 text-center text-slate-400 text-xs">Sin facturas</td></tr>' :
-        facturacion.map(f => `<tr class="hover:bg-slate-50"><td class="p-3 text-xs font-medium">${f.nombre}</td><td class="p-3 font-bold text-blue-600">${formatoMoneda.format(f.montoSinIVA)}</td><td class="p-3 text-right"><button onclick="eliminarArchivoNube('${f.idDoc}')" class="text-rose-600 font-bold text-xs">🗑️ Eliminar</button></td></tr>`).join('');
+      if (totalFacturas === 0) {
+        tablaBody.innerHTML = `
+          <tr>
+            <td colspan="3" class="p-4 text-center text-slate-400 italic text-xs">No hay facturas registradas para este periodo.</td>
+          </tr>
+        `;
+      } else {
+        tablaBody.innerHTML = listaFacturas.map(f => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-medium text-slate-800 text-xs">${f.nombre}</td>
+            <td class="p-3 font-bold text-blue-600">${formatoMoneda.format(f.montoSinIVA || 0)}</td>
+            <td class="p-3 text-right space-x-2">
+              <button onclick="editarMontoFactura(${f.id})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2 py-1 rounded-md transition-colors">
+                ✏️ Editar Monto
+              </button>
+              <a href="${f.url || '#'}" target="_blank" download="${f.nombre}" class="text-xs text-blue-600 font-semibold hover:underline">Descargar ↗</a>
+              <button onclick="eliminarArchivo('facturacion', ${f.id})" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-2 py-1 rounded-md transition-colors border border-rose-100">
+                🗑️ Eliminar
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
     }
 
-    setTimeout(() => { escucharCambiosNube(); }, 1000);
+    function renderModulo(categoria, listaArchivos) {
+      const contenedorMetricas = document.getElementById(`metricas-${categoria}`);
+      const totalArchivos = listaArchivos.length;
+      let totalFilas = 0;
+      listaArchivos.forEach(a => { totalFilas += (a.filas || 0); });
+
+      contenedorMetricas.innerHTML = `
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Archivos Guardados</p>
+          <p class="text-2xl font-bold text-slate-800 mt-1">${totalArchivos}</p>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Registros / Filas</p>
+          <p class="text-2xl font-bold text-blue-600 mt-1">${totalFilas}</p>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-400 uppercase font-bold">Estatus</p>
+          <p class="text-2xl font-bold text-emerald-600 mt-1">${totalArchivos > 0 ? 'Sincronizado' : 'Sin datos'}</p>
+        </div>
+      `;
+    }
+
+    actualizarPantalla();
   </script>
 </body>
 </html>
