@@ -53,7 +53,7 @@
   <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
   <aside class="w-72 bg-[#0F172A]/90 border-r border-slate-800/80 flex flex-col justify-between shrink-0 min-h-screen z-20">
     <div>
-      <!-- BRANDING CON LOGO FIEL AL ORIGINAL -->
+      <!-- BRANDING CON LOGO -->
       <div class="p-6 border-b border-slate-800/80 flex flex-col space-y-2">
         <div class="flex items-center space-x-3">
           <div class="h-8 shrink-0">
@@ -82,7 +82,7 @@
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-3">INTELIGENCIA DE CAMPO</p>
           <button onclick="cambiarVista('cobertura')" id="nav-cobertura" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-            <span>Cobertura y Análisis</span>
+            <span>Cobertura y Promotores</span>
           </button>
         </div>
         <div>
@@ -115,7 +115,7 @@
   <!-- ================= ÁREA PRINCIPAL ================= -->
   <main class="flex-1 p-8 space-y-8 overflow-y-auto">
     
-    <!-- BARRA DE FILTROS HIGH-TECH CON MODALIDAD COMPARATIVA -->
+    <!-- BARRA DE FILTROS HIGH-TECH -->
     <div class="glass-card p-5 rounded-2xl shadow-2xl flex flex-wrap items-center justify-between gap-4 relative overflow-hidden">
       <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
       
@@ -127,7 +127,6 @@
       </div>
 
       <div class="flex items-center gap-3 flex-wrap">
-        <!-- MODALIDAD DE VISTA: MES ÚNICO O COMPARATIVO -->
         <div class="flex items-center space-x-2">
           <label for="select-tipo-vista" class="text-xs font-bold text-slate-400 uppercase">Modo:</label>
           <select id="select-tipo-vista" onchange="alternarModoVista()" class="bg-slate-900 text-cyan-400 text-xs font-bold rounded-xl px-3 py-2 border border-cyan-500/40 focus:outline-none">
@@ -171,7 +170,7 @@
             <option value="5">Mayo</option>
             <option value="6">Junio</option>
             <option value="7">Julio</option>
-            <option value="8">Agosto</option>
+            <option value="8" selected>Agosto</option>
             <option value="9">Septiembre</option>
             <option value="10">Octubre</option>
             <option value="11">Noviembre</option>
@@ -205,8 +204,8 @@
             <option value="4">Abril</option>
             <option value="5">Mayo</option>
             <option value="6">Junio</option>
-            <option value="7" selected>Julio</option>
-            <option value="8">Agosto</option>
+            <option value="7">Julio</option>
+            <option value="8" selected>Agosto</option>
             <option value="9">Septiembre</option>
             <option value="10">Octubre</option>
             <option value="11">Noviembre</option>
@@ -301,12 +300,46 @@
 
     </div>
 
-    <!-- VISTA 2: COBERTURA -->
+    <!-- VISTA 2: COBERTURA Y ANÁLISIS DE PROMOTORES -->
     <div id="vista-cobertura" class="hidden space-y-6">
-      <div class="glass-card rounded-2xl p-6 shadow-sm">
-        <h2 class="text-lg font-bold text-white mb-1">📊 Analítica de Cobertura</h2>
-        <p class="text-slate-400 text-xs mb-6">Resumen operativo generado automáticamente desde la nube.</p>
-        <div id="metricas-cobertura" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+      
+      <!-- METRICAS DE COBERTURA -->
+      <div id="metricas-cobertura" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+      <!-- BUSCADOR Y FILTROS TABLA DE PROMOTORES -->
+      <div class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">📊 Desempeño por Promotor y Tienda</h2>
+            <p class="text-slate-400 text-xs">Métricas acumuladas procesadas directamente desde los reportes cargados.</p>
+          </div>
+          
+          <div class="w-full sm:w-72">
+            <input type="text" id="buscador-promotor" onkeyup="filtrarTablaPromotores()" placeholder="🔍 Buscar Promotor o Tienda..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2.5 border border-slate-700 focus:outline-none focus:border-cyan-500">
+          </div>
+        </div>
+
+        <!-- TABLA DINÁMICA DE PROMOTORES -->
+        <div class="overflow-x-auto border border-slate-800 rounded-xl">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/90 text-slate-400 font-bold uppercase border-b border-slate-800">
+              <tr>
+                <th class="p-3.5">Promotor</th>
+                <th class="p-3.5 text-center">Usuario</th>
+                <th class="p-3.5 text-center">Tiendas</th>
+                <th class="p-3.5 text-center">Frecuencia Meta</th>
+                <th class="p-3.5 text-center">Visitas Reales</th>
+                <th class="p-3.5 text-center">% Cobertura Promedio</th>
+                <th class="p-3.5 text-right">Estatus</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-promotores-body" class="divide-y divide-slate-800/60 text-slate-300">
+              <tr>
+                <td colspan="7" class="p-6 text-center text-slate-500 italic">No hay reportes de cobertura cargados para este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -343,8 +376,9 @@
     let marcaPrincipal = 'juguetimax';
     let subMarcaActual = 'Juguetimax por visita';
     let anioActual = '2026';
-    let modoVista = 'mes'; // 'mes' o 'rango'
+    let modoVista = 'mes';
     let unsubscribe = null;
+    let datosPromotoresGlobal = [];
 
     function alternarModoVista() {
       modoVista = document.getElementById('select-tipo-vista').value;
@@ -452,8 +486,54 @@
       const claveMarca = obtenerClaveMarcaActiva();
       const extension = file.name.split('.').pop().toLowerCase();
       let montoSubtotal = 0;
+      let estructuraPromotores = [];
 
       const mesGuardar = (modoVista === 'mes') ? parseInt(document.getElementById('select-mes').value) : parseInt(document.getElementById('select-mes-inicio').value);
+
+      // Si es un archivo de cobertura de Excel, parsear la estructura de tiendas y promotores
+      if (categoria === 'cobertura' && (extension === 'xlsx' || extension === 'xls' || extension === 'csv')) {
+        try {
+          const buffer = await file.arrayBuffer();
+          const workbook = XLSX.read(buffer, { type: 'array' });
+          const hoja = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonDatos = XLSX.utils.sheet_to_json(hoja, { header: 1 });
+
+          // Buscar la fila de encabezados que contenga "PROMOTOR"
+          let indexHeader = -1;
+          for (let i = 0; i < Math.min(jsonDatos.length, 10); i++) {
+            if (jsonDatos[i] && jsonDatos[i].includes("PROMOTOR")) {
+              indexHeader = i;
+              break;
+            }
+          }
+
+          if (indexHeader !== -1) {
+            const headers = jsonDatos[indexHeader];
+            const colPromotor = headers.indexOf("PROMOTOR");
+            const colUsuario = headers.indexOf("USUARIO");
+            const colFrecuencia = headers.indexOf("FRECUENCIA");
+            const colVisitas = headers.indexOf("TTL Visitas");
+            const colCobertura = headers.indexOf("% Cobertura");
+            const colNombreTienda = headers.indexOf("NOMBRE");
+
+            for (let r = indexHeader + 1; r < jsonDatos.length; r++) {
+              const row = jsonDatos[r];
+              if (row && row[colPromotor]) {
+                estructuraPromotores.push({
+                  promotor: String(row[colPromotor] || '').trim(),
+                  usuario: String(row[colUsuario] || '').trim(),
+                  frecuencia: parseFloat(row[colFrecuencia]) || 0,
+                  visitas: parseFloat(row[colVisitas]) || 0,
+                  coberturaPct: parseFloat(row[colCobertura]) || 0,
+                  tienda: String(row[colNombreTienda] || '').trim()
+                });
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Error al procesar Excel:", err);
+        }
+      }
 
       if (categoria === 'facturacion' && extension === 'xml') {
         const textoXML = await file.text();
@@ -468,6 +548,7 @@
         anio: anioActual,
         mesNum: mesGuardar,
         montoSinIVA: montoSubtotal,
+        promotoresData: estructuraPromotores,
         fechaSubida: new Date().toISOString()
       });
 
@@ -496,6 +577,17 @@
       document.getElementById('lista-bonos').innerHTML = renderizarListaHTML(bonos);
       document.getElementById('lista-plan').innerHTML = renderizarListaHTML(plan);
 
+      // PROCESAMIENTO DE PROMOTORES
+      let listaRegistros = [];
+      cobertura.forEach(c => {
+        if (c.promotoresData && Array.isArray(c.promotoresData)) {
+          listaRegistros = listaRegistros.concat(c.promotoresData);
+        }
+      });
+
+      renderizarTablaPromotores(listaRegistros);
+
+      // FACTURACIÓN
       const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
       let totalMonto = 0;
       facturacion.forEach(f => totalMonto += f.montoSinIVA);
@@ -507,6 +599,98 @@
 
       document.getElementById('tabla-facturas-body').innerHTML = facturacion.length === 0 ? '<tr><td colspan="3" class="p-4 text-center text-slate-500 text-xs italic">Sin facturas registradas en este periodo</td></tr>' :
         facturacion.map(f => `<tr class="hover:bg-slate-800/40 transition-colors"><td class="p-3.5 text-xs font-medium text-slate-200">${f.nombre}</td><td class="p-3.5 font-bold text-cyan-400">${formatoMoneda.format(f.montoSinIVA)}</td><td class="p-3.5 text-right"><button onclick="eliminarArchivoNube('${f.idDoc}')" class="text-rose-400 hover:text-rose-300 font-bold text-xs bg-rose-500/10 px-2.5 py-1 rounded-lg transition-colors">🗑️ Eliminar</button></td></tr>`).join('');
+    }
+
+    function renderizarTablaPromotores(registros) {
+      datosPromotoresGlobal = registros;
+
+      if (registros.length === 0) {
+        document.getElementById('metricas-cobertura').innerHTML = `
+          <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Promotores Activos</p><p class="text-2xl font-bold text-slate-500 mt-1">0</p></div>
+          <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Tiendas Totales</p><p class="text-2xl font-bold text-slate-500 mt-1">0</p></div>
+          <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Visitas Programadas vs Reales</p><p class="text-2xl font-bold text-slate-500 mt-1">0 / 0</p></div>
+          <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">% Cobertura General</p><p class="text-2xl font-bold text-slate-500 mt-1">0.0%</p></div>
+        `;
+
+        document.getElementById('tabla-promotores-body').innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500 italic">No hay reportes de cobertura cargados para este periodo. Sube un archivo Excel en "Descarga de Docs".</td></tr>';
+        return;
+      }
+
+      // Agrupar por Promotor
+      const mapa = {};
+      registros.forEach(r => {
+        if (!mapa[r.promotor]) {
+          mapa[r.promotor] = {
+            promotor: r.promotor,
+            usuario: r.usuario,
+            tiendas: 0,
+            frecuenciaMeta: 0,
+            visitasReales: 0,
+            sumaCobertura: 0
+          };
+        }
+        mapa[r.promotor].tiendas += 1;
+        mapa[r.promotor].frecuenciaMeta += r.frecuencia;
+        mapa[r.promotor].visitasReales += r.visitas;
+        mapa[r.promotor].sumaCobertura += r.coberturaPct;
+      });
+
+      const listaAgrupada = Object.values(mapa);
+
+      let totalTiendas = registros.length;
+      let totalPromotores = listaAgrupada.length;
+      let totalMeta = 0;
+      let totalReales = 0;
+
+      listaAgrupada.forEach(p => {
+        totalMeta += p.frecuenciaMeta;
+        totalReales += p.visitasReales;
+      });
+
+      const coberturaNacional = totalMeta > 0 ? ((totalReales / totalMeta) * 100).toFixed(1) : 0;
+
+      document.getElementById('metricas-cobertura').innerHTML = `
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Promotores Activos</p><p class="text-2xl font-bold text-white mt-1">${totalPromotores}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Tiendas Atendidas</p><p class="text-2xl font-bold text-cyan-400 mt-1">${totalTiendas}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Visitas Programadas / Reales</p><p class="text-2xl font-bold text-purple-400 mt-1">${totalMeta} / ${totalReales}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">% Cobertura Nacional</p><p class="text-2xl font-bold text-emerald-400 mt-1">${coberturaNacional}%</p></div>
+      `;
+
+      document.getElementById('tabla-promotores-body').innerHTML = listaAgrupada.map(p => {
+        const pctProm = p.tiendas > 0 ? ((p.sumaCobertura / p.tiendas) * 100).toFixed(1) : 0;
+        let badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+        let estatusTexto = "Óptimo";
+
+        if (pctProm < 50) {
+          badgeStyle = "bg-rose-500/10 text-rose-400 border-rose-500/30";
+          estatusTexto = "Crítico";
+        } else if (pctProm < 80) {
+          badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/30";
+          estatusTexto = "En Riesgo";
+        }
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="p-3.5 font-bold text-white">${p.promotor}</td>
+            <td class="p-3.5 text-center font-mono text-cyan-400 text-xs">${p.usuario}</td>
+            <td class="p-3.5 text-center font-semibold text-slate-300">${p.tiendas}</td>
+            <td class="p-3.5 text-center font-semibold text-slate-400">${p.frecuenciaMeta}</td>
+            <td class="p-3.5 text-center font-bold text-purple-300">${p.visitasReales}</td>
+            <td class="p-3.5 text-center font-extrabold text-cyan-300">${pctProm}%</td>
+            <td class="p-3.5 text-right"><span class="px-2.5 py-1 rounded-full border text-[10px] font-extrabold uppercase ${badgeStyle}">${estatusTexto}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filtrarTablaPromotores() {
+      const q = document.getElementById('buscador-promotor').value.toLowerCase();
+      const filtrados = datosPromotoresGlobal.filter(r => 
+        r.promotor.toLowerCase().includes(q) || 
+        r.usuario.toLowerCase().includes(q) || 
+        r.tienda.toLowerCase().includes(q)
+      );
+      renderizarTablaPromotores(filtrados);
     }
 
     setTimeout(() => { cambiarMarca('juguetimax'); }, 800);
