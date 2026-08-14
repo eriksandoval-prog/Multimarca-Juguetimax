@@ -53,18 +53,14 @@
   <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
   <aside class="w-72 bg-[#0F172A]/90 border-r border-slate-800/80 flex flex-col justify-between shrink-0 min-h-screen z-20">
     <div>
-      <!-- BRANDING CON LOGO EXACTO DE LA IMAGEN -->
+      <!-- BRANDING CON LOGO Y SUBTÍTULO -->
       <div class="p-6 border-b border-slate-800/80 flex flex-col space-y-2">
         <div class="flex items-center space-x-3">
           <div class="h-8 shrink-0">
-            <!-- Vector exacto del Isotipo + Texto evolve -->
             <svg viewBox="0 0 380 120" class="h-full w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Isotipo Hexagonal en 3 bloques diagonales -->
               <path d="M0 38.5L58 5L116 38.5L58 72L0 38.5Z" fill="#0091FF"/>
               <path d="M0 60.5L58 27L80 39.5L22 73L0 60.5Z" fill="#0091FF"/>
               <path d="M0 82.5L58 49L116 82.5L58 116L0 82.5Z" fill="#0091FF"/>
-              
-              <!-- Texto evolve en tipografía minúscula tech -->
               <text x="130" y="85" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="78" fill="#0091FF" letter-spacing="-3">evolve</text>
             </svg>
           </div>
@@ -119,7 +115,7 @@
   <!-- ================= ÁREA PRINCIPAL ================= -->
   <main class="flex-1 p-8 space-y-8 overflow-y-auto">
     
-    <!-- BARRA DE FILTROS HIGH-TECH -->
+    <!-- BARRA DE FILTROS HIGH-TECH CON MODALIDAD COMPARATIVA -->
     <div class="glass-card p-5 rounded-2xl shadow-2xl flex flex-wrap items-center justify-between gap-4 relative overflow-hidden">
       <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
       
@@ -131,9 +127,18 @@
       </div>
 
       <div class="flex items-center gap-3 flex-wrap">
+        <!-- MODALIDAD DE VISTA: MES ÚNICO O COMPARATIVO -->
+        <div class="flex items-center space-x-2">
+          <label for="select-tipo-vista" class="text-xs font-bold text-slate-400 uppercase">Modo:</label>
+          <select id="select-tipo-vista" onchange="alternarModoVista()" class="bg-slate-900 text-cyan-400 text-xs font-bold rounded-xl px-3 py-2 border border-cyan-500/40 focus:outline-none">
+            <option value="mes">Mes Individual</option>
+            <option value="rango">Rango Comparativo (Acumulado)</option>
+          </select>
+        </div>
+
         <div id="contenedor-submarca" class="hidden flex items-center space-x-2">
           <label for="select-submarca" class="text-xs font-bold text-slate-400 uppercase">Sub-Marca:</label>
-          <select id="select-submarca" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+          <select id="select-submarca" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
             <option value="Juguetimax por visita">Juguetimax por visita</option>
             <option value="Moose Toys">Moose Toys</option>
             <option value="Just Play">Just Play</option>
@@ -148,28 +153,64 @@
 
         <div class="flex items-center space-x-2">
           <label for="select-anio" class="text-xs font-bold text-slate-400 uppercase">Año:</label>
-          <select id="select-anio" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+          <select id="select-anio" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
             <option value="2026">2026</option>
             <option value="2025">2025</option>
             <option value="2024">2024</option>
           </select>
         </div>
 
-        <div class="flex items-center space-x-2">
+        <!-- SELECTOR MES INDIVIDUAL -->
+        <div id="contenedor-mes-unico" class="flex items-center space-x-2">
           <label for="select-mes" class="text-xs font-bold text-slate-400 uppercase">Mes:</label>
-          <select id="select-mes" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
-            <option value="enero">Enero</option>
-            <option value="febrero">Febrero</option>
-            <option value="marzo">Marzo</option>
-            <option value="abril">Abril</option>
-            <option value="mayo">Mayo</option>
-            <option value="junio">Junio</option>
-            <option value="julio">Julio</option>
-            <option value="agosto">Agosto</option>
-            <option value="septiembre">Septiembre</option>
-            <option value="octubre">Octubre</option>
-            <option value="noviembre">Noviembre</option>
-            <option value="diciembre">Diciembre</option>
+          <select id="select-mes" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+        </div>
+
+        <!-- SELECTORES RANGO COMPARATIVO -->
+        <div id="contenedor-rango" class="hidden flex items-center space-x-2">
+          <label for="select-mes-inicio" class="text-xs font-bold text-slate-400 uppercase">Desde:</label>
+          <select id="select-mes-inicio" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-2.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+
+          <label for="select-mes-fin" class="text-xs font-bold text-slate-400 uppercase">Hasta:</label>
+          <select id="select-mes-fin" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-2.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7" selected>Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
           </select>
         </div>
       </div>
@@ -188,7 +229,7 @@
             <h2 class="font-bold text-white text-lg">Reportes de Cobertura</h2>
           </div>
           <p class="text-slate-400 text-xs mb-5">Archivos de inventario y disponibilidad en PDV (Excel/CSV).</p>
-          <ul id="lista-cobertura" class="space-y-2.5 text-xs mb-6"></ul>
+          <ul id="lista-cobertura" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
         </div>
         
         <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-cyan-400 hover:text-cyan-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-cyan-500/50 flex items-center justify-center space-x-2 transition-all">
@@ -208,7 +249,7 @@
             <h2 class="font-bold text-white text-lg">Facturación</h2>
           </div>
           <p class="text-slate-400 text-xs mb-5">Facturas electrónicas y comprobantes públicos (XML/Excel).</p>
-          <ul id="lista-facturacion" class="space-y-2.5 text-xs mb-6"></ul>
+          <ul id="lista-facturacion" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
         </div>
 
         <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-purple-400 hover:text-purple-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-purple-500/50 flex items-center justify-center space-x-2 transition-all">
@@ -228,7 +269,7 @@
             <h2 class="font-bold text-white text-lg">Bonos Mensuales</h2>
           </div>
           <p class="text-slate-400 text-xs mb-5">Reportes de incentivos y métricas de desempeño.</p>
-          <ul id="lista-bonos" class="space-y-2.5 text-xs mb-6"></ul>
+          <ul id="lista-bonos" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
         </div>
 
         <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-amber-500/50 flex items-center justify-center space-x-2 transition-all">
@@ -248,7 +289,7 @@
             <h2 class="font-bold text-white text-lg">Plan de Trabajo</h2>
           </div>
           <p class="text-slate-400 text-xs mb-5">Cronogramas de ruta y planes operativos de promotores.</p>
-          <ul id="lista-plan" class="space-y-2.5 text-xs mb-6"></ul>
+          <ul id="lista-plan" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
         </div>
 
         <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-emerald-400 hover:text-emerald-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-center space-x-2 transition-all">
@@ -273,7 +314,7 @@
     <div id="vista-facturacion" class="hidden space-y-6">
       <div class="glass-card rounded-2xl p-6 shadow-sm">
         <h2 class="text-lg font-bold text-white mb-1">🧾 Desglose y Pagos de Facturación</h2>
-        <p class="text-slate-400 text-xs mb-6">Auditoría financiera y subtotal de CFDI cargados.</p>
+        <p class="text-slate-400 text-xs mb-6">Auditoría financiera y subtotal acumulado de CFDI cargados.</p>
         <div id="metricas-facturacion" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
 
         <div class="glass-card rounded-xl overflow-hidden border border-slate-800">
@@ -297,11 +338,20 @@
   </main>
 
   <script>
+    const NOMBRES_MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
     let marcaPrincipal = 'juguetimax';
     let subMarcaActual = 'Juguetimax por visita';
     let anioActual = '2026';
-    let mesActual = 'enero';
+    let modoVista = 'mes'; // 'mes' o 'rango'
     let unsubscribe = null;
+
+    function alternarModoVista() {
+      modoVista = document.getElementById('select-tipo-vista').value;
+      document.getElementById('contenedor-mes-unico').classList.toggle('hidden', modoVista === 'rango');
+      document.getElementById('contenedor-rango').classList.toggle('hidden', modoVista === 'mes');
+      escucharCambiosNube();
+    }
 
     function cambiarMarca(marca) {
       marcaPrincipal = marca;
@@ -340,18 +390,38 @@
 
     function escucharCambiosNube() {
       anioActual = document.getElementById('select-anio').value;
-      mesActual = document.getElementById('select-mes').value;
       subMarcaActual = document.getElementById('select-submarca').value;
+
+      let etiquetaFecha = '';
+      let mesNumInicio = 1;
+      let mesNumFin = 1;
+
+      if (modoVista === 'mes') {
+        mesNumInicio = parseInt(document.getElementById('select-mes').value);
+        mesNumFin = mesNumInicio;
+        etiquetaFecha = `${anioActual} - ${NOMBRES_MESES[mesNumInicio - 1].toUpperCase()}`;
+      } else {
+        mesNumInicio = parseInt(document.getElementById('select-mes-inicio').value);
+        mesNumFin = parseInt(document.getElementById('select-mes-fin').value);
+
+        if (mesNumInicio > mesNumFin) {
+          const temp = mesNumInicio;
+          mesNumInicio = mesNumFin;
+          mesNumFin = temp;
+        }
+
+        etiquetaFecha = `${anioActual} | ${NOMBRES_MESES[mesNumInicio - 1].toUpperCase()} A ${NOMBRES_MESES[mesNumFin - 1].toUpperCase()}`;
+      }
 
       const claveMarca = obtenerClaveMarcaActiva();
       
       let textoLabel = '';
       if (marcaPrincipal === 'juguetimax') {
-        textoLabel = `JUGUETIMAX (FIJO) | ${anioActual} - ${mesActual}`;
+        textoLabel = `JUGUETIMAX (FIJO) | ${etiquetaFecha}`;
       } else if (marcaPrincipal === 'multimarca') {
-        textoLabel = `MULTIMARCA (${subMarcaActual.toUpperCase()}) | ${anioActual} - ${mesActual}`;
+        textoLabel = `MULTIMARCA (${subMarcaActual.toUpperCase()}) | ${etiquetaFecha}`;
       } else {
-        textoLabel = `PROMOTORÍA POR VISITA (${subMarcaActual.toUpperCase()}) | ${anioActual} - ${mesActual}`;
+        textoLabel = `PROMOTORÍA POR VISITA (${subMarcaActual.toUpperCase()}) | ${etiquetaFecha}`;
       }
         
       document.getElementById('label-filtro').innerText = textoLabel;
@@ -364,7 +434,9 @@
         const archivosNube = [];
         snapshot.forEach((doc) => {
           const data = doc.data();
-          if (data.marca === claveMarca && data.anio === anioActual && data.mes === mesActual) {
+          const mesDoc = parseInt(data.mesNum || data.mes || 1);
+          
+          if (data.marca === claveMarca && data.anio === anioActual && (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
             archivosNube.push({ idDoc: doc.id, ...data });
           }
         });
@@ -381,6 +453,8 @@
       const extension = file.name.split('.').pop().toLowerCase();
       let montoSubtotal = 0;
 
+      const mesGuardar = (modoVista === 'mes') ? parseInt(document.getElementById('select-mes').value) : parseInt(document.getElementById('select-mes-inicio').value);
+
       if (categoria === 'facturacion' && extension === 'xml') {
         const textoXML = await file.text();
         const coincidencia = textoXML.match(/SubTotal=["']([\d.]+)\b["']/i);
@@ -392,7 +466,7 @@
         categoria: categoria,
         marca: claveMarca,
         anio: anioActual,
-        mes: mesActual,
+        mesNum: mesGuardar,
         montoSinIVA: montoSubtotal,
         fechaSubida: new Date().toISOString()
       });
