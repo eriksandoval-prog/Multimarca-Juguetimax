@@ -54,7 +54,7 @@
 
   <!-- NOTIFICACIÓN FLOTANTE -->
   <div id="toast-notificacion" class="fixed top-5 right-5 z-50 hidden bg-emerald-500 text-white font-bold px-4 py-3 rounded-xl shadow-2xl border border-emerald-400 flex items-center space-x-2 transition-all">
-    <span>✓ Archivo guardado permanentemente en la nube</span>
+    <span id="toast-mensaje">✓ Archivo guardado permanentemente en la nube</span>
   </div>
 
   <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
@@ -326,7 +326,7 @@
         </div>
       </div>
 
-      <!-- BUSCADOR Y FILTROS AVANZADOS (CADENA, TIENDA Y PROMOTOR) -->
+      <!-- BUSCADOR Y FILTROS AVANZADOS -->
       <div class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -454,10 +454,16 @@
     let columnaOrden = 'cobertura';
     let direccionOrden = 'desc';
 
-    function mostrarToast() {
+    function mostrarToast(msj = "✓ Archivo guardado permanentemente en la nube", esError = false) {
       const toast = document.getElementById('toast-notificacion');
+      const txt = document.getElementById('toast-mensaje');
+      txt.innerText = msj;
+      toast.className = esError 
+        ? "fixed top-5 right-5 z-50 bg-rose-500 text-white font-bold px-4 py-3 rounded-xl shadow-2xl border border-rose-400 flex items-center space-x-2 transition-all"
+        : "fixed top-5 right-5 z-50 bg-emerald-500 text-white font-bold px-4 py-3 rounded-xl shadow-2xl border border-emerald-400 flex items-center space-x-2 transition-all";
+      
       toast.classList.remove('hidden');
-      setTimeout(() => { toast.classList.add('hidden'); }, 3500);
+      setTimeout(() => { toast.classList.add('hidden'); }, 4000);
     }
 
     function alternarModoVista() {
@@ -511,13 +517,13 @@
       return MAPA_TEXTO_A_NUM[minus] || 1;
     }
 
-    function normalizarMarca(m) {
-      if (!m) return '';
-      return String(m).toLowerCase().replace(/[^a-z0-9]/g, '');
+    function normalizarCadena(str) {
+      if (!str) return '';
+      return String(str).toLowerCase().replace(/[^a-z0-9]/g, '');
     }
 
     function escucharCambiosNube() {
-      anioActual = document.getElementById('select-anio').value;
+      anioActual = String(document.getElementById('select-anio').value);
       subMarcaActual = document.getElementById('select-submarca').value;
 
       let etiquetaFecha = '';
@@ -542,7 +548,7 @@
       }
 
       const claveMarca = obtenerClaveMarcaActiva();
-      const claveNormalizada = normalizarMarca(claveMarca);
+      const idCuentaFiltro = normalizarCadena(claveMarca);
       
       let textoLabel = '';
       if (marcaPrincipal === 'juguetimax') {
@@ -561,17 +567,24 @@
 
       window.unsubscribe = window.onSnapshot(window.collection(window.db, "archivos_evolve"), (snapshot) => {
         const archivosNube = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
           const mesDoc = normalizarMesNumero(data.mesNum || data.mes);
-          const marcaDocNorm = normalizarMarca(data.marca);
           
-          if ((marcaDocNorm === claveNormalizada || marcaDocNorm.includes(claveNormalizada)) && String(data.anio) === String(anioActual) && (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
-            archivosNube.push({ idDoc: doc.id, ...data });
+          // Comparación robusta por idCuenta o marca normalizada
+          const idDocNormal = normalizarCadena(data.idCuenta || data.marca);
+
+          if ((idDocNormal === idCuentaFiltro || idDocNormal.includes(idCuentaFiltro) || idCuentaFiltro.includes(idDocNormal)) && 
+              String(data.anio) === String(anioActual) && 
+              (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
+            archivosNube.push({ idDoc: docSnap.id, ...data });
           }
         });
 
         renderizarPantalla(archivosNube);
+      }, (error) => {
+        console.error("Error al escuchar Firebase:", error);
+        mostrarToast("⚠️ Error de permisos en Firebase. Revisa tus Reglas en Firestore.", true);
       });
     }
 
@@ -580,6 +593,7 @@
       if (!file) return;
 
       const claveMarca = obtenerClaveMarcaActiva();
+      const idCuentaNormal = normalizarCadena(claveMarca);
       const extension = file.name.split('.').pop().toLowerCase();
       let montoSubtotal = 0;
       let estructuraPromotores = [];
@@ -637,25 +651,37 @@
         if (coincidencia && coincidencia[1]) montoSubtotal = parseFloat(coincidencia[1]);
       }
 
-      await window.addDoc(window.collection(window.db, "archivos_evolve"), {
-        nombre: file.name,
-        categoria: categoria,
-        marca: claveMarca,
-        anio: String(anioActual),
-        mesNum: mesGuardar,
-        mes: NOMBRES_MESES[mesGuardar - 1].toLowerCase(),
-        montoSinIVA: montoSubtotal,
-        promotoresData: estructuraPromotores,
-        fechaSubida: new Date().toISOString()
-      });
+      try {
+        await window.addDoc(window.collection(window.db, "archivos_evolve"), {
+          nombre: file.name,
+          categoria: categoria,
+          marca: claveMarca,
+          idCuenta: idCuentaNormal,
+          anio: String(anioActual),
+          mesNum: mesGuardar,
+          mes: NOMBRES_MESES[mesGuardar - 1].toLowerCase(),
+          montoSinIVA: montoSubtotal,
+          promotoresData: estructuraPromotores,
+          fechaSubida: new Date().toISOString()
+        });
 
-      mostrarToast();
+        mostrarToast("✓ Guardado permanentemente en Firebase");
+      } catch (e) {
+        console.error("Error guardando en Firebase:", e);
+        mostrarToast("❌ No se pudo guardar. Revisa tus Reglas en Firebase.", true);
+      }
+
       event.target.value = '';
     }
 
     async function eliminarArchivoNube(idDoc) {
       if (confirm("¿Deseas eliminar este archivo para todos los usuarios?")) {
-        await window.deleteDoc(window.doc(window.db, "archivos_evolve", idDoc));
+        try {
+          await window.deleteDoc(window.doc(window.db, "archivos_evolve", idDoc));
+          mostrarToast("🗑️ Archivo eliminado de Firebase");
+        } catch (e) {
+          mostrarToast("❌ Error al eliminar el archivo.", true);
+        }
       }
     }
 
@@ -881,7 +907,6 @@
         `;
       }).join('');
 
-      // ACTUALIZAR GRÁFICA CON MARGEN SUPERIOR Y SIN SOLAPAMIENTO
       const etiquetasTop = listaAgrupada.slice(0, 10).map(p => p.promotor.split(' ')[0] + ' ' + (p.promotor.split(' ')[1] || ''));
       const metasTop = listaAgrupada.slice(0, 10).map(p => p.frecuenciaMeta);
       const realesTop = listaAgrupada.slice(0, 10).map(p => p.visitasReales);
@@ -893,7 +918,6 @@
       const ctx = document.getElementById('grafica-cobertura').getContext('2d');
       if (miGrafica) miGrafica.destroy();
 
-      // Encontrar el valor máximo para darle un margen holgado al eje Y
       let maxVal = 0;
       dataMetas.concat(dataReales).forEach(v => { if (v > maxVal) maxVal = v; });
 
@@ -902,7 +926,6 @@
         afterDatasetsDraw(chart) {
           const { ctx } = chart;
           
-          // 1. Dibujar el número exacto de visitas sobre cada barra
           chart.data.datasets.forEach((dataset, datasetIndex) => {
             const meta = chart.getDatasetMeta(datasetIndex);
             meta.data.forEach((bar, index) => {
@@ -919,7 +942,6 @@
             });
           });
 
-          // 2. Dibujar el % de cobertura global encima del grupo de barras
           const meta0 = chart.getDatasetMeta(0);
           const meta1 = chart.getDatasetMeta(1);
 
