@@ -53,27 +53,24 @@
   <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
   <aside class="w-72 bg-[#0F172A]/90 border-r border-slate-800/80 flex flex-col justify-between shrink-0 min-h-screen z-20">
     <div>
-      <!-- LOGO FIEL AL ORIGINAL Y SUBTÍTULO ACTUALIZADO -->
-      <div class="p-6 border-b border-slate-800/80 flex items-center space-x-3.5">
-        <div class="w-10 h-10 shrink-0">
-          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
-            <!-- Círculo Azul de Fondo -->
-            <circle cx="50" cy="50" r="48" fill="#0091FF" />
-            <!-- Trazos Exactos del Logo "E" -->
-            <g fill="#FFFFFF">
-              <polygon points="34,28 66,38 34,48" />
-              <polygon points="34,51 54,44 34,60" />
-              <polygon points="40,64 68,52 68,62 48,72" />
-            </g>
-          </svg>
-        </div>
-        <div>
-          <div class="flex items-center space-x-2">
-            <h1 class="font-extrabold text-white text-xl tracking-tight">Evolve</h1>
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE</span>
+      <!-- BRANDING CON LOGO EXACTO DE LA IMAGEN -->
+      <div class="p-6 border-b border-slate-800/80 flex flex-col space-y-2">
+        <div class="flex items-center space-x-3">
+          <div class="h-8 shrink-0">
+            <!-- Vector exacto del Isotipo + Texto evolve -->
+            <svg viewBox="0 0 380 120" class="h-full w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Isotipo Hexagonal en 3 bloques diagonales -->
+              <path d="M0 38.5L58 5L116 38.5L58 72L0 38.5Z" fill="#0091FF"/>
+              <path d="M0 60.5L58 27L80 39.5L22 73L0 60.5Z" fill="#0091FF"/>
+              <path d="M0 82.5L58 49L116 82.5L58 116L0 82.5Z" fill="#0091FF"/>
+              
+              <!-- Texto evolve en tipografía minúscula tech -->
+              <text x="130" y="85" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="78" fill="#0091FF" letter-spacing="-3">evolve</text>
+            </svg>
           </div>
-          <p class="text-[10px] font-bold tracking-wider text-cyan-400 uppercase">JUGUETIMAX · MULTIMARCA</p>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE</span>
         </div>
+        <p class="text-[10px] font-bold tracking-wider text-cyan-400 uppercase">JUGUETIMAX · MULTIMARCA</p>
       </div>
 
       <!-- NAVEGACIÓN PRINCIPAL -->
