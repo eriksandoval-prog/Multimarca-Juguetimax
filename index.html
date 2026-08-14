@@ -122,7 +122,7 @@
       <div class="flex items-center space-x-3">
         <span class="text-slate-400 font-medium text-sm">Filtro Activo:</span>
         <span id="label-filtro" class="uppercase tracking-wider text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-inner">
-          JUGUETIMAX (FIJO) | 2026 - ENERO
+          JUGUETIMAX (FIJO) | 2026 - AGOSTO
         </span>
       </div>
 
@@ -372,6 +372,10 @@
 
   <script>
     const NOMBRES_MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const MAPA_TEXTO_A_NUM = {
+      "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
+      "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+    };
 
     let marcaPrincipal = 'juguetimax';
     let subMarcaActual = 'Juguetimax por visita';
@@ -422,6 +426,15 @@
       }
     }
 
+    function normalizarMesNumero(valorMes) {
+      if (!valorMes) return 1;
+      if (typeof valorMes === 'number') return valorMes;
+      const parsed = parseInt(valorMes);
+      if (!isNaN(parsed)) return parsed;
+      const minus = String(valorMes).toLowerCase().trim();
+      return MAPA_TEXTO_A_NUM[minus] || 1;
+    }
+
     function escucharCambiosNube() {
       anioActual = document.getElementById('select-anio').value;
       subMarcaActual = document.getElementById('select-submarca').value;
@@ -468,9 +481,11 @@
         const archivosNube = [];
         snapshot.forEach((doc) => {
           const data = doc.data();
-          const mesDoc = parseInt(data.mesNum || data.mes || 1);
           
-          if (data.marca === claveMarca && data.anio === anioActual && (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
+          // Compatibilidad total con formatos viejos y nuevos de Firebase
+          const mesDoc = normalizarMesNumero(data.mesNum || data.mes);
+          
+          if (data.marca === claveMarca && String(data.anio) === String(anioActual) && (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
             archivosNube.push({ idDoc: doc.id, ...data });
           }
         });
@@ -490,7 +505,6 @@
 
       const mesGuardar = (modoVista === 'mes') ? parseInt(document.getElementById('select-mes').value) : parseInt(document.getElementById('select-mes-inicio').value);
 
-      // Si es un archivo de cobertura de Excel, parsear la estructura de tiendas y promotores
       if (categoria === 'cobertura' && (extension === 'xlsx' || extension === 'xls' || extension === 'csv')) {
         try {
           const buffer = await file.arrayBuffer();
@@ -498,7 +512,6 @@
           const hoja = workbook.Sheets[workbook.SheetNames[0]];
           const jsonDatos = XLSX.utils.sheet_to_json(hoja, { header: 1 });
 
-          // Buscar la fila de encabezados que contenga "PROMOTOR"
           let indexHeader = -1;
           for (let i = 0; i < Math.min(jsonDatos.length, 10); i++) {
             if (jsonDatos[i] && jsonDatos[i].includes("PROMOTOR")) {
@@ -547,6 +560,7 @@
         marca: claveMarca,
         anio: anioActual,
         mesNum: mesGuardar,
+        mes: NOMBRES_MESES[mesGuardar - 1].toLowerCase(),
         montoSinIVA: montoSubtotal,
         promotoresData: estructuraPromotores,
         fechaSubida: new Date().toISOString()
@@ -577,7 +591,6 @@
       document.getElementById('lista-bonos').innerHTML = renderizarListaHTML(bonos);
       document.getElementById('lista-plan').innerHTML = renderizarListaHTML(plan);
 
-      // PROCESAMIENTO DE PROMOTORES
       let listaRegistros = [];
       cobertura.forEach(c => {
         if (c.promotoresData && Array.isArray(c.promotoresData)) {
@@ -587,7 +600,6 @@
 
       renderizarTablaPromotores(listaRegistros);
 
-      // FACTURACIÓN
       const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
       let totalMonto = 0;
       facturacion.forEach(f => totalMonto += f.montoSinIVA);
@@ -616,7 +628,6 @@
         return;
       }
 
-      // Agrupar por Promotor
       const mapa = {};
       registros.forEach(r => {
         if (!mapa[r.promotor]) {
