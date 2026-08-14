@@ -318,10 +318,10 @@
         <div class="flex items-center justify-between">
           <div>
             <h3 class="text-base font-bold text-white">📈 Análitica Visual de Visitas: Programadas vs Reales</h3>
-            <p class="text-slate-400 text-xs">Comparativa de cumplimiento interactiva basada en los filtros seleccionados.</p>
+            <p class="text-slate-400 text-xs">Visitas visibles sobre cada barra y porcentaje % de cobertura destacado arriba.</p>
           </div>
         </div>
-        <div class="h-64 w-full relative">
+        <div class="h-72 w-full relative">
           <canvas id="grafica-cobertura"></canvas>
         </div>
       </div>
@@ -881,7 +881,7 @@
         `;
       }).join('');
 
-      // ACTUALIZAR GRÁFICA
+      // ACTUALIZAR GRÁFICA CON VISITAS Y PORCENTAJE VISIBLE
       const etiquetasTop = listaAgrupada.slice(0, 10).map(p => p.promotor.split(' ')[0] + ' ' + (p.promotor.split(' ')[1] || ''));
       const metasTop = listaAgrupada.slice(0, 10).map(p => p.frecuenciaMeta);
       const realesTop = listaAgrupada.slice(0, 10).map(p => p.visitasReales);
@@ -893,6 +893,56 @@
       const ctx = document.getElementById('grafica-cobertura').getContext('2d');
       if (miGrafica) miGrafica.destroy();
 
+      // Custom Plugin para dibujar Visitas y % Cobertura visible sobre las barras
+      const pluginValoresYPorcentaje = {
+        id: 'pluginEtiquetas',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          
+          // 1. Dibujar el número exacto de visitas sobre cada barra
+          chart.data.datasets.forEach((dataset, datasetIndex) => {
+            const meta = chart.getDatasetMeta(datasetIndex);
+            meta.data.forEach((bar, index) => {
+              const val = dataset.data[index];
+              if (val !== undefined && val !== null && val >= 0) {
+                ctx.save();
+                ctx.fillStyle = datasetIndex === 0 ? '#cbd5e1' : '#38bdf8';
+                ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(val, bar.x, bar.y - 3);
+                ctx.restore();
+              }
+            });
+          });
+
+          // 2. Dibujar el % de cobertura global encima del grupo de barras
+          const meta0 = chart.getDatasetMeta(0);
+          const meta1 = chart.getDatasetMeta(1);
+
+          meta0.data.forEach((bar0, index) => {
+            const metaVal = chart.data.datasets[0].data[index] || 0;
+            const realVal = chart.data.datasets[1].data[index] || 0;
+            const bar1 = meta1.data[index];
+
+            if (metaVal > 0 && bar1) {
+              const pctNum = (realVal / metaVal) * 100;
+              const pctTexto = pctNum.toFixed(0) + '%';
+              const topY = Math.min(bar0.y, bar1.y);
+              const posX = (bar0.x + bar1.x) / 2;
+
+              ctx.save();
+              ctx.fillStyle = pctNum >= 80 ? '#34d399' : (pctNum >= 50 ? '#fbbf24' : '#f43f5e');
+              ctx.font = '800 12px "Plus Jakarta Sans", sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(pctTexto, posX, topY - 18);
+              ctx.restore();
+            }
+          });
+        }
+      };
+
       miGrafica = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -901,7 +951,7 @@
             {
               label: 'Visitas Programadas (Meta)',
               data: dataMetas,
-              backgroundColor: 'rgba(148, 163, 184, 0.4)',
+              backgroundColor: 'rgba(148, 163, 184, 0.35)',
               borderColor: 'rgba(148, 163, 184, 0.8)',
               borderWidth: 1,
               borderRadius: 6
@@ -909,29 +959,47 @@
             {
               label: 'Visitas Reales Efectuadas',
               data: dataReales,
-              backgroundColor: 'rgba(56, 189, 248, 0.8)',
+              backgroundColor: 'rgba(56, 189, 248, 0.85)',
               borderColor: '#0091FF',
               borderWidth: 1,
               borderRadius: 6
             }
           ]
         },
+        plugins: [pluginValoresYPorcentaje],
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: {
+              top: 35
+            }
+          },
           plugins: {
             legend: {
               labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' } }
+            },
+            tooltip: {
+              callbacks: {
+                afterBody: function(context) {
+                  const idx = context[0].dataIndex;
+                  const m = dataMetas[idx] || 0;
+                  const r = dataReales[idx] || 0;
+                  const pct = m > 0 ? ((r / m) * 100).toFixed(1) : 0;
+                  return `% Cobertura: ${pct}%`;
+                }
+              }
             }
           },
           scales: {
             x: {
-              ticks: { color: '#94a3b8', font: { size: 10 } },
+              ticks: { color: '#94a3b8', font: { size: 10, weight: '600' } },
               grid: { color: 'rgba(255,255,255,0.05)' }
             },
             y: {
               ticks: { color: '#94a3b8', font: { size: 10 } },
-              grid: { color: 'rgba(255,255,255,0.05)' }
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              beginAtZero: true
             }
           }
         }
