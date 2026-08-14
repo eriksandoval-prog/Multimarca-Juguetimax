@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Librería para procesar Excel / CSV -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Librería para Gráficas Interactivas -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- CONEXIÓN DIRECTA CON FIREBASE -->
   <script type="module">
@@ -311,28 +313,61 @@
       <!-- METRICAS DE COBERTURA -->
       <div id="metricas-cobertura" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
 
-      <!-- BUSCADOR Y FILTROS TABLA DE PROMOTORES -->
+      <!-- SECCIÓN DE GRÁFICA DINÁMICA -->
+      <div class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-white">📈 Análitica Visual de Visitas: Programadas vs Reales</h3>
+            <p class="text-slate-400 text-xs">Comparativa de cumplimiento interactiva basada en los filtros seleccionados.</p>
+          </div>
+        </div>
+        <div class="h-64 w-full relative">
+          <canvas id="grafica-cobertura"></canvas>
+        </div>
+      </div>
+
+      <!-- BUSCADOR Y FILTROS AVANZADOS (CADENA, TIENDA Y PROMOTOR) -->
       <div class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 class="text-lg font-extrabold text-white">📊 Desempeño por Promotor y Tienda</h2>
-            <p class="text-slate-400 text-xs">Métricas acumuladas. Haz clic en cualquier encabezado para ordenar de menor a mayor o viceversa.</p>
+            <h2 class="text-lg font-extrabold text-white">📊 Desempeño por Promotor, Cadena y Tienda</h2>
+            <p class="text-slate-400 text-xs">Filtra por Cadena Comercial, Sucursal o Promotor para un análisis detallado.</p>
           </div>
           
-          <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
-            <select id="select-orden-columna" onchange="cambiarOrdenSelector()" class="bg-slate-900 text-xs text-slate-300 rounded-xl px-3 py-2.5 border border-slate-700 focus:outline-none focus:border-cyan-500">
-              <option value="cobertura_desc">% Cobertura (Mayor a Menor)</option>
-              <option value="cobertura_asc">% Cobertura (Menor a Mayor)</option>
-              <option value="promotor_asc">Promotor (A - Z)</option>
-              <option value="promotor_desc">Promotor (Z - A)</option>
-              <option value="tiendas_desc">Tiendas (Mayor a Menor)</option>
-              <option value="tiendas_asc">Tiendas (Menor a Mayor)</option>
-              <option value="visitas_desc">Visitas Reales (Mayor a Menor)</option>
-              <option value="visitas_asc">Visitas Reales (Menor a Mayor)</option>
-            </select>
+          <div class="flex items-center gap-3 flex-wrap w-full lg:w-auto">
+            <!-- FILTRO DE CADENA -->
+            <div class="flex flex-col">
+              <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Cadena:</label>
+              <select id="filter-cadena" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+                <option value="TODAS">Todas las Cadenas</option>
+              </select>
+            </div>
 
-            <div class="w-full sm:w-64">
-              <input type="text" id="buscador-promotor" onkeyup="filtrarTablaPromotores()" placeholder="🔍 Buscar Promotor o Tienda..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2.5 border border-slate-700 focus:outline-none focus:border-cyan-500">
+            <!-- FILTRO DE PROMOTOR -->
+            <div class="flex flex-col">
+              <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Promotor:</label>
+              <select id="filter-promotor" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+                <option value="TODOS">Todos los Promotores</option>
+              </select>
+            </div>
+
+            <!-- ORDENAMIENTO -->
+            <div class="flex flex-col">
+              <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Ordenar por:</label>
+              <select id="select-orden-columna" onchange="cambiarOrdenSelector()" class="bg-slate-900 text-xs text-slate-300 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+                <option value="cobertura_desc">% Cobertura (Mayor a Menor)</option>
+                <option value="cobertura_asc">% Cobertura (Menor a Mayor)</option>
+                <option value="promotor_asc">Promotor (A - Z)</option>
+                <option value="promotor_desc">Promotor (Z - A)</option>
+                <option value="tiendas_desc">Tiendas (Mayor a Menor)</option>
+                <option value="tiendas_asc">Tiendas (Menor a Mayor)</option>
+              </select>
+            </div>
+
+            <!-- BUSCADOR LIBRE -->
+            <div class="flex flex-col w-full sm:w-64">
+              <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Buscar:</label>
+              <input type="text" id="buscador-promotor" onkeyup="aplicarFiltrosPromotores()" placeholder="🔍 Buscar Tienda o Ciudad..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
             </div>
           </div>
         </div>
@@ -348,6 +383,7 @@
                 <th onclick="ordenarPorColumna('usuario')" class="p-3.5 text-center cursor-pointer hover:text-cyan-400 transition-colors">
                   Usuario <span id="icon-usuario">↕</span>
                 </th>
+                <th class="p-3.5 text-center">Cadena Principal</th>
                 <th onclick="ordenarPorColumna('tiendas')" class="p-3.5 text-center cursor-pointer hover:text-cyan-400 transition-colors">
                   Tiendas <span id="icon-tiendas">↕</span>
                 </th>
@@ -365,7 +401,7 @@
             </thead>
             <tbody id="tabla-promotores-body" class="divide-y divide-slate-800/60 text-slate-300">
               <tr>
-                <td colspan="7" class="p-6 text-center text-slate-500 italic">No hay reportes de cobertura cargados para este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
+                <td colspan="8" class="p-6 text-center text-slate-500 italic">No hay reportes de cobertura cargados para este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
               </tr>
             </tbody>
           </table>
@@ -413,8 +449,8 @@
     let modoVista = 'mes';
     let unsubscribe = null;
     let datosPromotoresGlobal = [];
+    let miGrafica = null;
 
-    // Variables de ordenamiento
     let columnaOrden = 'cobertura';
     let direccionOrden = 'desc';
 
@@ -569,6 +605,7 @@
             const headers = jsonDatos[indexHeader];
             const colPromotor = headers.indexOf("PROMOTOR");
             const colUsuario = headers.indexOf("USUARIO");
+            const colCadena = headers.indexOf("CADENA");
             const colFrecuencia = headers.indexOf("FRECUENCIA");
             const colVisitas = headers.indexOf("TTL Visitas");
             const colCobertura = headers.indexOf("% Cobertura");
@@ -580,6 +617,7 @@
                 estructuraPromotores.push({
                   promotor: String(row[colPromotor] || '').trim(),
                   usuario: String(row[colUsuario] || '').trim(),
+                  cadena: String(row[colCadena] || 'VARIAS').trim(),
                   frecuencia: parseFloat(row[colFrecuencia]) || 0,
                   visitas: parseFloat(row[colVisitas]) || 0,
                   coberturaPct: parseFloat(row[colCobertura]) || 0,
@@ -644,7 +682,9 @@
         }
       });
 
-      renderizarTablaPromotores(listaRegistros);
+      datosPromotoresGlobal = listaRegistros;
+      poblarDesplegablesFiltros(listaRegistros);
+      aplicarFiltrosPromotores();
 
       const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
       let totalMonto = 0;
@@ -659,6 +699,54 @@
         facturacion.map(f => `<tr class="hover:bg-slate-800/40 transition-colors"><td class="p-3.5 text-xs font-medium text-slate-200">${f.nombre}</td><td class="p-3.5 font-bold text-cyan-400">${formatoMoneda.format(f.montoSinIVA)}</td><td class="p-3.5 text-right"><button onclick="eliminarArchivoNube('${f.idDoc}')" class="text-rose-400 hover:text-rose-300 font-bold text-xs bg-rose-500/10 px-2.5 py-1 rounded-lg transition-colors">🗑️ Eliminar</button></td></tr>`).join('');
     }
 
+    function poblarDesplegablesFiltros(registros) {
+      const selectCadena = document.getElementById('filter-cadena');
+      const selectPromotor = document.getElementById('filter-promotor');
+
+      const valCadenaActual = selectCadena.value;
+      const valPromotorActual = selectPromotor.value;
+
+      const conjuntoCadenas = new Set();
+      const conjuntoPromotores = new Set();
+
+      registros.forEach(r => {
+        if (r.cadena) conjuntoCadenas.add(r.cadena);
+        if (r.promotor) conjuntoPromotores.add(r.promotor);
+      });
+
+      const arrCadenas = Array.from(conjuntoCadenas).sort();
+      const arrPromotores = Array.from(conjuntoPromotores).sort();
+
+      selectCadena.innerHTML = '<option value="TODAS">Todas las Cadenas</option>' + 
+        arrCadenas.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      selectPromotor.innerHTML = '<option value="TODOS">Todos los Promotores</option>' + 
+        arrPromotores.map(p => `<option value="${p}">${p}</option>`).join('');
+
+      if (arrCadenas.includes(valCadenaActual)) selectCadena.value = valCadenaActual;
+      if (arrPromotores.includes(valPromotorActual)) selectPromotor.value = valPromotorActual;
+    }
+
+    function aplicarFiltrosPromotores() {
+      const selCadena = document.getElementById('filter-cadena').value;
+      const selPromotor = document.getElementById('filter-promotor').value;
+      const q = document.getElementById('buscador-promotor').value.toLowerCase();
+
+      let filtrados = datosPromotoresGlobal.filter(r => {
+        const cumpleCadena = (selCadena === 'TODAS') || (r.cadena === selCadena);
+        const cumplePromotor = (selPromotor === 'TODOS') || (r.promotor === selPromotor);
+        const cumpleBusqueda = !q || 
+          r.promotor.toLowerCase().includes(q) || 
+          r.usuario.toLowerCase().includes(q) || 
+          r.tienda.toLowerCase().includes(q) || 
+          r.cadena.toLowerCase().includes(q);
+
+        return cumpleCadena && cumplePromotor && cumpleBusqueda;
+      });
+
+      renderizarTablaPromotores(filtrados);
+    }
+
     function ordenarPorColumna(col) {
       if (columnaOrden === col) {
         direccionOrden = direccionOrden === 'asc' ? 'desc' : 'asc';
@@ -667,7 +755,7 @@
         direccionOrden = 'desc';
       }
       actualizarIconosEncabezados();
-      renderizarTablaPromotores(datosPromotoresGlobal);
+      aplicarFiltrosPromotores();
     }
 
     function cambiarOrdenSelector() {
@@ -676,7 +764,7 @@
       columnaOrden = partes[0];
       direccionOrden = partes[1];
       actualizarIconosEncabezados();
-      renderizarTablaPromotores(datosPromotoresGlobal);
+      aplicarFiltrosPromotores();
     }
 
     function actualizarIconosEncabezados() {
@@ -695,8 +783,6 @@
     }
 
     function renderizarTablaPromotores(registros) {
-      datosPromotoresGlobal = registros;
-
       if (registros.length === 0) {
         document.getElementById('metricas-cobertura').innerHTML = `
           <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Promotores Activos</p><p class="text-2xl font-bold text-slate-500 mt-1">0</p></div>
@@ -705,7 +791,8 @@
           <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">% Cobertura General</p><p class="text-2xl font-bold text-slate-500 mt-1">0.0%</p></div>
         `;
 
-        document.getElementById('tabla-promotores-body').innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500 italic">No hay reportes de cobertura cargados para este periodo. Sube un archivo Excel en "Descarga de Docs".</td></tr>';
+        document.getElementById('tabla-promotores-body').innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No hay resultados de cobertura para el filtro seleccionado.</td></tr>';
+        renderizarGrafica([], [], []);
         return;
       }
 
@@ -715,6 +802,7 @@
           mapa[r.promotor] = {
             promotor: r.promotor,
             usuario: r.usuario,
+            cadena: r.cadena,
             tiendas: 0,
             frecuenciaMeta: 0,
             visitasReales: 0,
@@ -763,7 +851,7 @@
         <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Promotores Activos</p><p class="text-2xl font-bold text-white mt-1">${totalPromotores}</p></div>
         <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Tiendas Atendidas</p><p class="text-2xl font-bold text-cyan-400 mt-1">${totalTiendas}</p></div>
         <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Visitas Programadas / Reales</p><p class="text-2xl font-bold text-purple-400 mt-1">${totalMeta} / ${totalReales}</p></div>
-        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">% Cobertura Nacional</p><p class="text-2xl font-bold text-emerald-400 mt-1">${coberturaNacional}%</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">% Cobertura General</p><p class="text-2xl font-bold text-emerald-400 mt-1">${coberturaNacional}%</p></div>
       `;
 
       document.getElementById('tabla-promotores-body').innerHTML = listaAgrupada.map(p => {
@@ -783,6 +871,7 @@
           <tr class="hover:bg-slate-800/40 transition-colors">
             <td class="p-3.5 font-bold text-white">${p.promotor}</td>
             <td class="p-3.5 text-center font-mono text-cyan-400 text-xs">${p.usuario}</td>
+            <td class="p-3.5 text-center font-semibold text-slate-400">${p.cadena}</td>
             <td class="p-3.5 text-center font-semibold text-slate-300">${p.tiendas}</td>
             <td class="p-3.5 text-center font-semibold text-slate-400">${p.frecuenciaMeta}</td>
             <td class="p-3.5 text-center font-bold text-purple-300">${p.visitasReales}</td>
@@ -791,16 +880,62 @@
           </tr>
         `;
       }).join('');
+
+      // ACTUALIZAR GRÁFICA
+      const etiquetasTop = listaAgrupada.slice(0, 10).map(p => p.promotor.split(' ')[0] + ' ' + (p.promotor.split(' ')[1] || ''));
+      const metasTop = listaAgrupada.slice(0, 10).map(p => p.frecuenciaMeta);
+      const realesTop = listaAgrupada.slice(0, 10).map(p => p.visitasReales);
+
+      renderizarGrafica(etiquetasTop, metasTop, realesTop);
     }
 
-    function filtrarTablaPromotores() {
-      const q = document.getElementById('buscador-promotor').value.toLowerCase();
-      const filtrados = datosPromotoresGlobal.filter(r => 
-        r.promotor.toLowerCase().includes(q) || 
-        r.usuario.toLowerCase().includes(q) || 
-        r.tienda.toLowerCase().includes(q)
-      );
-      renderizarTablaPromotores(filtrados);
+    function renderizarGrafica(labels, dataMetas, dataReales) {
+      const ctx = document.getElementById('grafica-cobertura').getContext('2d');
+      if (miGrafica) miGrafica.destroy();
+
+      miGrafica = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Visitas Programadas (Meta)',
+              data: dataMetas,
+              backgroundColor: 'rgba(148, 163, 184, 0.4)',
+              borderColor: 'rgba(148, 163, 184, 0.8)',
+              borderWidth: 1,
+              borderRadius: 6
+            },
+            {
+              label: 'Visitas Reales Efectuadas',
+              data: dataReales,
+              backgroundColor: 'rgba(56, 189, 248, 0.8)',
+              borderColor: '#0091FF',
+              borderWidth: 1,
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' } }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#94a3b8', font: { size: 10 } },
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            y: {
+              ticks: { color: '#94a3b8', font: { size: 10 } },
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            }
+          }
+        }
+      });
     }
 
     setTimeout(() => { cambiarMarca('juguetimax'); }, 800);
