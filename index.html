@@ -313,7 +313,7 @@
       <!-- METRICAS DE COBERTURA -->
       <div id="metricas-cobertura" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
 
-      <!-- SECCIÓN DE GRÁFICA DINÁMICA -->
+      <!-- SECCIÓN DE GRÁFICA DINÁMICA CON MARGENES AMPLIADOS -->
       <div class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
         <div class="flex items-center justify-between">
           <div>
@@ -321,7 +321,7 @@
             <p class="text-slate-400 text-xs">Visitas visibles sobre cada barra y porcentaje % de cobertura destacado arriba.</p>
           </div>
         </div>
-        <div class="h-72 w-full relative">
+        <div class="h-80 w-full relative">
           <canvas id="grafica-cobertura"></canvas>
         </div>
       </div>
@@ -881,7 +881,7 @@
         `;
       }).join('');
 
-      // ACTUALIZAR GRÁFICA CON VISITAS Y PORCENTAJE VISIBLE
+      // ACTUALIZAR GRÁFICA CON MARGEN SUPERIOR Y SIN SOLAPAMIENTO
       const etiquetasTop = listaAgrupada.slice(0, 10).map(p => p.promotor.split(' ')[0] + ' ' + (p.promotor.split(' ')[1] || ''));
       const metasTop = listaAgrupada.slice(0, 10).map(p => p.frecuenciaMeta);
       const realesTop = listaAgrupada.slice(0, 10).map(p => p.visitasReales);
@@ -893,7 +893,10 @@
       const ctx = document.getElementById('grafica-cobertura').getContext('2d');
       if (miGrafica) miGrafica.destroy();
 
-      // Custom Plugin para dibujar Visitas y % Cobertura visible sobre las barras
+      // Encontrar el valor máximo para darle un margen holgado al eje Y
+      let maxVal = 0;
+      dataMetas.concat(dataReales).forEach(v => { if (v > maxVal) maxVal = v; });
+
       const pluginValoresYPorcentaje = {
         id: 'pluginEtiquetas',
         afterDatasetsDraw(chart) {
@@ -906,11 +909,11 @@
               const val = dataset.data[index];
               if (val !== undefined && val !== null && val >= 0) {
                 ctx.save();
-                ctx.fillStyle = datasetIndex === 0 ? '#cbd5e1' : '#38bdf8';
-                ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = datasetIndex === 0 ? '#e2e8f0' : '#38bdf8';
+                ctx.font = 'extrabold 11px "Plus Jakarta Sans", sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
-                ctx.fillText(val, bar.x, bar.y - 3);
+                ctx.fillText(val, bar.x, bar.y - 4);
                 ctx.restore();
               }
             });
@@ -933,10 +936,10 @@
 
               ctx.save();
               ctx.fillStyle = pctNum >= 80 ? '#34d399' : (pctNum >= 50 ? '#fbbf24' : '#f43f5e');
-              ctx.font = '800 12px "Plus Jakarta Sans", sans-serif';
+              ctx.font = '800 13px "Plus Jakarta Sans", sans-serif';
               ctx.textAlign = 'center';
               ctx.textBaseline = 'bottom';
-              ctx.fillText(pctTexto, posX, topY - 18);
+              ctx.fillText(pctTexto, posX, topY - 22);
               ctx.restore();
             }
           });
@@ -972,12 +975,20 @@
           maintainAspectRatio: false,
           layout: {
             padding: {
-              top: 35
+              top: 45,
+              bottom: 10
             }
           },
           plugins: {
             legend: {
-              labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' } }
+              position: 'top',
+              align: 'end',
+              labels: { 
+                color: '#94a3b8', 
+                font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
+                boxWidth: 14,
+                padding: 15
+              }
             },
             tooltip: {
               callbacks: {
@@ -997,6 +1008,7 @@
               grid: { color: 'rgba(255,255,255,0.05)' }
             },
             y: {
+              suggestedMax: maxVal > 0 ? maxVal * 1.3 : 10,
               ticks: { color: '#94a3b8', font: { size: 10 } },
               grid: { color: 'rgba(255,255,255,0.05)' },
               beginAtZero: true
