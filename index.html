@@ -50,6 +50,11 @@
 </head>
 <body class="bg-[#0B0F19] text-slate-100 min-h-screen flex font-sans antialiased selection:bg-cyan-500 selection:text-white">
 
+  <!-- NOTIFICACIÓN FLOTANTE -->
+  <div id="toast-notificacion" class="fixed top-5 right-5 z-50 hidden bg-emerald-500 text-white font-bold px-4 py-3 rounded-xl shadow-2xl border border-emerald-400 flex items-center space-x-2 transition-all">
+    <span>✓ Archivo guardado permanentemente en la nube</span>
+  </div>
+
   <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
   <aside class="w-72 bg-[#0F172A]/90 border-r border-slate-800/80 flex flex-col justify-between shrink-0 min-h-screen z-20">
     <div>
@@ -411,7 +416,13 @@
 
     // Variables de ordenamiento
     let columnaOrden = 'cobertura';
-    let direccionOrden = 'desc'; // 'asc' o 'desc'
+    let direccionOrden = 'desc';
+
+    function mostrarToast() {
+      const toast = document.getElementById('toast-notificacion');
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 3500);
+    }
 
     function alternarModoVista() {
       modoVista = document.getElementById('select-tipo-vista').value;
@@ -464,6 +475,11 @@
       return MAPA_TEXTO_A_NUM[minus] || 1;
     }
 
+    function normalizarMarca(m) {
+      if (!m) return '';
+      return String(m).toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
     function escucharCambiosNube() {
       anioActual = document.getElementById('select-anio').value;
       subMarcaActual = document.getElementById('select-submarca').value;
@@ -490,6 +506,7 @@
       }
 
       const claveMarca = obtenerClaveMarcaActiva();
+      const claveNormalizada = normalizarMarca(claveMarca);
       
       let textoLabel = '';
       if (marcaPrincipal === 'juguetimax') {
@@ -511,8 +528,9 @@
         snapshot.forEach((doc) => {
           const data = doc.data();
           const mesDoc = normalizarMesNumero(data.mesNum || data.mes);
+          const marcaDocNorm = normalizarMarca(data.marca);
           
-          if (data.marca === claveMarca && String(data.anio) === String(anioActual) && (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
+          if ((marcaDocNorm === claveNormalizada || marcaDocNorm.includes(claveNormalizada)) && String(data.anio) === String(anioActual) && (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
             archivosNube.push({ idDoc: doc.id, ...data });
           }
         });
@@ -585,7 +603,7 @@
         nombre: file.name,
         categoria: categoria,
         marca: claveMarca,
-        anio: anioActual,
+        anio: String(anioActual),
         mesNum: mesGuardar,
         mes: NOMBRES_MESES[mesGuardar - 1].toLowerCase(),
         montoSinIVA: montoSubtotal,
@@ -593,6 +611,7 @@
         fechaSubida: new Date().toISOString()
       });
 
+      mostrarToast();
       event.target.value = '';
     }
 
@@ -710,12 +729,10 @@
 
       let listaAgrupada = Object.values(mapa);
 
-      // Calcular % Promedio antes de ordenar
       listaAgrupada.forEach(p => {
         p.cobertura = p.tiendas > 0 ? (p.sumaCobertura / p.tiendas) * 100 : 0;
       });
 
-      // LÓGICA DE ORDENAMIENTO (MENOR A MAYOR / MAYOR A MENOR)
       listaAgrupada.sort((a, b) => {
         let valA = a[columnaOrden];
         let valB = b[columnaOrden];
