@@ -570,8 +570,6 @@
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           const mesDoc = normalizarMesNumero(data.mesNum || data.mes);
-          
-          // Comparación robusta por idCuenta o marca normalizada
           const idDocNormal = normalizarCadena(data.idCuenta || data.marca);
 
           if ((idDocNormal === idCuentaFiltro || idDocNormal.includes(idCuentaFiltro) || idCuentaFiltro.includes(idDocNormal)) && 
