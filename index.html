@@ -333,38 +333,44 @@
             <h2 class="text-lg font-extrabold text-white">📊 Desempeño por Promotor, Cadena y Tienda</h2>
             <p class="text-slate-400 text-xs">Filtra por Cadena Comercial, Sucursal o Promotor para un análisis detallado.</p>
           </div>
-          
-          <div class="flex items-center gap-3 flex-wrap w-full lg:w-auto">
-            <div class="flex flex-col">
-              <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Cadena:</label>
-              <select id="filter-cadena" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
-                <option value="TODAS">Todas las Cadenas</option>
-              </select>
-            </div>
 
-            <div class="flex flex-col">
-              <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Promotor:</label>
-              <select id="filter-promotor" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
-                <option value="TODOS">Todos los Promotores</option>
-              </select>
-            </div>
+          <!-- BOTÓN DE DESCARGA DE EXCEL -->
+          <button onclick="exportarTablaExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 border border-emerald-500/40 flex items-center space-x-2 transition-all shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span>📥 Descargar Reporte Excel</span>
+          </button>
+        </div>
 
-            <div class="flex flex-col">
-              <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Ordenar por:</label>
-              <select id="select-orden-columna" onchange="cambiarOrdenSelector()" class="bg-slate-900 text-xs text-slate-300 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
-                <option value="cobertura_desc">% Cobertura (Mayor a Menor)</option>
-                <option value="cobertura_asc">% Cobertura (Menor a Mayor)</option>
-                <option value="promotor_asc">Promotor (A - Z)</option>
-                <option value="promotor_desc">Promotor (Z - A)</option>
-                <option value="tiendas_desc">Tiendas (Mayor a Menor)</option>
-                <option value="tiendas_asc">Tiendas (Menor a Mayor)</option>
-              </select>
-            </div>
+        <div class="flex items-center gap-3 flex-wrap w-full lg:w-auto pt-2">
+          <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Cadena:</label>
+            <select id="filter-cadena" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+              <option value="TODAS">Todas las Cadenas</option>
+            </select>
+          </div>
 
-            <div class="flex flex-col w-full sm:w-64">
-              <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Buscar:</label>
-              <input type="text" id="buscador-promotor" onkeyup="aplicarFiltrosPromotores()" placeholder="🔍 Buscar Tienda o Ciudad..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
-            </div>
+          <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Promotor:</label>
+            <select id="filter-promotor" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+              <option value="TODOS">Todos los Promotores</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Ordenar por:</label>
+            <select id="select-orden-columna" onchange="cambiarOrdenSelector()" class="bg-slate-900 text-xs text-slate-300 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+              <option value="cobertura_desc">% Cobertura (Mayor a Menor)</option>
+              <option value="cobertura_asc">% Cobertura (Menor a Mayor)</option>
+              <option value="promotor_asc">Promotor (A - Z)</option>
+              <option value="promotor_desc">Promotor (Z - A)</option>
+              <option value="tiendas_desc">Tiendas (Mayor a Menor)</option>
+              <option value="tiendas_asc">Tiendas (Menor a Mayor)</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col w-full sm:w-64">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Buscar:</label>
+            <input type="text" id="buscador-promotor" onkeyup="aplicarFiltrosPromotores()" placeholder="🔍 Buscar Tienda o Ciudad..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
           </div>
         </div>
 
@@ -439,8 +445,14 @@
         <div class="glass-card rounded-xl overflow-hidden border border-slate-800 space-y-4 p-4">
           <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="font-bold text-slate-200 text-sm">Desglose Individual de Bonos</div>
-            <div class="w-full sm:w-64">
-              <input type="text" id="buscador-bono" onkeyup="filtrarTablaBonos()" placeholder="🔍 Buscar Colaborador..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-amber-500">
+            <div class="flex items-center gap-3">
+              <button onclick="exportarTablaBonosExcel()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-lg border border-amber-500/40 flex items-center space-x-1.5 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span>Descargar Bonos Excel</span>
+              </button>
+              <div class="w-full sm:w-64">
+                <input type="text" id="buscador-bono" onkeyup="filtrarTablaBonos()" placeholder="🔍 Buscar Colaborador..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-amber-500">
+              </div>
             </div>
           </div>
 
@@ -478,6 +490,7 @@
     let modoVista = 'mes';
     let unsubscribe = null;
     let datosPromotoresGlobal = [];
+    let datosPromotoresFiltrados = [];
     let datosBonosGlobal = [];
     let miGrafica = null;
 
@@ -830,6 +843,53 @@
       renderizarTablaBonos(filtrados);
     }
 
+    // EXPORTACIÓN A EXCEL DE TABLA DE PROMOTORES
+    function exportarTablaExcel() {
+      if (!datosPromotoresFiltrados || datosPromotoresFiltrados.length === 0) {
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      const datosExcel = datosPromotoresFiltrados.map(p => ({
+        "Promotor": p.promotor,
+        "Usuario": p.usuario,
+        "Cadena Principal": p.cadena,
+        "Tiendas Atendidas": p.tiendas,
+        "Frecuencia Meta": p.frecuenciaMeta,
+        "Visitas Reales": p.visitasReales,
+        "% Cobertura": parseFloat(p.cobertura.toFixed(1)),
+        "Estatus": p.cobertura < 50 ? "Crítico" : (p.cobertura < 80 ? "En Riesgo" : "Óptimo")
+      }));
+
+      const hoja = XLSX.utils.json_to_sheet(datosExcel);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Cobertura");
+
+      const claveMarca = obtenerClaveMarcaActiva();
+      const mesTexto = modoVista === 'mes' ? NOMBRES_MESES[parseInt(document.getElementById('select-mes').value) - 1] : "Rango";
+      XLSX.writeFile(libro, `Reporte_Cobertura_${claveMarca}_${anioActual}_${mesTexto}.xlsx`);
+    }
+
+    // EXPORTACIÓN A EXCEL DE TABLA DE BONOS
+    function exportarTablaBonosExcel() {
+      if (!datosBonosGlobal || datosBonosGlobal.length === 0) {
+        alert("No hay datos de bonos para exportar.");
+        return;
+      }
+
+      const datosExcel = datosBonosGlobal.map(b => ({
+        "Colaborador / Promotor": b.nombre,
+        "Monto Bono": b.montoBono
+      }));
+
+      const hoja = XLSX.utils.json_to_sheet(datosExcel);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Bonos");
+
+      const claveMarca = obtenerClaveMarcaActiva();
+      XLSX.writeFile(libro, `Reporte_Bonos_${claveMarca}_${anioActual}.xlsx`);
+    }
+
     function poblarDesplegablesFiltros(registros) {
       const selectCadena = document.getElementById('filter-cadena');
       const selectPromotor = document.getElementById('filter-promotor');
@@ -915,6 +975,7 @@
 
     function renderizarTablaPromotores(registros) {
       if (registros.length === 0) {
+        datosPromotoresFiltrados = [];
         document.getElementById('metricas-cobertura').innerHTML = `
           <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Promotores Activos</p><p class="text-2xl font-bold text-slate-500 mt-1">0</p></div>
           <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Tiendas Totales</p><p class="text-2xl font-bold text-slate-500 mt-1">0</p></div>
@@ -965,6 +1026,8 @@
         if (valA > valB) return direccionOrden === 'asc' ? 1 : -1;
         return 0;
       });
+
+      datosPromotoresFiltrados = listaAgrupada;
 
       let totalTiendas = registros.length;
       let totalPromotores = listaAgrupada.length;
