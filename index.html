@@ -98,6 +98,10 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
             <span>Pagos y Facturación</span>
           </button>
+          <button onclick="cambiarVista('bonos')" id="nav-bonos" class="w-full mt-2 flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Reportes de Bonos</span>
+          </button>
         </div>
       </nav>
     </div>
@@ -281,7 +285,7 @@
         <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-amber-500/50 flex items-center justify-center space-x-2 transition-all">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
           <span>Subir Archivo de Bonos</span>
-          <input type="file" class="hidden" onchange="subirArchivoNube(event, 'bonos')">
+          <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'bonos')">
         </label>
       </div>
 
@@ -309,11 +313,8 @@
 
     <!-- VISTA 2: COBERTURA Y ANÁLISIS DE PROMOTORES -->
     <div id="vista-cobertura" class="hidden space-y-6">
-      
-      <!-- METRICAS DE COBERTURA -->
       <div id="metricas-cobertura" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
 
-      <!-- SECCIÓN DE GRÁFICA DINÁMICA CON MARGENES AMPLIADOS -->
       <div class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
         <div class="flex items-center justify-between">
           <div>
@@ -326,7 +327,6 @@
         </div>
       </div>
 
-      <!-- BUSCADOR Y FILTROS AVANZADOS -->
       <div class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -335,7 +335,6 @@
           </div>
           
           <div class="flex items-center gap-3 flex-wrap w-full lg:w-auto">
-            <!-- FILTRO DE CADENA -->
             <div class="flex flex-col">
               <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Cadena:</label>
               <select id="filter-cadena" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
@@ -343,7 +342,6 @@
               </select>
             </div>
 
-            <!-- FILTRO DE PROMOTOR -->
             <div class="flex flex-col">
               <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Promotor:</label>
               <select id="filter-promotor" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
@@ -351,7 +349,6 @@
               </select>
             </div>
 
-            <!-- ORDENAMIENTO -->
             <div class="flex flex-col">
               <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Ordenar por:</label>
               <select id="select-orden-columna" onchange="cambiarOrdenSelector()" class="bg-slate-900 text-xs text-slate-300 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
@@ -364,7 +361,6 @@
               </select>
             </div>
 
-            <!-- BUSCADOR LIBRE -->
             <div class="flex flex-col w-full sm:w-64">
               <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Buscar:</label>
               <input type="text" id="buscador-promotor" onkeyup="aplicarFiltrosPromotores()" placeholder="🔍 Buscar Tienda o Ciudad..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
@@ -372,7 +368,6 @@
           </div>
         </div>
 
-        <!-- TABLA DINÁMICA DE PROMOTORES CON ENCABEZADOS CLICKABLES -->
         <div class="overflow-x-auto border border-slate-800 rounded-xl">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-900/90 text-slate-400 font-bold uppercase border-b border-slate-800 select-none">
@@ -434,6 +429,40 @@
       </div>
     </div>
 
+    <!-- VISTA 4: REPORTES DE BONOS -->
+    <div id="vista-bonos" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-white mb-1">🎁 Reporte e Incentivos de Bonos Mensuales</h2>
+        <p class="text-slate-400 text-xs mb-6">Análisis detallado de montos e incentivos otorgados por persona.</p>
+        <div id="metricas-bonos" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+
+        <div class="glass-card rounded-xl overflow-hidden border border-slate-800 space-y-4 p-4">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="font-bold text-slate-200 text-sm">Desglose Individual de Bonos</div>
+            <div class="w-full sm:w-64">
+              <input type="text" id="buscador-bono" onkeyup="filtrarTablaBonos()" placeholder="🔍 Buscar Colaborador..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-800 rounded-xl">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-900/80 text-slate-400 text-xs font-bold uppercase border-b border-slate-800">
+                <tr>
+                  <th class="p-3.5">Colaborador / Promotor</th>
+                  <th class="p-3.5 text-right">Monto de Bono</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-bonos-body" class="divide-y divide-slate-800/60 text-slate-300">
+                <tr>
+                  <td colspan="2" class="p-6 text-center text-slate-500 italic">No hay reportes de bonos cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <script>
@@ -449,6 +478,7 @@
     let modoVista = 'mes';
     let unsubscribe = null;
     let datosPromotoresGlobal = [];
+    let datosBonosGlobal = [];
     let miGrafica = null;
 
     let columnaOrden = 'cobertura';
@@ -493,7 +523,7 @@
     }
 
     function cambiarVista(vista) {
-      ['descarga', 'cobertura', 'facturacion'].forEach(v => {
+      ['descarga', 'cobertura', 'facturacion', 'bonos'].forEach(v => {
         document.getElementById(`vista-${v}`).classList.toggle('hidden', v !== vista);
       });
     }
@@ -595,45 +625,76 @@
       const extension = file.name.split('.').pop().toLowerCase();
       let montoSubtotal = 0;
       let estructuraPromotores = [];
+      let estructuraBonos = [];
 
       const mesGuardar = (modoVista === 'mes') ? parseInt(document.getElementById('select-mes').value) : parseInt(document.getElementById('select-mes-inicio').value);
 
-      if (categoria === 'cobertura' && (extension === 'xlsx' || extension === 'xls' || extension === 'csv')) {
+      if ((categoria === 'cobertura' || categoria === 'bonos') && (extension === 'xlsx' || extension === 'xls' || extension === 'csv')) {
         try {
           const buffer = await file.arrayBuffer();
           const workbook = XLSX.read(buffer, { type: 'array' });
           const hoja = workbook.Sheets[workbook.SheetNames[0]];
           const jsonDatos = XLSX.utils.sheet_to_json(hoja, { header: 1 });
 
-          let indexHeader = -1;
-          for (let i = 0; i < Math.min(jsonDatos.length, 10); i++) {
-            if (jsonDatos[i] && jsonDatos[i].includes("PROMOTOR")) {
-              indexHeader = i;
-              break;
+          if (categoria === 'cobertura') {
+            let indexHeader = -1;
+            for (let i = 0; i < Math.min(jsonDatos.length, 10); i++) {
+              if (jsonDatos[i] && jsonDatos[i].includes("PROMOTOR")) {
+                indexHeader = i;
+                break;
+              }
             }
-          }
 
-          if (indexHeader !== -1) {
-            const headers = jsonDatos[indexHeader];
-            const colPromotor = headers.indexOf("PROMOTOR");
-            const colUsuario = headers.indexOf("USUARIO");
-            const colCadena = headers.indexOf("CADENA");
-            const colFrecuencia = headers.indexOf("FRECUENCIA");
-            const colVisitas = headers.indexOf("TTL Visitas");
-            const colCobertura = headers.indexOf("% Cobertura");
-            const colNombreTienda = headers.indexOf("NOMBRE");
+            if (indexHeader !== -1) {
+              const headers = jsonDatos[indexHeader];
+              const colPromotor = headers.indexOf("PROMOTOR");
+              const colUsuario = headers.indexOf("USUARIO");
+              const colCadena = headers.indexOf("CADENA");
+              const colFrecuencia = headers.indexOf("FRECUENCIA");
+              const colVisitas = headers.indexOf("TTL Visitas");
+              const colCobertura = headers.indexOf("% Cobertura");
+              const colNombreTienda = headers.indexOf("NOMBRE");
 
-            for (let r = indexHeader + 1; r < jsonDatos.length; r++) {
+              for (let r = indexHeader + 1; r < jsonDatos.length; r++) {
+                const row = jsonDatos[r];
+                if (row && row[colPromotor]) {
+                  estructuraPromotores.push({
+                    promotor: String(row[colPromotor] || '').trim(),
+                    usuario: String(row[colUsuario] || '').trim(),
+                    cadena: String(row[colCadena] || 'VARIAS').trim(),
+                    frecuencia: parseFloat(row[colFrecuencia]) || 0,
+                    visitas: parseFloat(row[colVisitas]) || 0,
+                    coberturaPct: parseFloat(row[colCobertura]) || 0,
+                    tienda: String(row[colNombreTienda] || '').trim()
+                  });
+                }
+              }
+            }
+          } else if (categoria === 'bonos') {
+            let colNombre = -1;
+            let colMonto = -1;
+
+            for (let i = 0; i < Math.min(jsonDatos.length, 10); i++) {
+              if (jsonDatos[i]) {
+                jsonDatos[i].forEach((col, idx) => {
+                  const val = String(col || '').toLowerCase();
+                  if (val.includes('nombre') || val.includes('promotor') || val.includes('empleado') || val.includes('persona')) colNombre = idx;
+                  if (val.includes('bono') || val.includes('monto') || val.includes('cantidad') || val.includes('incentivo') || val.includes('total')) colMonto = idx;
+                });
+                if (colNombre !== -1 && colMonto !== -1) break;
+              }
+            }
+
+            if (colNombre === -1) colNombre = 0;
+            if (colMonto === -1) colMonto = 1;
+
+            for (let r = 1; r < jsonDatos.length; r++) {
               const row = jsonDatos[r];
-              if (row && row[colPromotor]) {
-                estructuraPromotores.push({
-                  promotor: String(row[colPromotor] || '').trim(),
-                  usuario: String(row[colUsuario] || '').trim(),
-                  cadena: String(row[colCadena] || 'VARIAS').trim(),
-                  frecuencia: parseFloat(row[colFrecuencia]) || 0,
-                  visitas: parseFloat(row[colVisitas]) || 0,
-                  coberturaPct: parseFloat(row[colCobertura]) || 0,
-                  tienda: String(row[colNombreTienda] || '').trim()
+              if (row && row[colNombre]) {
+                const m = parseFloat(String(row[colMonto] || 0).replace(/[^0-9.]/g, '')) || 0;
+                estructuraBonos.push({
+                  nombre: String(row[colNombre] || '').trim(),
+                  montoBono: m
                 });
               }
             }
@@ -660,6 +721,7 @@
           mes: NOMBRES_MESES[mesGuardar - 1].toLowerCase(),
           montoSinIVA: montoSubtotal,
           promotoresData: estructuraPromotores,
+          bonosData: estructuraBonos,
           fechaSubida: new Date().toISOString()
         });
 
@@ -699,6 +761,7 @@
       document.getElementById('lista-bonos').innerHTML = renderizarListaHTML(bonos);
       document.getElementById('lista-plan').innerHTML = renderizarListaHTML(plan);
 
+      // COBERTURA
       let listaRegistros = [];
       cobertura.forEach(c => {
         if (c.promotoresData && Array.isArray(c.promotoresData)) {
@@ -710,6 +773,17 @@
       poblarDesplegablesFiltros(listaRegistros);
       aplicarFiltrosPromotores();
 
+      // BONOS
+      let listaBonos = [];
+      bonos.forEach(b => {
+        if (b.bonosData && Array.isArray(b.bonosData)) {
+          listaBonos = listaBonos.concat(b.bonosData);
+        }
+      });
+      datosBonosGlobal = listaBonos;
+      renderizarTablaBonos(listaBonos);
+
+      // FACTURACIÓN
       const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
       let totalMonto = 0;
       facturacion.forEach(f => totalMonto += f.montoSinIVA);
@@ -721,6 +795,39 @@
 
       document.getElementById('tabla-facturas-body').innerHTML = facturacion.length === 0 ? '<tr><td colspan="3" class="p-4 text-center text-slate-500 text-xs italic">Sin facturas registradas en este periodo</td></tr>' :
         facturacion.map(f => `<tr class="hover:bg-slate-800/40 transition-colors"><td class="p-3.5 text-xs font-medium text-slate-200">${f.nombre}</td><td class="p-3.5 font-bold text-cyan-400">${formatoMoneda.format(f.montoSinIVA)}</td><td class="p-3.5 text-right"><button onclick="eliminarArchivoNube('${f.idDoc}')" class="text-rose-400 hover:text-rose-300 font-bold text-xs bg-rose-500/10 px-2.5 py-1 rounded-lg transition-colors">🗑️ Eliminar</button></td></tr>`).join('');
+    }
+
+    function renderizarTablaBonos(registros) {
+      const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+      let totalMontoBonos = 0;
+
+      registros.forEach(r => totalMontoBonos += r.montoBono);
+
+      const promedioBono = registros.length > 0 ? (totalMontoBonos / registros.length) : 0;
+
+      document.getElementById('metricas-bonos').innerHTML = `
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Colaboradores con Bono</p><p class="text-2xl font-bold text-white mt-1">${registros.length}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Monto Total de Bonos</p><p class="text-2xl font-bold text-amber-400 mt-1">${formatoMoneda.format(totalMontoBonos)}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Promedio por Persona</p><p class="text-2xl font-bold text-emerald-400 mt-1">${formatoMoneda.format(promedioBono)}</p></div>
+      `;
+
+      if (registros.length === 0) {
+        document.getElementById('tabla-bonos-body').innerHTML = '<tr><td colspan="2" class="p-6 text-center text-slate-500 italic">No hay reportes de bonos cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td></tr>';
+        return;
+      }
+
+      document.getElementById('tabla-bonos-body').innerHTML = registros.map(r => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="p-3.5 font-bold text-white">${r.nombre}</td>
+          <td class="p-3.5 text-right font-bold text-amber-400">${formatoMoneda.format(r.montoBono)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function filtrarTablaBonos() {
+      const q = document.getElementById('buscador-bono').value.toLowerCase();
+      const filtrados = datosBonosGlobal.filter(r => r.nombre.toLowerCase().includes(q));
+      renderizarTablaBonos(filtrados);
     }
 
     function poblarDesplegablesFiltros(registros) {
