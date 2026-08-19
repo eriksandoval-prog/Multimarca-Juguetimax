@@ -331,7 +331,7 @@
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 class="text-lg font-extrabold text-white">📊 Desempeño por Promotor, Cadena y Tienda</h2>
-            <p class="text-slate-400 text-xs">Filtra por Cadena Comercial, Sucursal o Promotor para un análisis detallado.</p>
+            <p class="text-slate-400 text-xs">Filtra por Cadena Comercial, Nombre de Tienda o Promotor para un análisis detallado.</p>
           </div>
 
           <button onclick="exportarTablaExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 border border-emerald-500/40 flex items-center space-x-2 transition-all shrink-0">
@@ -340,11 +340,20 @@
           </button>
         </div>
 
+        <!-- BARRA DE FILTROS AVANZADOS (INCLUYE NOMBRE DE TIENDA) -->
         <div class="flex items-center gap-3 flex-wrap w-full lg:w-auto pt-2">
           <div class="flex flex-col">
             <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Cadena:</label>
             <select id="filter-cadena" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
               <option value="TODAS">Todas las Cadenas</option>
+            </select>
+          </div>
+
+          <!-- NUEVO FILTRO DE NOMBRE DE TIENDA -->
+          <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Tienda:</label>
+            <select id="filter-tienda" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500 max-w-xs">
+              <option value="TODAS">Todas las Tiendas</option>
             </select>
           </div>
 
@@ -893,26 +902,37 @@
     function poblarDesplegablesFiltros(registros) {
       const selectCadena = document.getElementById('filter-cadena');
       const selectPromotor = document.getElementById('filter-promotor');
+      const selectTienda = document.getElementById('filter-tienda');
 
       const valCadenaActual = selectCadena.value;
       const valPromotorActual = selectPromotor.value;
+      const valTiendaActual = selectTienda ? selectTienda.value : 'TODAS';
 
       const conjuntoCadenas = new Set();
       const conjuntoPromotores = new Set();
+      const conjuntoTiendas = new Set();
 
       registros.forEach(r => {
         if (r.cadena) conjuntoCadenas.add(r.cadena);
         if (r.promotor) conjuntoPromotores.add(r.promotor);
+        if (r.tienda) conjuntoTiendas.add(r.tienda);
       });
 
       const arrCadenas = Array.from(conjuntoCadenas).sort();
       const arrPromotores = Array.from(conjuntoPromotores).sort();
+      const arrTiendas = Array.from(conjuntoTiendas).sort();
 
       selectCadena.innerHTML = '<option value="TODAS">Todas las Cadenas</option>' + 
         arrCadenas.map(c => `<option value="${c}">${c}</option>`).join('');
 
       selectPromotor.innerHTML = '<option value="TODOS">Todos los Promotores</option>' + 
         arrPromotores.map(p => `<option value="${p}">${p}</option>`).join('');
+
+      if (selectTienda) {
+        selectTienda.innerHTML = '<option value="TODAS">Todas las Tiendas</option>' + 
+          arrTiendas.map(t => `<option value="${t}">${t}</option>`).join('');
+        if (arrTiendas.includes(valTiendaActual)) selectTienda.value = valTiendaActual;
+      }
 
       if (arrCadenas.includes(valCadenaActual)) selectCadena.value = valCadenaActual;
       if (arrPromotores.includes(valPromotorActual)) selectPromotor.value = valPromotorActual;
@@ -921,18 +941,20 @@
     function aplicarFiltrosPromotores() {
       const selCadena = document.getElementById('filter-cadena').value;
       const selPromotor = document.getElementById('filter-promotor').value;
+      const selTienda = document.getElementById('filter-tienda') ? document.getElementById('filter-tienda').value : 'TODAS';
       const q = document.getElementById('buscador-promotor').value.toLowerCase();
 
       let filtrados = datosPromotoresGlobal.filter(r => {
         const cumpleCadena = (selCadena === 'TODAS') || (r.cadena === selCadena);
         const cumplePromotor = (selPromotor === 'TODOS') || (r.promotor === selPromotor);
+        const cumpleTienda = (selTienda === 'TODAS') || (r.tienda === selTienda);
         const cumpleBusqueda = !q || 
           r.promotor.toLowerCase().includes(q) || 
           r.usuario.toLowerCase().includes(q) || 
           r.tienda.toLowerCase().includes(q) || 
           r.cadena.toLowerCase().includes(q);
 
-        return cumpleCadena && cumplePromotor && cumpleBusqueda;
+        return cumpleCadena && cumplePromotor && cumpleTienda && cumpleBusqueda;
       });
 
       renderizarTablaPromotores(filtrados);
