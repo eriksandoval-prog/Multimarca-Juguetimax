@@ -10,14 +10,15 @@
   <!-- Librería para Gráficas Interactivas -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- CONEXIÓN DIRECTA CON FIREBASE -->
+  <!-- CONEXIÓN DIRECTA CON FIREBASE (REALTIME DATABASE) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBXddmuE57qC-UvunpYzft8rxHo12hvJfY",
       authDomain: "juguetimax---multimarca.firebaseapp.com",
+      databaseURL: "https://juguetimax---multimarca-default-rtdb.firebaseio.com",
       projectId: "juguetimax---multimarca",
       storageBucket: "juguetimax---multimarca.firebasestorage.app",
       messagingSenderId: "879522328879",
@@ -26,14 +27,13 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
 
     window.db = db;
-    window.addDoc = addDoc;
-    window.collection = collection;
-    window.onSnapshot = onSnapshot;
-    window.deleteDoc = deleteDoc;
-    window.doc = doc;
+    window.ref = ref;
+    window.push = push;
+    window.onValue = onValue;
+    window.remove = remove;
   </script>
   
   <style>
@@ -334,7 +334,6 @@
             <p class="text-slate-400 text-xs">Filtra por Cadena Comercial, Sucursal o Promotor para un análisis detallado.</p>
           </div>
 
-          <!-- BOTÓN DE DESCARGA DE EXCEL -->
           <button onclick="exportarTablaExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 border border-emerald-500/40 flex items-center space-x-2 transition-all shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             <span>📥 Descargar Reporte Excel</span>
@@ -604,28 +603,29 @@
         
       document.getElementById('label-filtro').innerText = textoLabel;
 
-      if (unsubscribe) unsubscribe();
-
       if (!window.db) return;
 
-      window.unsubscribe = window.onSnapshot(window.collection(window.db, "archivos_evolve"), (snapshot) => {
+      const dbRef = window.ref(window.db, "archivos_evolve");
+
+      window.onValue(dbRef, (snapshot) => {
         const archivosNube = [];
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
+        snapshot.forEach((childSnap) => {
+          const data = childSnap.val();
+          const keyDoc = childSnap.key;
           const mesDoc = normalizarMesNumero(data.mesNum || data.mes);
           const idDocNormal = normalizarCadena(data.idCuenta || data.marca);
 
           if ((idDocNormal === idCuentaFiltro || idDocNormal.includes(idCuentaFiltro) || idCuentaFiltro.includes(idDocNormal)) && 
               String(data.anio) === String(anioActual) && 
               (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
-            archivosNube.push({ idDoc: docSnap.id, ...data });
+            archivosNube.push({ idDoc: keyDoc, ...data });
           }
         });
 
         renderizarPantalla(archivosNube);
       }, (error) => {
-        console.error("Error al escuchar Firebase:", error);
-        mostrarToast("⚠️ Error de permisos en Firebase. Revisa tus Reglas en Firestore.", true);
+        console.error("Error al escuchar Firebase Realtime Database:", error);
+        mostrarToast("⚠️ Error de permisos en Firebase.", true);
       });
     }
 
@@ -724,7 +724,8 @@
       }
 
       try {
-        await window.addDoc(window.collection(window.db, "archivos_evolve"), {
+        const dbRef = window.ref(window.db, "archivos_evolve");
+        await window.push(dbRef, {
           nombre: file.name,
           categoria: categoria,
           marca: claveMarca,
@@ -741,7 +742,7 @@
         mostrarToast("✓ Guardado permanentemente en Firebase");
       } catch (e) {
         console.error("Error guardando en Firebase:", e);
-        mostrarToast("❌ No se pudo guardar. Revisa tus Reglas en Firebase.", true);
+        mostrarToast("❌ No se pudo guardar. Revisa Firebase.", true);
       }
 
       event.target.value = '';
@@ -750,7 +751,8 @@
     async function eliminarArchivoNube(idDoc) {
       if (confirm("¿Deseas eliminar este archivo para todos los usuarios?")) {
         try {
-          await window.deleteDoc(window.doc(window.db, "archivos_evolve", idDoc));
+          const itemRef = window.ref(window.db, `archivos_evolve/${idDoc}`);
+          await window.remove(itemRef);
           mostrarToast("🗑️ Archivo eliminado de Firebase");
         } catch (e) {
           mostrarToast("❌ Error al eliminar el archivo.", true);
@@ -843,7 +845,6 @@
       renderizarTablaBonos(filtrados);
     }
 
-    // EXPORTACIÓN A EXCEL DE TABLA DE PROMOTORES
     function exportarTablaExcel() {
       if (!datosPromotoresFiltrados || datosPromotoresFiltrados.length === 0) {
         alert("No hay datos para exportar.");
@@ -870,7 +871,6 @@
       XLSX.writeFile(libro, `Reporte_Cobertura_${claveMarca}_${anioActual}_${mesTexto}.xlsx`);
     }
 
-    // EXPORTACIÓN A EXCEL DE TABLA DE BONOS
     function exportarTablaBonosExcel() {
       if (!datosBonosGlobal || datosBonosGlobal.length === 0) {
         alert("No hay datos de bonos para exportar.");
