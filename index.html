@@ -81,8 +81,12 @@
         <div>
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-3">PANEL GENERAL</p>
           <button onclick="cambiarVista('descarga')" id="nav-descarga" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 transition-all">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-            <span>Descarga de Docs</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12"></path></svg>
+            <span>Carga de Docs</span>
+          </button>
+          <button onclick="cambiarVista('vacantes')" id="nav-vacantes" class="w-full mt-2 flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+            <span>Reportes de Vacantes</span>
           </button>
         </div>
         <div>
@@ -101,10 +105,6 @@
           <button onclick="cambiarVista('bonos')" id="nav-bonos" class="w-full mt-2 flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span>Reportes de Bonos</span>
-          </button>
-          <button onclick="cambiarVista('vacantes')" id="nav-vacantes" class="w-full mt-2 flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-            <span>Reportes de Vacantes</span>
           </button>
         </div>
       </nav>
@@ -230,7 +230,7 @@
       </div>
     </div>
 
-    <!-- VISTA 1: DESCARGA DE DOCUMENTOS -->
+    <!-- VISTA 1: CARGA DE DOCUMENTOS -->
     <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       
       <!-- 1. Cobertura -->
@@ -302,7 +302,7 @@
             </div>
             <h2 class="font-bold text-white text-lg">Reportes de Vacantes</h2>
           </div>
-          <p class="text-slate-400 text-xs mb-5">Archivos y seguimiento de posiciones abiertas en tienda.</p>
+          <p class="text-slate-400 text-xs mb-5">Archivos y seguimiento general de posiciones abiertas.</p>
           <ul id="lista-vacantes" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
         </div>
 
@@ -432,7 +432,7 @@
             </thead>
             <tbody id="tabla-promotores-body" class="divide-y divide-slate-800/60 text-slate-300">
               <tr>
-                <td colspan="8" class="p-6 text-center text-slate-500 italic">No hay reportes de cobertura cargados para este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
+                <td colspan="8" class="p-6 text-center text-slate-500 italic">No hay reportes de cobertura cargados para este periodo. Sube un archivo Excel en "Carga de Docs".</td>
               </tr>
             </tbody>
           </table>
@@ -496,7 +496,7 @@
               </thead>
               <tbody id="tabla-bonos-body" class="divide-y divide-slate-800/60 text-slate-300">
                 <tr>
-                  <td colspan="2" class="p-6 text-center text-slate-500 italic">No hay reportes de bonos cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
+                  <td colspan="2" class="p-6 text-center text-slate-500 italic">No hay reportes de bonos cargados en este periodo. Sube un archivo Excel en "Carga de Docs".</td>
                 </tr>
               </tbody>
             </table>
@@ -505,12 +505,12 @@
       </div>
     </div>
 
-    <!-- VISTA 5: REPORTES DE VACANTES CON NAVEGACIÓN POR SUB-PESTAÑAS -->
+    <!-- VISTA 5: REPORTES DE VACANTES GENERAL CON NAVEGACIÓN POR SUB-PESTAÑAS -->
     <div id="vista-vacantes" class="hidden space-y-6">
       <div class="glass-card rounded-2xl p-6 shadow-sm space-y-6">
         <div>
-          <h2 class="text-lg font-extrabold text-white mb-1">🚨 Diagnóstico Operativo y Análisis de Vacantes</h2>
-          <p class="text-slate-400 text-xs">Monitoreo de posiciones abiertas, asignación por reclutador y cobertura geográfica.</p>
+          <h2 class="text-lg font-extrabold text-white mb-1">🚨 Diagnóstico Operativo General de Vacantes</h2>
+          <p class="text-slate-400 text-xs">Monitoreo global de posiciones abiertas, asignación por reclutador y cobertura geográfica (Sin segmentación por marca).</p>
         </div>
 
         <!-- MENÚ DE SUB-PESTAÑAS -->
@@ -537,7 +537,7 @@
           <div id="metricas-vacantes-general" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
           
           <div class="glass-card rounded-xl p-4 border border-slate-800 flex justify-between items-center flex-wrap gap-4">
-            <span class="text-xs text-slate-300 font-semibold">Descarga el reporte completo de vacantes con todas las variables cargadas.</span>
+            <span class="text-xs text-slate-300 font-semibold">Descarga el reporte completo de vacantes generales almacenadas en el sistema.</span>
             <button onclick="exportarVacantesGeneralesExcel()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg border border-rose-500/40 flex items-center space-x-1.5 transition-all">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
               <span>Descargar Reporte General Excel</span>
@@ -809,12 +809,20 @@
 
       window.onValue(dbRef, (snapshot) => {
         const archivosNube = [];
+        const archivosVacantesGlobales = [];
+
         snapshot.forEach((childSnap) => {
           const data = childSnap.val();
           const keyDoc = childSnap.key;
           const mesDoc = normalizarMesNumero(data.mesNum || data.mes);
           const idDocNormal = normalizarCadena(data.idCuenta || data.marca);
 
+          // Si el archivo es de vacantes, lo tomamos de forma GLOBAL (sin segmentar por marca)
+          if (data.categoria === 'vacantes') {
+            archivosVacantesGlobales.push({ idDoc: keyDoc, ...data });
+          }
+
+          // Para el resto de categorías, filtramos por marca/cuenta y fecha
           if ((idDocNormal === idCuentaFiltro || idDocNormal.includes(idCuentaFiltro) || idCuentaFiltro.includes(idDocNormal)) && 
               String(data.anio) === String(anioActual) && 
               (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
@@ -822,7 +830,7 @@
           }
         });
 
-        renderizarPantalla(archivosNube);
+        renderizarPantalla(archivosNube, archivosVacantesGlobales);
       }, (error) => {
         console.error("Error al escuchar Firebase Realtime Database:", error);
         mostrarToast("⚠️ Error de permisos en Firebase.", true);
@@ -1011,17 +1019,16 @@
       return archivos.map(a => `<li class="flex justify-between items-center p-2.5 bg-slate-900/80 border border-slate-800 rounded-xl text-xs text-slate-300"><span class="truncate pr-2">${a.nombre}</span><button onclick="eliminarArchivoNube('${a.idDoc}')" class="text-rose-400 hover:text-rose-300 font-bold px-2 py-1 bg-rose-500/10 rounded-lg shrink-0 transition-colors">🗑️ Eliminar</button></li>`).join('');
     }
 
-    function renderizarPantalla(archivos) {
+    function renderizarPantalla(archivos, archivosVacantesGlobales = []) {
       const cobertura = archivos.filter(a => a.categoria === 'cobertura');
       const facturacion = archivos.filter(a => a.categoria === 'facturacion');
       const bonos = archivos.filter(a => a.categoria === 'bonos');
-      const vacantes = archivos.filter(a => a.categoria === 'vacantes');
       const plan = archivos.filter(a => a.categoria === 'plan');
 
       document.getElementById('lista-cobertura').innerHTML = renderizarListaHTML(cobertura);
       document.getElementById('lista-facturacion').innerHTML = renderizarListaHTML(facturacion);
       document.getElementById('lista-bonos').innerHTML = renderizarListaHTML(bonos);
-      document.getElementById('lista-vacantes').innerHTML = renderizarListaHTML(vacantes);
+      document.getElementById('lista-vacantes').innerHTML = renderizarListaHTML(archivosVacantesGlobales);
       document.getElementById('lista-plan').innerHTML = renderizarListaHTML(plan);
 
       // COBERTURA
@@ -1046,9 +1053,9 @@
       datosBonosGlobal = listaBonos;
       renderizarTablaBonos(listaBonos);
 
-      // VACANTES
+      // VACANTES GLOBALES (SIN FILTRAR POR MARCA/CUENTA)
       let listaVacantes = [];
-      vacantes.forEach(v => {
+      archivosVacantesGlobales.forEach(v => {
         if (v.vacantesData && Array.isArray(v.vacantesData)) {
           listaVacantes = listaVacantes.concat(v.vacantesData);
         }
@@ -1085,7 +1092,7 @@
       `;
 
       if (registros.length === 0) {
-        document.getElementById('tabla-bonos-body').innerHTML = '<tr><td colspan="2" class="p-6 text-center text-slate-500 italic">No hay reportes de bonos cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td></tr>';
+        document.getElementById('tabla-bonos-body').innerHTML = '<tr><td colspan="2" class="p-6 text-center text-slate-500 italic">No hay reportes de bonos cargados en este periodo. Sube un archivo Excel en "Carga de Docs".</td></tr>';
         return;
       }
 
@@ -1210,7 +1217,6 @@
           `).join('');
     }
 
-    // FUNCIONES DE EXPORTACIÓN A EXCEL DEDICADAS
     function exportarVacantesGeneralesExcel() {
       if (!datosVacantesGlobal || datosVacantesGlobal.length === 0) return alert("Sin datos de vacantes.");
       const hoja = XLSX.utils.json_to_sheet(datosVacantesGlobal);
