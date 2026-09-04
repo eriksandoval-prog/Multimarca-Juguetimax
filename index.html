@@ -505,46 +505,156 @@
       </div>
     </div>
 
-    <!-- VISTA 5: REPORTES DE VACANTES -->
+    <!-- VISTA 5: REPORTES DE VACANTES CON NAVEGACIÓN POR SUB-PESTAÑAS -->
     <div id="vista-vacantes" class="hidden space-y-6">
-      <div class="glass-card rounded-2xl p-6 shadow-sm">
-        <h2 class="text-lg font-bold text-white mb-1">🚨 Seguimiento y Auditoría de Vacantes</h2>
-        <p class="text-slate-400 text-xs mb-6">Análisis operativo de posiciones abiertas y tiendas sin cobertura.</p>
-        <div id="metricas-vacantes" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+      <div class="glass-card rounded-2xl p-6 shadow-sm space-y-6">
+        <div>
+          <h2 class="text-lg font-extrabold text-white mb-1">🚨 Diagnóstico Operativo y Análisis de Vacantes</h2>
+          <p class="text-slate-400 text-xs">Monitoreo de posiciones abiertas, asignación por reclutador y cobertura geográfica.</p>
+        </div>
 
-        <div class="glass-card rounded-xl overflow-hidden border border-slate-800 space-y-4 p-4">
-          <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="font-bold text-slate-200 text-sm">Listado General de Vacantes</div>
-            <div class="flex items-center gap-3">
-              <button onclick="exportarTablaVacantesExcel()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-lg border border-rose-500/40 flex items-center space-x-1.5 transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span>Descargar Vacantes Excel</span>
-              </button>
-              <div class="w-full sm:w-64">
-                <input type="text" id="buscador-vacante" onkeyup="filtrarTablaVacantes()" placeholder="🔍 Buscar Tienda o Promotor..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-rose-500">
-              </div>
-            </div>
+        <!-- MENÚ DE SUB-PESTAÑAS -->
+        <div class="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
+          <button onclick="cambiarSubPestanaVacantes('tab-v1')" id="btn-tab-v1" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-500 text-white shadow-lg transition-all">
+            📌 Resumen General & KPIs
+          </button>
+          <button onclick="cambiarSubPestanaVacantes('tab-v2')" id="btn-tab-v2" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+            🏢 Por Cuentas & Prioridad
+          </button>
+          <button onclick="cambiarSubPestanaVacantes('tab-v3')" id="btn-tab-v3" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+            👤 Reclutadores & Carga
+          </button>
+          <button onclick="cambiarSubPestanaVacantes('tab-v4')" id="btn-tab-v4" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+            🗺️ Cobertura Geográfica
+          </button>
+          <button onclick="cambiarSubPestanaVacantes('tab-v5')" id="btn-tab-v5" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+            🔥 Plazas Prioritarias
+          </button>
+        </div>
+
+        <!-- CONTENIDO SUB-PESTAÑA 1: RESUMEN GENERAL -->
+        <div id="subtab-v1" class="space-y-6">
+          <div id="metricas-vacantes-general" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+          
+          <div class="glass-card rounded-xl p-4 border border-slate-800 flex justify-between items-center flex-wrap gap-4">
+            <span class="text-xs text-slate-300 font-semibold">Descarga el reporte completo de vacantes con todas las variables cargadas.</span>
+            <button onclick="exportarVacantesGeneralesExcel()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg border border-rose-500/40 flex items-center space-x-1.5 transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              <span>Descargar Reporte General Excel</span>
+            </button>
           </div>
+        </div>
 
+        <!-- CONTENIDO SUB-PESTAÑA 2: POR CUENTAS -->
+        <div id="subtab-v2" class="hidden space-y-4">
+          <div class="flex justify-between items-center flex-wrap gap-4">
+            <div class="font-bold text-slate-200 text-sm">Distribución por Cuenta Comercial y Prioridad</div>
+            <button onclick="exportarVacantesPorCuentaExcel()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-lg border border-rose-500/40 flex items-center space-x-1.5 transition-all">
+              <span>📥 Exportar Cuentas Excel</span>
+            </button>
+          </div>
           <div class="overflow-x-auto border border-slate-800 rounded-xl">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900/80 text-slate-400 text-xs font-bold uppercase border-b border-slate-800">
+              <thead class="bg-slate-900/80 text-slate-400 font-bold uppercase border-b border-slate-800">
+                <tr>
+                  <th class="p-3.5">Cuenta Comercial</th>
+                  <th class="p-3.5 text-center">Vacantes Abiertas</th>
+                  <th class="p-3.5 text-center">En Proceso</th>
+                  <th class="p-3.5 text-center">Se Presentó PDV</th>
+                  <th class="p-3.5 text-center">Sin Estatus</th>
+                  <th class="p-3.5 text-center">Total General</th>
+                  <th class="p-3.5 text-right">% Alta Prioridad</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-vacantes-cuentas-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CONTENIDO SUB-PESTAÑA 3: RECLUTADORES -->
+        <div id="subtab-v3" class="hidden space-y-4">
+          <div class="flex justify-between items-center flex-wrap gap-4">
+            <div class="font-bold text-slate-200 text-sm">Carga de Trabajo y Desempeño por Reclutador</div>
+            <button onclick="exportarVacantesReclutadoresExcel()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-lg border border-rose-500/40 flex items-center space-x-1.5 transition-all">
+              <span>📥 Exportar Reclutadores Excel</span>
+            </button>
+          </div>
+          <div class="overflow-x-auto border border-slate-800 rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900/80 text-slate-400 font-bold uppercase border-b border-slate-800">
+                <tr>
+                  <th class="p-3.5">Reclutador Asignado</th>
+                  <th class="p-3.5 text-center">Vacantes Pendientes</th>
+                  <th class="p-3.5 text-center">En Proceso</th>
+                  <th class="p-3.5 text-center">Se Presentó PDV</th>
+                  <th class="p-3.5 text-center">Sin Estatus</th>
+                  <th class="p-3.5 text-right">Total Carga</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-vacantes-reclutadores-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CONTENIDO SUB-PESTAÑA 4: COBERTURA GEOGRÁFICA -->
+        <div id="subtab-v4" class="hidden space-y-4">
+          <div class="flex justify-between items-center flex-wrap gap-4">
+            <div class="font-bold text-slate-200 text-sm">Impacto por Estado y Cadena Comercial</div>
+            <button onclick="exportarVacantesGeografiaExcel()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-lg border border-rose-500/40 flex items-center space-x-1.5 transition-all">
+              <span>📥 Exportar Geografía Excel</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="overflow-x-auto border border-slate-800 rounded-xl">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-900/80 text-slate-400 font-bold uppercase border-b border-slate-800">
+                  <tr>
+                    <th class="p-3.5">Top Estados Afectados</th>
+                    <th class="p-3.5 text-right">Vacantes</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-vacantes-estados-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+              </table>
+            </div>
+            <div class="overflow-x-auto border border-slate-800 rounded-xl">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-900/80 text-slate-400 font-bold uppercase border-b border-slate-800">
+                  <tr>
+                    <th class="p-3.5">Top Cadenas Comercial</th>
+                    <th class="p-3.5 text-right">Tiendas Sin Cobertura</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-vacantes-cadenas-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENIDO SUB-PESTAÑA 5: PLAZAS PRIORITARIAS -->
+        <div id="subtab-v5" class="hidden space-y-4">
+          <div class="flex justify-between items-center flex-wrap gap-4">
+            <div class="font-bold text-rose-400 text-sm">🔥 Plazas con Etiqueta de PRIORIDAD Urgentísima</div>
+            <button onclick="exportarVacantesPrioritariasExcel()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-lg border border-rose-500/40 flex items-center space-x-1.5 transition-all">
+              <span>📥 Exportar Plazas Prioritarias Excel</span>
+            </button>
+          </div>
+          <div class="overflow-x-auto border border-slate-800 rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900/80 text-slate-400 font-bold uppercase border-b border-slate-800">
                 <tr>
                   <th class="p-3.5">Ejecutivo / Cuenta</th>
                   <th class="p-3.5">Cadena</th>
                   <th class="p-3.5">Nombre de Tienda</th>
                   <th class="p-3.5 text-center">Ciudad / Estado</th>
-                  <th class="p-3.5 text-right">Estatus</th>
+                  <th class="p-3.5 text-center">Reclutador</th>
+                  <th class="p-3.5 text-right">Prioridad</th>
                 </tr>
               </thead>
-              <tbody id="tabla-vacantes-body" class="divide-y divide-slate-800/60 text-slate-300">
-                <tr>
-                  <td colspan="5" class="p-6 text-center text-slate-500 italic">No hay reportes de vacantes cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
-                </tr>
-              </tbody>
+              <tbody id="tabla-vacantes-prioritarias-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
             </table>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -612,6 +722,21 @@
     function cambiarVista(vista) {
       ['descarga', 'cobertura', 'facturacion', 'bonos', 'vacantes'].forEach(v => {
         document.getElementById(`vista-${v}`).classList.toggle('hidden', v !== vista);
+      });
+    }
+
+    function cambiarSubPestanaVacantes(tabId) {
+      ['tab-v1', 'tab-v2', 'tab-v3', 'tab-v4', 'tab-v5'].forEach(t => {
+        const btn = document.getElementById(`btn-${t}`);
+        const sec = document.getElementById(`sub${t.replace('tab-', 'tab-')}`);
+        
+        if (t === tabId) {
+          btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-rose-500 text-white shadow-lg transition-all";
+          sec.classList.remove('hidden');
+        } else {
+          btn.className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all";
+          sec.classList.add('hidden');
+        }
       });
     }
 
@@ -792,40 +917,42 @@
               }
             }
           } else if (categoria === 'vacantes') {
-            let colEjecutivo = -1, colCuenta = -1, colCadena = -1, colTienda = -1, colCiudad = -1, colEstado = -1, colEstatus = -1;
+            let colEjecutivo = 0, colCuenta = 1, colEstado = 2, colCiudad = 3, colCadena = 4, colTienda = 5, colPropuesta = 6, colVisitas = 7, colMonto = 8, colReclutador = 10, colEstatus = 11, colPrioridad = 21;
 
             for (let i = 0; i < Math.min(jsonDatos.length, 10); i++) {
               if (jsonDatos[i]) {
                 jsonDatos[i].forEach((col, idx) => {
                   const val = String(col || '').toLowerCase();
                   if (val.includes('ejecutivo')) colEjecutivo = idx;
-                  if (val.includes('cuenta')) colCuenta = idx;
+                  if (val === 'cuenta') colCuenta = idx;
+                  if (val.includes('estado')) colEstado = idx;
+                  if (val.includes('ciudad')) colCiudad = idx;
                   if (val.includes('cadena')) colCadena = idx;
                   if (val.includes('tienda')) colTienda = idx;
-                  if (val.includes('ciudad')) colCiudad = idx;
-                  if (val.includes('estado')) colEstado = idx;
-                  if (val.includes('estatus')) colEstatus = idx;
+                  if (val.includes('reclutador')) colReclutador = idx;
+                  if (val === 'estatus') colEstatus = idx;
+                  if (val.includes('prioridad')) colPrioridad = idx;
+                  if (val.includes('visitas al mes')) colVisitas = idx;
+                  if (val.includes('monto total')) colMonto = idx;
                 });
-                if (colTienda !== -1) break;
               }
             }
 
-            if (colEjecutivo === -1) colEjecutivo = 0;
-            if (colCuenta === -1) colCuenta = 1;
-            if (colCadena === -1) colCadena = 4;
-            if (colTienda === -1) colTienda = 5;
-
             for (let r = 1; r < jsonDatos.length; r++) {
               const row = jsonDatos[r];
-              if (row && (row[colTienda] || row[colCadena])) {
+              if (row && (row[colTienda] || row[colCadena] || row[colCuenta])) {
                 estructuraVacantes.push({
-                  ejecutivo: String(row[colEjecutivo] || '').trim(),
-                  cuenta: String(row[colCuenta] || '').trim(),
+                  ejecutivo: String(row[colEjecutivo] || 'SANDRA').trim(),
+                  cuenta: String(row[colCuenta] || 'LTH').trim(),
+                  estado: String(row[colEstado] || '').trim(),
+                  ciudad: String(row[colCiudad] || '').trim(),
                   cadena: String(row[colCadena] || 'VARIAS').trim(),
                   tienda: String(row[colTienda] || 'GENERAL').trim(),
-                  ciudad: String(row[colCiudad] || '').trim(),
-                  estado: String(row[colEstado] || '').trim(),
-                  estatus: String(row[colEstatus] || 'VACANTE').trim()
+                  visitasMes: parseFloat(row[colVisitas]) || 0,
+                  montoTotal: parseFloat(row[colMonto]) || 0,
+                  reclutador: String(row[colReclutador] || 'SIN ASIGNAR').trim(),
+                  estatus: String(row[colEstatus] || 'VACANTE').trim(),
+                  prioridad: String(row[colPrioridad] || 'NORMAL').trim()
                 });
               }
             }
@@ -927,7 +1054,7 @@
         }
       });
       datosVacantesGlobal = listaVacantes;
-      renderizarTablaVacantes(listaVacantes);
+      renderizarTodasPestanasVacantes(listaVacantes);
 
       // FACTURACIÓN
       const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
@@ -970,122 +1097,181 @@
       `).join('');
     }
 
-    function filtrarTablaBonos() {
-      const q = document.getElementById('buscador-bono').value.toLowerCase();
-      const filtrados = datosBonosGlobal.filter(r => r.nombre.toLowerCase().includes(q));
-      renderizarTablaBonos(filtrados);
-    }
+    function renderizarTodasPestanasVacantes(registros) {
+      const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 
-    function renderizarTablaVacantes(registros) {
-      const conjuntoCadenas = new Set();
-      const conjuntoTiendas = new Set();
-
+      // METRICAS SUB-TAB 1
+      let abiertas = 0, enProceso = 0, enPdv = 0, montoTotalPresupuesto = 0, visitasTotalesMes = 0;
       registros.forEach(r => {
-        if (r.cadena) conjuntoCadenas.add(r.cadena);
-        if (r.tienda) conjuntoTiendas.add(r.tienda);
+        const est = (r.estatus || '').toUpperCase();
+        if (est.includes('VACANTE')) abiertas++;
+        else if (est.includes('PROCESO')) enProceso++;
+        else if (est.includes('PRESENTO')) enPdv++;
+
+        montoTotalPresupuesto += (r.montoTotal || 0);
+        visitasTotalesMes += (r.visitasMes || 0);
       });
 
-      document.getElementById('metricas-vacantes').innerHTML = `
-        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Total de Vacantes Registradas</p><p class="text-2xl font-bold text-rose-400 mt-1">${registros.length}</p></div>
-        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Cadenas Afectadas</p><p class="text-2xl font-bold text-amber-400 mt-1">${conjuntoCadenas.size}</p></div>
-        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Tiendas Afectadas</p><p class="text-2xl font-bold text-purple-400 mt-1">${conjuntoTiendas.size}</p></div>
+      document.getElementById('metricas-vacantes-general').innerHTML = `
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Total Registros</p><p class="text-2xl font-bold text-white mt-1">${registros.length}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Vacantes Activas</p><p class="text-2xl font-bold text-rose-400 mt-1">${abiertas} (${registros.length > 0 ? ((abiertas/registros.length)*100).toFixed(1) : 0}%)</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">En Proceso Reclutamiento</p><p class="text-2xl font-bold text-amber-400 mt-1">${enProceso}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Monto Estimado por Visitas</p><p class="text-2xl font-bold text-emerald-400 mt-1">${formatoMoneda.format(montoTotalPresupuesto)}</p></div>
       `;
 
-      if (registros.length === 0) {
-        document.getElementById('tabla-vacantes-body').innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-500 italic">No hay reportes de vacantes cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td></tr>';
-        return;
-      }
+      // TABLA SUB-TAB 2: CUENTAS
+      const mapaCuentas = {};
+      registros.forEach(r => {
+        const c = (r.cuenta || 'GENERAL').toUpperCase();
+        if (!mapaCuentas[c]) mapaCuentas[c] = { abierta: 0, proceso: 0, pdv: 0, sinEst: 0, total: 0, prio: 0 };
+        mapaCuentas[c].total++;
+        const est = (r.estatus || '').toUpperCase();
+        if (est.includes('VACANTE')) mapaCuentas[c].abierta++;
+        else if (est.includes('PROCESO')) mapaCuentas[c].proceso++;
+        else if (est.includes('PRESENTO')) mapaCuentas[c].pdv++;
+        else mapaCuentas[c].sinEst++;
 
-      document.getElementById('tabla-vacantes-body').innerHTML = registros.map(r => `
-        <tr class="hover:bg-slate-800/40 transition-colors">
-          <td class="p-3.5 font-bold text-white">${r.ejecutivo || '-'} ${r.cuenta ? '(' + r.cuenta + ')' : ''}</td>
-          <td class="p-3.5 font-semibold text-slate-400">${r.cadena}</td>
-          <td class="p-3.5 font-medium text-slate-300">${r.tienda}</td>
-          <td class="p-3.5 text-center text-slate-400">${r.ciudad || '-'} ${r.estado ? '(' + r.estado + ')' : ''}</td>
-          <td class="p-3.5 text-right"><span class="px-2.5 py-1 rounded-full border text-[10px] font-extrabold uppercase ${r.estatus.toUpperCase().includes('VACANTE') ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'}">${r.estatus}</span></td>
-        </tr>
+        if ((r.prioridad || '').toUpperCase().includes('PRIORIDAD')) mapaCuentas[c].prio++;
+      });
+
+      document.getElementById('tabla-vacantes-cuentas-body').innerHTML = Object.keys(mapaCuentas).length === 0 
+        ? '<tr><td colspan="7" class="p-4 text-center text-slate-500 italic">Sin vacantes registradas</td></tr>'
+        : Object.entries(mapaCuentas).map(([cta, d]) => `
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="p-3.5 font-bold text-white">${cta}</td>
+              <td class="p-3.5 text-center text-rose-400 font-bold">${d.abierta}</td>
+              <td class="p-3.5 text-center text-amber-400 font-bold">${d.proceso}</td>
+              <td class="p-3.5 text-center text-emerald-400 font-bold">${d.pdv}</td>
+              <td class="p-3.5 text-center text-slate-400">${d.sinEst}</td>
+              <td class="p-3.5 text-center font-extrabold text-cyan-300">${d.total}</td>
+              <td class="p-3.5 text-right font-bold text-rose-300">${((d.prio / d.total)*100).toFixed(1)}%</td>
+            </tr>
+          `).join('');
+
+      // TABLA SUB-TAB 3: RECLUTADORES
+      const mapaRec = {};
+      registros.forEach(r => {
+        const rec = (r.reclutador || 'SIN ASIGNAR').toUpperCase();
+        if (!mapaRec[rec]) mapaRec[rec] = { abierta: 0, proceso: 0, pdv: 0, sinEst: 0, total: 0 };
+        mapaRec[rec].total++;
+        const est = (r.estatus || '').toUpperCase();
+        if (est.includes('VACANTE')) mapaRec[rec].abierta++;
+        else if (est.includes('PROCESO')) mapaRec[rec].proceso++;
+        else if (est.includes('PRESENTO')) mapaRec[rec].pdv++;
+        else mapaRec[rec].sinEst++;
+      });
+
+      document.getElementById('tabla-vacantes-reclutadores-body').innerHTML = Object.keys(mapaRec).length === 0
+        ? '<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Sin datos de reclutadores</td></tr>'
+        : Object.entries(mapaRec).map(([rec, d]) => `
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="p-3.5 font-bold text-white">${rec}</td>
+              <td class="p-3.5 text-center text-rose-400 font-bold">${d.abierta}</td>
+              <td class="p-3.5 text-center text-amber-400 font-bold">${d.proceso}</td>
+              <td class="p-3.5 text-center text-emerald-400 font-bold">${d.pdv}</td>
+              <td class="p-3.5 text-center text-slate-400">${d.sinEst}</td>
+              <td class="p-3.5 text-right font-extrabold text-cyan-300">${d.total}</td>
+            </tr>
+          `).join('');
+
+      // TABLA SUB-TAB 4: GEOGRAFÍA Y CADENAS
+      const mapaEst = {}, mapaCad = {};
+      registros.forEach(r => {
+        const est = (r.estado || 'SIN ESTADO').toUpperCase();
+        const cad = (r.cadena || 'VARIAS').toUpperCase();
+        mapaEst[est] = (mapaEst[est] || 0) + 1;
+        mapaCad[cad] = (mapaCad[cad] || 0) + 1;
+      });
+
+      const arrEst = Object.entries(mapaEst).sort((a,b) => b[1] - a[1]).slice(0, 10);
+      const arrCad = Object.entries(mapaCad).sort((a,b) => b[1] - a[1]).slice(0, 10);
+
+      document.getElementById('tabla-vacantes-estados-body').innerHTML = arrEst.map(([e, cnt]) => `
+        <tr class="hover:bg-slate-800/40 transition-colors"><td class="p-3.5 font-bold text-white">${e}</td><td class="p-3.5 text-right font-extrabold text-rose-400">${cnt}</td></tr>
       `).join('');
+
+      document.getElementById('tabla-vacantes-cadenas-body').innerHTML = arrCad.map(([c, cnt]) => `
+        <tr class="hover:bg-slate-800/40 transition-colors"><td class="p-3.5 font-bold text-white">${c}</td><td class="p-3.5 text-right font-extrabold text-amber-400">${cnt}</td></tr>
+      `).join('');
+
+      // TABLA SUB-TAB 5: PLAZAS PRIORITARIAS
+      const prioritarias = registros.filter(r => (r.prioridad || '').toUpperCase().includes('PRIORIDAD'));
+      document.getElementById('tabla-vacantes-prioritarias-body').innerHTML = prioritarias.length === 0
+        ? '<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">No hay plazas prioritarias marcadas</td></tr>'
+        : prioritarias.map(r => `
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="p-3.5 font-bold text-white">${r.ejecutivo || '-'} ${r.cuenta ? '(' + r.cuenta + ')' : ''}</td>
+              <td class="p-3.5 font-semibold text-slate-400">${r.cadena}</td>
+              <td class="p-3.5 font-medium text-slate-300">${r.tienda}</td>
+              <td class="p-3.5 text-center text-slate-400">${r.ciudad || '-'} ${r.estado ? '(' + r.estado + ')' : ''}</td>
+              <td class="p-3.5 text-center text-cyan-400 font-bold">${r.reclutador || 'SIN ASIGNAR'}</td>
+              <td class="p-3.5 text-right"><span class="px-2.5 py-1 rounded-full border text-[10px] font-extrabold uppercase bg-rose-500/10 text-rose-400 border-rose-500/30">🔥 PRIORIDAD</span></td>
+            </tr>
+          `).join('');
     }
 
-    function filtrarTablaVacantes() {
-      const q = document.getElementById('buscador-vacante').value.toLowerCase();
-      const filtrados = datosVacantesGlobal.filter(r => 
-        (r.ejecutivo && r.ejecutivo.toLowerCase().includes(q)) || 
-        (r.cuenta && r.cuenta.toLowerCase().includes(q)) || 
-        (r.cadena && r.cadena.toLowerCase().includes(q)) || 
-        (r.tienda && r.tienda.toLowerCase().includes(q)) || 
-        (r.ciudad && r.ciudad.toLowerCase().includes(q))
-      );
-      renderizarTablaVacantes(filtrados);
+    // FUNCIONES DE EXPORTACIÓN A EXCEL DEDICADAS
+    function exportarVacantesGeneralesExcel() {
+      if (!datosVacantesGlobal || datosVacantesGlobal.length === 0) return alert("Sin datos de vacantes.");
+      const hoja = XLSX.utils.json_to_sheet(datosVacantesGlobal);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Vacantes_General");
+      XLSX.writeFile(libro, `Reporte_Vacantes_General_${anioActual}.xlsx`);
+    }
+
+    function exportarVacantesPorCuentaExcel() {
+      if (!datosVacantesGlobal || datosVacantesGlobal.length === 0) return alert("Sin datos.");
+      const hoja = XLSX.utils.json_to_sheet(datosVacantesGlobal.map(v => ({ Cuenta: v.cuenta, Cadena: v.cadena, Tienda: v.tienda, Estatus: v.estatus, Prioridad: v.prioridad })));
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Por_Cuenta");
+      XLSX.writeFile(libro, `Reporte_Vacantes_Cuentas_${anioActual}.xlsx`);
+    }
+
+    function exportarVacantesReclutadoresExcel() {
+      if (!datosVacantesGlobal || datosVacantesGlobal.length === 0) return alert("Sin datos.");
+      const hoja = XLSX.utils.json_to_sheet(datosVacantesGlobal.map(v => ({ Reclutador: v.reclutador, Posicion: v.tienda, Cadena: v.cadena, Estatus: v.estatus })));
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Reclutadores");
+      XLSX.writeFile(libro, `Reporte_Vacantes_Reclutadores_${anioActual}.xlsx`);
+    }
+
+    function exportarVacantesGeografiaExcel() {
+      if (!datosVacantesGlobal || datosVacantesGlobal.length === 0) return alert("Sin datos.");
+      const hoja = XLSX.utils.json_to_sheet(datosVacantesGlobal.map(v => ({ Estado: v.estado, Ciudad: v.ciudad, Cadena: v.cadena, Tienda: v.tienda })));
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Geografia");
+      XLSX.writeFile(libro, `Reporte_Vacantes_Geografia_${anioActual}.xlsx`);
+    }
+
+    function exportarVacantesPrioritariasExcel() {
+      const prio = datosVacantesGlobal.filter(r => (r.prioridad || '').toUpperCase().includes('PRIORIDAD'));
+      if (prio.length === 0) return alert("Sin plazas prioritarias.");
+      const hoja = XLSX.utils.json_to_sheet(prio);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Prioritarias");
+      XLSX.writeFile(libro, `Reporte_Vacantes_Prioritarias_${anioActual}.xlsx`);
     }
 
     function exportarTablaExcel() {
-      if (!datosPromotoresFiltrados || datosPromotoresFiltrados.length === 0) {
-        alert("No hay datos para exportar.");
-        return;
-      }
-
+      if (!datosPromotoresFiltrados || datosPromotoresFiltrados.length === 0) return alert("No hay datos para exportar.");
       const datosExcel = datosPromotoresFiltrados.map(p => ({
-        "Promotor": p.promotor,
-        "Usuario": p.usuario,
-        "Cadena Principal": p.cadena,
-        "Tiendas Atendidas": p.tiendas,
-        "Frecuencia Meta": p.frecuenciaMeta,
-        "Visitas Reales": p.visitasReales,
-        "% Cobertura": parseFloat(p.cobertura.toFixed(1)),
+        "Promotor": p.promotor, "Usuario": p.usuario, "Cadena Principal": p.cadena,
+        "Tiendas Atendidas": p.tiendas, "Frecuencia Meta": p.frecuenciaMeta,
+        "Visitas Reales": p.visitasReales, "% Cobertura": parseFloat(p.cobertura.toFixed(1)),
         "Estatus": p.cobertura < 50 ? "Crítico" : (p.cobertura < 80 ? "En Riesgo" : "Óptimo")
       }));
-
       const hoja = XLSX.utils.json_to_sheet(datosExcel);
       const libro = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(libro, hoja, "Cobertura");
-
-      const claveMarca = obtenerClaveMarcaActiva();
-      const mesTexto = modoVista === 'mes' ? NOMBRES_MESES[parseInt(document.getElementById('select-mes').value) - 1] : "Rango";
-      XLSX.writeFile(libro, `Reporte_Cobertura_${claveMarca}_${anioActual}_${mesTexto}.xlsx`);
+      XLSX.writeFile(libro, `Reporte_Cobertura_${anioActual}.xlsx`);
     }
 
     function exportarTablaBonosExcel() {
-      if (!datosBonosGlobal || datosBonosGlobal.length === 0) {
-        alert("No hay datos de bonos para exportar.");
-        return;
-      }
-
-      const datosExcel = datosBonosGlobal.map(b => ({
-        "Colaborador / Promotor": b.nombre,
-        "Monto Bono": b.montoBono
-      }));
-
-      const hoja = XLSX.utils.json_to_sheet(datosExcel);
+      if (!datosBonosGlobal || datosBonosGlobal.length === 0) return alert("No hay datos de bonos para exportar.");
+      const hoja = XLSX.utils.json_to_sheet(datosBonosGlobal.map(b => ({ "Colaborador / Promotor": b.nombre, "Monto Bono": b.montoBono })));
       const libro = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(libro, hoja, "Bonos");
-
-      const claveMarca = obtenerClaveMarcaActiva();
-      XLSX.writeFile(libro, `Reporte_Bonos_${claveMarca}_${anioActual}.xlsx`);
-    }
-
-    function exportarTablaVacantesExcel() {
-      if (!datosVacantesGlobal || datosVacantesGlobal.length === 0) {
-        alert("No hay datos de vacantes para exportar.");
-        return;
-      }
-
-      const datosExcel = datosVacantesGlobal.map(v => ({
-        "Ejecutivo / Posición": v.ejecutivo,
-        "Cuenta": v.cuenta,
-        "Cadena": v.cadena,
-        "Nombre de Tienda": v.tienda,
-        "Ciudad": v.ciudad,
-        "Estado": v.estado,
-        "Estatus": v.estatus
-      }));
-
-      const hoja = XLSX.utils.json_to_sheet(datosExcel);
-      const libro = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(libro, hoja, "Vacantes");
-
-      const claveMarca = obtenerClaveMarcaActiva();
-      XLSX.writeFile(libro, `Reporte_Vacantes_${claveMarca}_${anioActual}.xlsx`);
+      XLSX.writeFile(libro, `Reporte_Bonos_${anioActual}.xlsx`);
     }
 
     function poblarDesplegablesFiltros(registros) {
@@ -1111,15 +1297,11 @@
       const arrPromotores = Array.from(conjuntoPromotores).sort();
       const arrTiendas = Array.from(conjuntoTiendas).sort();
 
-      selectCadena.innerHTML = '<option value="TODAS">Todas las Cadenas</option>' + 
-        arrCadenas.map(c => `<option value="${c}">${c}</option>`).join('');
-
-      selectPromotor.innerHTML = '<option value="TODOS">Todos los Promotores</option>' + 
-        arrPromotores.map(p => `<option value="${p}">${p}</option>`).join('');
+      selectCadena.innerHTML = '<option value="TODAS">Todas las Cadenas</option>' + arrCadenas.map(c => `<option value="${c}">${c}</option>`).join('');
+      selectPromotor.innerHTML = '<option value="TODOS">Todos los Promotores</option>' + arrPromotores.map(p => `<option value="${p}">${p}</option>`).join('');
 
       if (selectTienda) {
-        selectTienda.innerHTML = '<option value="TODAS">Todas las Tiendas</option>' + 
-          arrTiendas.map(t => `<option value="${t}">${t}</option>`).join('');
+        selectTienda.innerHTML = '<option value="TODAS">Todas las Tiendas</option>' + arrTiendas.map(t => `<option value="${t}">${t}</option>`).join('');
         if (arrTiendas.includes(valTiendaActual)) selectTienda.value = valTiendaActual;
       }
 
@@ -1137,12 +1319,7 @@
         const cumpleCadena = (selCadena === 'TODAS') || (r.cadena === selCadena);
         const cumplePromotor = (selPromotor === 'TODOS') || (r.promotor === selPromotor);
         const cumpleTienda = (selTienda === 'TODAS') || (r.tienda === selTienda);
-        const cumpleBusqueda = !q || 
-          r.promotor.toLowerCase().includes(q) || 
-          r.usuario.toLowerCase().includes(q) || 
-          r.tienda.toLowerCase().includes(q) || 
-          r.cadena.toLowerCase().includes(q);
-
+        const cumpleBusqueda = !q || r.promotor.toLowerCase().includes(q) || r.usuario.toLowerCase().includes(q) || r.tienda.toLowerCase().includes(q) || r.cadena.toLowerCase().includes(q);
         return cumpleCadena && cumplePromotor && cumpleTienda && cumpleBusqueda;
       });
 
@@ -1150,12 +1327,8 @@
     }
 
     function ordenarPorColumna(col) {
-      if (columnaOrden === col) {
-        direccionOrden = direccionOrden === 'asc' ? 'desc' : 'asc';
-      } else {
-        columnaOrden = col;
-        direccionOrden = 'desc';
-      }
+      if (columnaOrden === col) direccionOrden = direccionOrden === 'asc' ? 'desc' : 'asc';
+      else { columnaOrden = col; direccionOrden = 'desc'; }
       actualizarIconosEncabezados();
       aplicarFiltrosPromotores();
     }
@@ -1163,8 +1336,7 @@
     function cambiarOrdenSelector() {
       const val = document.getElementById('select-orden-columna').value;
       const partes = val.split('_');
-      columnaOrden = partes[0];
-      direccionOrden = partes[1];
+      columnaOrden = partes[0]; direccionOrden = partes[1];
       actualizarIconosEncabezados();
       aplicarFiltrosPromotores();
     }
@@ -1173,13 +1345,8 @@
       ['promotor', 'usuario', 'tiendas', 'frecuenciaMeta', 'visitasReales', 'cobertura'].forEach(c => {
         const el = document.getElementById(`icon-${c}`);
         if (el) {
-          if (c === columnaOrden) {
-            el.innerText = direccionOrden === 'asc' ? '↑' : '↓';
-            el.className = 'text-cyan-400 font-black';
-          } else {
-            el.innerText = '↕';
-            el.className = 'text-slate-600 font-normal';
-          }
+          if (c === columnaOrden) { el.innerText = direccionOrden === 'asc' ? '↑' : '↓'; el.className = 'text-cyan-400 font-black'; }
+          else { el.innerText = '↕'; el.className = 'text-slate-600 font-normal'; }
         }
       });
     }
@@ -1193,8 +1360,7 @@
           <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Visitas Programadas vs Reales</p><p class="text-2xl font-bold text-slate-500 mt-1">0 / 0</p></div>
           <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">% Cobertura General</p><p class="text-2xl font-bold text-slate-500 mt-1">0.0%</p></div>
         `;
-
-        document.getElementById('tabla-promotores-body').innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No hay resultados de cobertura para el filtro seleccionado.</td></tr>';
+        document.getElementById('tabla-promotores-body').innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No hay resultados de cobertura.</td></tr>';
         renderizarGrafica([], [], []);
         return;
       }
@@ -1202,15 +1368,7 @@
       const mapa = {};
       registros.forEach(r => {
         if (!mapa[r.promotor]) {
-          mapa[r.promotor] = {
-            promotor: r.promotor,
-            usuario: r.usuario,
-            cadena: r.cadena,
-            tiendas: 0,
-            frecuenciaMeta: 0,
-            visitasReales: 0,
-            sumaCobertura: 0
-          };
+          mapa[r.promotor] = { promotor: r.promotor, usuario: r.usuario, cadena: r.cadena, tiendas: 0, frecuenciaMeta: 0, visitasReales: 0, sumaCobertura: 0 };
         }
         mapa[r.promotor].tiendas += 1;
         mapa[r.promotor].frecuenciaMeta += r.frecuencia;
@@ -1219,20 +1377,11 @@
       });
 
       let listaAgrupada = Object.values(mapa);
-
-      listaAgrupada.forEach(p => {
-        p.cobertura = p.tiendas > 0 ? (p.sumaCobertura / p.tiendas) * 100 : 0;
-      });
+      listaAgrupada.forEach(p => { p.cobertura = p.tiendas > 0 ? (p.sumaCobertura / p.tiendas) * 100 : 0; });
 
       listaAgrupada.sort((a, b) => {
-        let valA = a[columnaOrden];
-        let valB = b[columnaOrden];
-
-        if (typeof valA === 'string') {
-          valA = valA.toLowerCase();
-          valB = valB.toLowerCase();
-        }
-
+        let valA = a[columnaOrden], valB = b[columnaOrden];
+        if (typeof valA === 'string') { valA = valA.toLowerCase(); valB = valB.toLowerCase(); }
         if (valA < valB) return direccionOrden === 'asc' ? -1 : 1;
         if (valA > valB) return direccionOrden === 'asc' ? 1 : -1;
         return 0;
@@ -1242,14 +1391,9 @@
 
       let totalTiendas = registros.length;
       let totalPromotores = listaAgrupada.length;
-      let totalMeta = 0;
-      let totalReales = 0;
+      let totalMeta = 0, totalReales = 0;
 
-      listaAgrupada.forEach(p => {
-        totalMeta += p.frecuenciaMeta;
-        totalReales += p.visitasReales;
-      });
-
+      listaAgrupada.forEach(p => { totalMeta += p.frecuenciaMeta; totalReales += p.visitasReales; });
       const coberturaNacional = totalMeta > 0 ? ((totalReales / totalMeta) * 100).toFixed(1) : 0;
 
       document.getElementById('metricas-cobertura').innerHTML = `
@@ -1261,16 +1405,9 @@
 
       document.getElementById('tabla-promotores-body').innerHTML = listaAgrupada.map(p => {
         const pctProm = p.cobertura.toFixed(1);
-        let badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
-        let estatusTexto = "Óptimo";
-
-        if (pctProm < 50) {
-          badgeStyle = "bg-rose-500/10 text-rose-400 border-rose-500/30";
-          estatusTexto = "Crítico";
-        } else if (pctProm < 80) {
-          badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/30";
-          estatusTexto = "En Riesgo";
-        }
+        let badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30", estatusTexto = "Óptimo";
+        if (pctProm < 50) { badgeStyle = "bg-rose-500/10 text-rose-400 border-rose-500/30"; estatusTexto = "Crítico"; }
+        else if (pctProm < 80) { badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/30"; estatusTexto = "En Riesgo"; }
 
         return `
           <tr class="hover:bg-slate-800/40 transition-colors">
@@ -1304,7 +1441,6 @@
         id: 'pluginEtiquetas',
         afterDatasetsDraw(chart) {
           const { ctx } = chart;
-          
           chart.data.datasets.forEach((dataset, datasetIndex) => {
             const meta = chart.getDatasetMeta(datasetIndex);
             meta.data.forEach((bar, index) => {
@@ -1313,8 +1449,7 @@
                 ctx.save();
                 ctx.fillStyle = datasetIndex === 0 ? '#e2e8f0' : '#38bdf8';
                 ctx.font = 'extrabold 11px "Plus Jakarta Sans", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
                 ctx.fillText(val, bar.x, bar.y - 4);
                 ctx.restore();
               }
@@ -1338,8 +1473,7 @@
               ctx.save();
               ctx.fillStyle = pctNum >= 80 ? '#34d399' : (pctNum >= 50 ? '#fbbf24' : '#f43f5e');
               ctx.font = '800 13px "Plus Jakarta Sans", sans-serif';
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'bottom';
+              ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
               ctx.fillText(pctTexto, posX, topY - 22);
               ctx.restore();
             }
@@ -1352,68 +1486,20 @@
         data: {
           labels: labels,
           datasets: [
-            {
-              label: 'Visitas Programadas (Meta)',
-              data: dataMetas,
-              backgroundColor: 'rgba(148, 163, 184, 0.35)',
-              borderColor: 'rgba(148, 163, 184, 0.8)',
-              borderWidth: 1,
-              borderRadius: 6
-            },
-            {
-              label: 'Visitas Reales Efectuadas',
-              data: dataReales,
-              backgroundColor: 'rgba(56, 189, 248, 0.85)',
-              borderColor: '#0091FF',
-              borderWidth: 1,
-              borderRadius: 6
-            }
+            { label: 'Visitas Programadas (Meta)', data: dataMetas, backgroundColor: 'rgba(148, 163, 184, 0.35)', borderColor: 'rgba(148, 163, 184, 0.8)', borderWidth: 1, borderRadius: 6 },
+            { label: 'Visitas Reales Efectuadas', data: dataReales, backgroundColor: 'rgba(56, 189, 248, 0.85)', borderColor: '#0091FF', borderWidth: 1, borderRadius: 6 }
           ]
         },
         plugins: [pluginValoresYPorcentaje],
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          layout: {
-            padding: {
-              top: 45,
-              bottom: 10
-            }
-          },
+          responsive: true, maintainAspectRatio: false,
+          layout: { padding: { top: 45, bottom: 10 } },
           plugins: {
-            legend: {
-              position: 'top',
-              align: 'end',
-              labels: { 
-                color: '#94a3b8', 
-                font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
-                boxWidth: 14,
-                padding: 15
-              }
-            },
-            tooltip: {
-              callbacks: {
-                afterBody: function(context) {
-                  const idx = context[0].dataIndex;
-                  const m = dataMetas[idx] || 0;
-                  const r = dataReales[idx] || 0;
-                  const pct = m > 0 ? ((r / m) * 100).toFixed(1) : 0;
-                  return `% Cobertura: ${pct}%`;
-                }
-              }
-            }
+            legend: { position: 'top', align: 'end', labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' }, boxWidth: 14, padding: 15 } }
           },
           scales: {
-            x: {
-              ticks: { color: '#94a3b8', font: { size: 10, weight: '600' } },
-              grid: { color: 'rgba(255,255,255,0.05)' }
-            },
-            y: {
-              suggestedMax: maxVal > 0 ? maxVal * 1.3 : 10,
-              ticks: { color: '#94a3b8', font: { size: 10 } },
-              grid: { color: 'rgba(255,255,255,0.05)' },
-              beginAtZero: true
-            }
+            x: { ticks: { color: '#94a3b8', font: { size: 10, weight: '600' } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { suggestedMax: maxVal > 0 ? maxVal * 1.3 : 10, ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
           }
         }
       });
