@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evolve - Portal de Reportes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Librería para procesar Excel / CSV -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Librería para Gráficas Interactivas -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- CONEXIÓN DIRECTA CON FIREBASE (REALTIME DATABASE) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXddmuE57qC-UvunpYzft8rxHo12hvJfY",
+      authDomain: "juguetimax---multimarca.firebaseapp.com",
+      databaseURL: "https://juguetimax---multimarca-default-rtdb.firebaseio.com",
+      projectId: "juguetimax---multimarca",
+      storageBucket: "juguetimax---multimarca.firebasestorage.app",
+      messagingSenderId: "879522328879",
+      appId: "1:879522328879:web:748599d96ee74aa43eb1da",
+      measurementId: "G-QKF3M6FH56"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.db = db;
+    window.ref = ref;
+    window.push = push;
+    window.onValue = onValue;
+    window.remove = remove;
+  </script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-[#0B0F19] text-slate-100 min-h-screen flex font-sans antialiased selection:bg-cyan-500 selection:text-white">
+
+  <!-- NOTIFICACIÓN FLOTANTE -->
+  <div id="toast-notificacion" class="fixed top-5 right-5 z-50 hidden bg-emerald-500 text-white font-bold px-4 py-3 rounded-xl shadow-2xl border border-emerald-400 flex items-center space-x-2 transition-all">
+    <span id="toast-mensaje">✓ Archivo guardado permanentemente en la nube</span>
+  </div>
+
+  <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
+  <aside class="w-72 bg-[#0F172A]/90 border-r border-slate-800/80 flex flex-col justify-between shrink-0 min-h-screen z-20">
+    <div>
+      <!-- BRANDING CON LOGO -->
+      <div class="p-6 border-b border-slate-800/80 flex flex-col space-y-2">
+        <div class="flex items-center space-x-3">
+          <div class="h-8 shrink-0">
+            <svg viewBox="0 0 380 120" class="h-full w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 38.5L58 5L116 38.5L58 72L0 38.5Z" fill="#0091FF"/>
+              <path d="M0 60.5L58 27L80 39.5L22 73L0 60.5Z" fill="#0091FF"/>
+              <path d="M0 82.5L58 49L116 82.5L58 116L0 82.5Z" fill="#0091FF"/>
+              <text x="130" y="85" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="78" fill="#0091FF" letter-spacing="-3">evolve</text>
+            </svg>
+          </div>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE</span>
+        </div>
+        <p class="text-[10px] font-bold tracking-wider text-cyan-400 uppercase">JUGUETIMAX · MULTIMARCA</p>
+      </div>
+
+      <!-- NAVEGACIÓN PRINCIPAL -->
+      <nav class="p-4 space-y-6">
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-3">PANEL GENERAL</p>
+          <button onclick="cambiarVista('descarga')" id="nav-descarga" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <span>Descarga de Docs</span>
+          </button>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-3">INTELIGENCIA DE CAMPO</p>
+          <button onclick="cambiarVista('cobertura')" id="nav-cobertura" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span>Cobertura y Promotores</span>
+          </button>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-3">ADMINISTRACIÓN</p>
+          <button onclick="cambiarVista('facturacion')" id="nav-facturacion" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            <span>Pagos y Facturación</span>
+          </button>
+          <button onclick="cambiarVista('bonos')" id="nav-bonos" class="w-full mt-2 flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Reportes de Bonos</span>
+          </button>
+          <button onclick="cambiarVista('vacantes')" id="nav-vacantes" class="w-full mt-2 flex items-center space-x-3 px-3.5 py-3 rounded-xl font-semibold text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+            <span>Reportes de Vacantes</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+
+    <!-- SELECCIÓN DE CUENTA / MARCA -->
+    <div class="p-4 border-t border-slate-800/80 bg-[#0B0F19]/50">
+      <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2.5">SELECCIÓN DE CUENTA</p>
+      <div class="flex flex-col gap-1.5 rounded-xl bg-slate-900/90 p-1.5 border border-slate-800">
+        <button id="btn-juguetimax" onclick="cambiarMarca('juguetimax')" class="py-2 text-xs font-bold rounded-lg bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 transition-all text-center">
+          Juguetimax (Fijo)
+        </button>
+        <button id="btn-multimarca" onclick="cambiarMarca('multimarca')" class="py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all text-center">
+          Multimarca
+        </button>
+        <button id="btn-promotoria" onclick="cambiarMarca('promotoria')" class="py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all text-center">
+          Promotoría por Visita
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= ÁREA PRINCIPAL ================= -->
+  <main class="flex-1 p-8 space-y-8 overflow-y-auto">
+    
+    <!-- BARRA DE FILTROS HIGH-TECH -->
+    <div class="glass-card p-5 rounded-2xl shadow-2xl flex flex-wrap items-center justify-between gap-4 relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="flex items-center space-x-3">
+        <span class="text-slate-400 font-medium text-sm">Filtro Activo:</span>
+        <span id="label-filtro" class="uppercase tracking-wider text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-inner">
+          JUGUETIMAX (FIJO) | 2026 - AGOSTO
+        </span>
+      </div>
+
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex items-center space-x-2">
+          <label for="select-tipo-vista" class="text-xs font-bold text-slate-400 uppercase">Modo:</label>
+          <select id="select-tipo-vista" onchange="alternarModoVista()" class="bg-slate-900 text-cyan-400 text-xs font-bold rounded-xl px-3 py-2 border border-cyan-500/40 focus:outline-none">
+            <option value="mes">Mes Individual</option>
+            <option value="rango">Rango Comparativo (Acumulado)</option>
+          </select>
+        </div>
+
+        <div id="contenedor-submarca" class="hidden flex items-center space-x-2">
+          <label for="select-submarca" class="text-xs font-bold text-slate-400 uppercase">Sub-Marca:</label>
+          <select id="select-submarca" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+            <option value="Juguetimax por visita">Juguetimax por visita</option>
+            <option value="Moose Toys">Moose Toys</option>
+            <option value="Just Play">Just Play</option>
+            <option value="Clarios">Clarios</option>
+            <option value="Bondy Fiesta">Bondy Fiesta</option>
+            <option value="Ambientair">Ambientair</option>
+            <option value="Blink Solutions">Blink Solutions</option>
+            <option value="Kiss">Kiss</option>
+            <option value="Preslow">Preslow</option>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <label for="select-anio" class="text-xs font-bold text-slate-400 uppercase">Año:</label>
+          <select id="select-anio" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+
+        <!-- SELECTOR MES INDIVIDUAL -->
+        <div id="contenedor-mes-unico" class="flex items-center space-x-2">
+          <label for="select-mes" class="text-xs font-bold text-slate-400 uppercase">Mes:</label>
+          <select id="select-mes" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8" selected>Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+        </div>
+
+        <!-- SELECTORES RANGO COMPARATIVO -->
+        <div id="contenedor-rango" class="hidden flex items-center space-x-2">
+          <label for="select-mes-inicio" class="text-xs font-bold text-slate-400 uppercase">Desde:</label>
+          <select id="select-mes-inicio" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-2.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+
+          <label for="select-mes-fin" class="text-xs font-bold text-slate-400 uppercase">Hasta:</label>
+          <select id="select-mes-fin" onchange="escucharCambiosNube()" class="bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl px-2.5 py-2 border border-slate-700/80 focus:outline-none focus:border-cyan-500">
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8" selected>Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 1: DESCARGA DE DOCUMENTOS -->
+    <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <!-- 1. Cobertura -->
+      <div class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h2 class="font-bold text-white text-lg">Reportes de Cobertura</h2>
+          </div>
+          <p class="text-slate-400 text-xs mb-5">Archivos de inventario y disponibilidad en PDV (Excel/CSV).</p>
+          <ul id="lista-cobertura" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
+        </div>
+        
+        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-cyan-400 hover:text-cyan-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-cyan-500/50 flex items-center justify-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Excel (.xlsx / .xls / .csv)</span>
+          <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'cobertura')">
+        </label>
+      </div>
+
+      <!-- 2. Facturación -->
+      <div class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h2 class="font-bold text-white text-lg">Facturación</h2>
+          </div>
+          <p class="text-slate-400 text-xs mb-5">Facturas electrónicas y comprobantes públicos (XML/Excel).</p>
+          <ul id="lista-facturacion" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
+        </div>
+
+        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-purple-400 hover:text-purple-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-purple-500/50 flex items-center justify-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Factura (XML / Excel)</span>
+          <input type="file" accept=".xml, .xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'facturacion')">
+        </label>
+      </div>
+
+      <!-- 3. Bonos Mensuales -->
+      <div id="card-bonos" class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h2 class="font-bold text-white text-lg">Bonos Mensuales</h2>
+          </div>
+          <p class="text-slate-400 text-xs mb-5">Reportes de incentivos y métricas de desempeño.</p>
+          <ul id="lista-bonos" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
+        </div>
+
+        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-amber-500/50 flex items-center justify-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Archivo de Bonos</span>
+          <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'bonos')">
+        </label>
+      </div>
+
+      <!-- 4. Vacantes -->
+      <div id="card-vacantes" class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+            </div>
+            <h2 class="font-bold text-white text-lg">Reportes de Vacantes</h2>
+          </div>
+          <p class="text-slate-400 text-xs mb-5">Archivos y seguimiento de posiciones abiertas en tienda.</p>
+          <ul id="lista-vacantes" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
+        </div>
+
+        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-rose-400 hover:text-rose-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-rose-500/50 flex items-center justify-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Archivo de Vacantes</span>
+          <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'vacantes')">
+        </label>
+      </div>
+
+      <!-- 5. Plan de Trabajo -->
+      <div id="card-plan" class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            </div>
+            <h2 class="font-bold text-white text-lg">Plan de Trabajo</h2>
+          </div>
+          <p class="text-slate-400 text-xs mb-5">Cronogramas de ruta y planes operativos de promotores.</p>
+          <ul id="lista-plan" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
+        </div>
+
+        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-emerald-400 hover:text-emerald-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Plan de Trabajo</span>
+          <input type="file" class="hidden" onchange="subirArchivoNube(event, 'plan')">
+        </label>
+      </div>
+
+    </div>
+
+    <!-- VISTA 2: COBERTURA Y ANÁLISIS DE PROMOTORES -->
+    <div id="vista-cobertura" class="hidden space-y-6">
+      <div id="metricas-cobertura" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+      <div class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-white">📈 Análitica Visual de Visitas: Programadas vs Reales</h3>
+            <p class="text-slate-400 text-xs">Visitas visibles sobre cada barra y porcentaje % de cobertura destacado arriba.</p>
+          </div>
+        </div>
+        <div class="h-80 w-full relative">
+          <canvas id="grafica-cobertura"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">📊 Desempeño por Promotor, Cadena y Tienda</h2>
+            <p class="text-slate-400 text-xs">Filtra por Cadena Comercial, Nombre de Tienda o Promotor para un análisis detallado.</p>
+          </div>
+
+          <button onclick="exportarTablaExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 border border-emerald-500/40 flex items-center space-x-2 transition-all shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span>📥 Descargar Reporte Excel</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap w-full lg:w-auto pt-2">
+          <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Cadena:</label>
+            <select id="filter-cadena" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+              <option value="TODAS">Todas las Cadenas</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Tienda:</label>
+            <select id="filter-tienda" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500 max-w-xs">
+              <option value="TODAS">Todas las Tiendas</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Promotor:</label>
+            <select id="filter-promotor" onchange="aplicarFiltrosPromotores()" class="bg-slate-900 text-xs text-slate-200 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+              <option value="TODOS">Todos los Promotores</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Ordenar por:</label>
+            <select id="select-orden-columna" onchange="cambiarOrdenSelector()" class="bg-slate-900 text-xs text-slate-300 rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+              <option value="cobertura_desc">% Cobertura (Mayor a Menor)</option>
+              <option value="cobertura_asc">% Cobertura (Menor a Mayor)</option>
+              <option value="promotor_asc">Promotor (A - Z)</option>
+              <option value="promotor_desc">Promotor (Z - A)</option>
+              <option value="tiendas_desc">Tiendas (Mayor a Menor)</option>
+              <option value="tiendas_asc">Tiendas (Menor a Mayor)</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col w-full sm:w-64">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Buscar:</label>
+            <input type="text" id="buscador-promotor" onkeyup="aplicarFiltrosPromotores()" placeholder="🔍 Buscar Tienda o Ciudad..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-cyan-500">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-800 rounded-xl">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/90 text-slate-400 font-bold uppercase border-b border-slate-800 select-none">
+              <tr>
+                <th onclick="ordenarPorColumna('promotor')" class="p-3.5 cursor-pointer hover:text-cyan-400 transition-colors">
+                  Promotor <span id="icon-promotor">↕</span>
+                </th>
+                <th onclick="ordenarPorColumna('usuario')" class="p-3.5 text-center cursor-pointer hover:text-cyan-400 transition-colors">
+                  Usuario <span id="icon-usuario">↕</span>
+                </th>
+                <th class="p-3.5 text-center">Cadena Principal</th>
+                <th onclick="ordenarPorColumna('tiendas')" class="p-3.5 text-center cursor-pointer hover:text-cyan-400 transition-colors">
+                  Tiendas <span id="icon-tiendas">↕</span>
+                </th>
+                <th onclick="ordenarPorColumna('frecuenciaMeta')" class="p-3.5 text-center cursor-pointer hover:text-cyan-400 transition-colors">
+                  Frecuencia Meta <span id="icon-frecuenciaMeta">↕</span>
+                </th>
+                <th onclick="ordenarPorColumna('visitasReales')" class="p-3.5 text-center cursor-pointer hover:text-cyan-400 transition-colors">
+                  Visitas Reales <span id="icon-visitasReales">↕</span>
+                </th>
+                <th onclick="ordenarPorColumna('cobertura')" class="p-3.5 text-center cursor-pointer hover:text-cyan-400 transition-colors">
+                  % Cobertura Promedio <span id="icon-cobertura">↓</span>
+                </th>
+                <th class="p-3.5 text-right">Estatus</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-promotores-body" class="divide-y divide-slate-800/60 text-slate-300">
+              <tr>
+                <td colspan="8" class="p-6 text-center text-slate-500 italic">No hay reportes de cobertura cargados para este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 3: FACTURACIÓN -->
+    <div id="vista-facturacion" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-white mb-1">🧾 Desglose y Pagos de Facturación</h2>
+        <p class="text-slate-400 text-xs mb-6">Auditoría financiera y subtotal acumulado de CFDI cargados.</p>
+        <div id="metricas-facturacion" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+
+        <div class="glass-card rounded-xl overflow-hidden border border-slate-800">
+          <div class="p-4 border-b border-slate-800 font-bold text-slate-200 text-sm bg-slate-900/50">Facturas Registradas en la Nube</div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-900/80 text-slate-400 text-xs font-bold uppercase border-b border-slate-800">
+                <tr>
+                  <th class="p-3.5">Archivo Factura</th>
+                  <th class="p-3.5">Monto Sin IVA (Subtotal)</th>
+                  <th class="p-3.5 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-facturas-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 4: REPORTES DE BONOS -->
+    <div id="vista-bonos" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-white mb-1">🎁 Reporte e Incentivos de Bonos Mensuales</h2>
+        <p class="text-slate-400 text-xs mb-6">Análisis detallado de montos e incentivos otorgados por persona.</p>
+        <div id="metricas-bonos" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+
+        <div class="glass-card rounded-xl overflow-hidden border border-slate-800 space-y-4 p-4">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="font-bold text-slate-200 text-sm">Desglose Individual de Bonos</div>
+            <div class="flex items-center gap-3">
+              <button onclick="exportarTablaBonosExcel()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-lg border border-amber-500/40 flex items-center space-x-1.5 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span>Descargar Bonos Excel</span>
+              </button>
+              <div class="w-full sm:w-64">
+                <input type="text" id="buscador-bono" onkeyup="filtrarTablaBonos()" placeholder="🔍 Buscar Colaborador..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-800 rounded-xl">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-900/80 text-slate-400 text-xs font-bold uppercase border-b border-slate-800">
+                <tr>
+                  <th class="p-3.5">Colaborador / Promotor</th>
+                  <th class="p-3.5 text-right">Monto de Bono</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-bonos-body" class="divide-y divide-slate-800/60 text-slate-300">
+                <tr>
+                  <td colspan="2" class="p-6 text-center text-slate-500 italic">No hay reportes de bonos cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 5: REPORTES DE VACANTES -->
+    <div id="vista-vacantes" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-white mb-1">🚨 Seguimiento y Auditoría de Vacantes</h2>
+        <p class="text-slate-400 text-xs mb-6">Análisis operativo de posiciones abiertas y tiendas sin cobertura.</p>
+        <div id="metricas-vacantes" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+
+        <div class="glass-card rounded-xl overflow-hidden border border-slate-800 space-y-4 p-4">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="font-bold text-slate-200 text-sm">Listado General de Vacantes</div>
+            <div class="flex items-center gap-3">
+              <button onclick="exportarTablaVacantesExcel()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-lg border border-rose-500/40 flex items-center space-x-1.5 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span>Descargar Vacantes Excel</span>
+              </button>
+              <div class="w-full sm:w-64">
+                <input type="text" id="buscador-vacante" onkeyup="filtrarTablaVacantes()" placeholder="🔍 Buscar Tienda o Promotor..." class="w-full bg-slate-900 text-xs text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2 border border-slate-700 focus:outline-none focus:border-rose-500">
+              </div>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-800 rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900/80 text-slate-400 text-xs font-bold uppercase border-b border-slate-800">
+                <tr>
+                  <th class="p-3.5">Ejecutivo / Cuenta</th>
+                  <th class="p-3.5">Cadena</th>
+                  <th class="p-3.5">Nombre de Tienda</th>
+                  <th class="p-3.5 text-center">Ciudad / Estado</th>
+                  <th class="p-3.5 text-right">Estatus</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-vacantes-body" class="divide-y divide-slate-800/60 text-slate-300">
+                <tr>
+                  <td colspan="5" class="p-6 text-center text-slate-500 italic">No hay reportes de vacantes cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const NOMBRES_MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const MAPA_TEXTO_A_NUM = {
+      "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
+      "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+    };
+
+    let marcaPrincipal = 'juguetimax';
+    let subMarcaActual = 'Juguetimax por visita';
+    let anioActual = '2026';
+    let modoVista = 'mes';
+    let unsubscribe = null;
+    let datosPromotoresGlobal = [];
+    let datosPromotoresFiltrados = [];
+    let datosBonosGlobal = [];
+    let datosVacantesGlobal = [];
+    let miGrafica = null;
+
+    let columnaOrden = 'cobertura';
+    let direccionOrden = 'desc';
+
+    function mostrarToast(msj = "✓ Archivo guardado permanentemente en la nube", esError = false) {
+      const toast = document.getElementById('toast-notificacion');
+      const txt = document.getElementById('toast-mensaje');
+      txt.innerText = msj;
+      toast.className = esError 
+        ? "fixed top-5 right-5 z-50 bg-rose-500 text-white font-bold px-4 py-3 rounded-xl shadow-2xl border border-rose-400 flex items-center space-x-2 transition-all"
+        : "fixed top-5 right-5 z-50 bg-emerald-500 text-white font-bold px-4 py-3 rounded-xl shadow-2xl border border-emerald-400 flex items-center space-x-2 transition-all";
+      
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 4000);
+    }
+
+    function alternarModoVista() {
+      modoVista = document.getElementById('select-tipo-vista').value;
+      document.getElementById('contenedor-mes-unico').classList.toggle('hidden', modoVista === 'rango');
+      document.getElementById('contenedor-rango').classList.toggle('hidden', modoVista === 'mes');
+      escucharCambiosNube();
+    }
+
+    function cambiarMarca(marca) {
+      marcaPrincipal = marca;
+      
+      const btnJ = document.getElementById('btn-juguetimax');
+      const btnM = document.getElementById('btn-multimarca');
+      const btnP = document.getElementById('btn-promotoria');
+
+      const estiloActivo = "py-2 text-xs font-bold rounded-lg bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 transition-all text-center";
+      const estiloInactivo = "py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all text-center";
+
+      btnJ.className = (marca === 'juguetimax') ? estiloActivo : estiloInactivo;
+      btnM.className = (marca === 'multimarca') ? estiloActivo : estiloInactivo;
+      btnP.className = (marca === 'promotoria') ? estiloActivo : estiloInactivo;
+
+      document.getElementById('contenedor-submarca').classList.toggle('hidden', marca === 'juguetimax');
+      
+      escucharCambiosNube();
+    }
+
+    function cambiarVista(vista) {
+      ['descarga', 'cobertura', 'facturacion', 'bonos', 'vacantes'].forEach(v => {
+        document.getElementById(`vista-${v}`).classList.toggle('hidden', v !== vista);
+      });
+    }
+
+    function obtenerClaveMarcaActiva() {
+      if (marcaPrincipal === 'juguetimax') {
+        return 'Juguetimax-Fijo';
+      } else if (marcaPrincipal === 'multimarca') {
+        return `Multimarca-${subMarcaActual}`;
+      } else {
+        return `Promotoria-${subMarcaActual}`;
+      }
+    }
+
+    function normalizarMesNumero(valorMes) {
+      if (!valorMes) return 1;
+      if (typeof valorMes === 'number') return valorMes;
+      const parsed = parseInt(valorMes);
+      if (!isNaN(parsed)) return parsed;
+      const minus = String(valorMes).toLowerCase().trim();
+      return MAPA_TEXTO_A_NUM[minus] || 1;
+    }
+
+    function normalizarCadena(str) {
+      if (!str) return '';
+      return String(str).toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function escucharCambiosNube() {
+      anioActual = String(document.getElementById('select-anio').value);
+      subMarcaActual = document.getElementById('select-submarca').value;
+
+      let etiquetaFecha = '';
+      let mesNumInicio = 1;
+      let mesNumFin = 1;
+
+      if (modoVista === 'mes') {
+        mesNumInicio = parseInt(document.getElementById('select-mes').value);
+        mesNumFin = mesNumInicio;
+        etiquetaFecha = `${anioActual} - ${NOMBRES_MESES[mesNumInicio - 1].toUpperCase()}`;
+      } else {
+        mesNumInicio = parseInt(document.getElementById('select-mes-inicio').value);
+        mesNumFin = parseInt(document.getElementById('select-mes-fin').value);
+
+        if (mesNumInicio > mesNumFin) {
+          const temp = mesNumInicio;
+          mesNumInicio = mesNumFin;
+          mesNumFin = temp;
+        }
+
+        etiquetaFecha = `${anioActual} | ${NOMBRES_MESES[mesNumInicio - 1].toUpperCase()} A ${NOMBRES_MESES[mesNumFin - 1].toUpperCase()}`;
+      }
+
+      const claveMarca = obtenerClaveMarcaActiva();
+      const idCuentaFiltro = normalizarCadena(claveMarca);
+      
+      let textoLabel = '';
+      if (marcaPrincipal === 'juguetimax') {
+        textoLabel = `JUGUETIMAX (FIJO) | ${etiquetaFecha}`;
+      } else if (marcaPrincipal === 'multimarca') {
+        textoLabel = `MULTIMARCA (${subMarcaActual.toUpperCase()}) | ${etiquetaFecha}`;
+      } else {
+        textoLabel = `PROMOTORÍA POR VISITA (${subMarcaActual.toUpperCase()}) | ${etiquetaFecha}`;
+      }
+        
+      document.getElementById('label-filtro').innerText = textoLabel;
+
+      if (!window.db) return;
+
+      const dbRef = window.ref(window.db, "archivos_evolve");
+
+      window.onValue(dbRef, (snapshot) => {
+        const archivosNube = [];
+        snapshot.forEach((childSnap) => {
+          const data = childSnap.val();
+          const keyDoc = childSnap.key;
+          const mesDoc = normalizarMesNumero(data.mesNum || data.mes);
+          const idDocNormal = normalizarCadena(data.idCuenta || data.marca);
+
+          if ((idDocNormal === idCuentaFiltro || idDocNormal.includes(idCuentaFiltro) || idCuentaFiltro.includes(idDocNormal)) && 
+              String(data.anio) === String(anioActual) && 
+              (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
+            archivosNube.push({ idDoc: keyDoc, ...data });
+          }
+        });
+
+        renderizarPantalla(archivosNube);
+      }, (error) => {
+        console.error("Error al escuchar Firebase Realtime Database:", error);
+        mostrarToast("⚠️ Error de permisos en Firebase.", true);
+      });
+    }
+
+    async function subirArchivoNube(event, categoria) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const claveMarca = obtenerClaveMarcaActiva();
+      const idCuentaNormal = normalizarCadena(claveMarca);
+      const extension = file.name.split('.').pop().toLowerCase();
+      let montoSubtotal = 0;
+      let estructuraPromotores = [];
+      let estructuraBonos = [];
+      let estructuraVacantes = [];
+
+      const mesGuardar = (modoVista === 'mes') ? parseInt(document.getElementById('select-mes').value) : parseInt(document.getElementById('select-mes-inicio').value);
+
+      if ((categoria === 'cobertura' || categoria === 'bonos' || categoria === 'vacantes') && (extension === 'xlsx' || extension === 'xls' || extension === 'csv')) {
+        try {
+          const buffer = await file.arrayBuffer();
+          const workbook = XLSX.read(buffer, { type: 'array' });
+          
+          let hojaUsar = workbook.Sheets[workbook.SheetNames[0]];
+          if (categoria === 'vacantes' && workbook.SheetNames.includes('Concentrado ttl')) {
+            hojaUsar = workbook.Sheets['Concentrado ttl'];
+          }
+
+          const jsonDatos = XLSX.utils.sheet_to_json(hojaUsar, { header: 1 });
+
+          if (categoria === 'cobertura') {
+            let indexHeader = -1;
+            for (let i = 0; i < Math.min(jsonDatos.length, 10); i++) {
+              if (jsonDatos[i] && jsonDatos[i].includes("PROMOTOR")) {
+                indexHeader = i;
+                break;
+              }
+            }
+
+            if (indexHeader !== -1) {
+              const headers = jsonDatos[indexHeader];
+              const colPromotor = headers.indexOf("PROMOTOR");
+              const colUsuario = headers.indexOf("USUARIO");
+              const colCadena = headers.indexOf("CADENA");
+              const colFrecuencia = headers.indexOf("FRECUENCIA");
+              const colVisitas = headers.indexOf("TTL Visitas");
+              const colCobertura = headers.indexOf("% Cobertura");
+              const colNombreTienda = headers.indexOf("NOMBRE");
+
+              for (let r = indexHeader + 1; r < jsonDatos.length; r++) {
+                const row = jsonDatos[r];
+                if (row && row[colPromotor]) {
+                  estructuraPromotores.push({
+                    promotor: String(row[colPromotor] || '').trim(),
+                    usuario: String(row[colUsuario] || '').trim(),
+                    cadena: String(row[colCadena] || 'VARIAS').trim(),
+                    frecuencia: parseFloat(row[colFrecuencia]) || 0,
+                    visitas: parseFloat(row[colVisitas]) || 0,
+                    coberturaPct: parseFloat(row[colCobertura]) || 0,
+                    tienda: String(row[colNombreTienda] || '').trim()
+                  });
+                }
+              }
+            }
+          } else if (categoria === 'bonos') {
+            let colNombre = -1, colMonto = -1;
+
+            for (let i = 0; i < Math.min(jsonDatos.length, 10); i++) {
+              if (jsonDatos[i]) {
+                jsonDatos[i].forEach((col, idx) => {
+                  const val = String(col || '').toLowerCase();
+                  if (val.includes('nombre') || val.includes('promotor') || val.includes('empleado') || val.includes('persona')) colNombre = idx;
+                  if (val.includes('bono') || val.includes('monto') || val.includes('cantidad') || val.includes('incentivo') || val.includes('total')) colMonto = idx;
+                });
+                if (colNombre !== -1 && colMonto !== -1) break;
+              }
+            }
+
+            if (colNombre === -1) colNombre = 0;
+            if (colMonto === -1) colMonto = 1;
+
+            for (let r = 1; r < jsonDatos.length; r++) {
+              const row = jsonDatos[r];
+              if (row && row[colNombre]) {
+                const m = parseFloat(String(row[colMonto] || 0).replace(/[^0-9.]/g, '')) || 0;
+                estructuraBonos.push({
+                  nombre: String(row[colNombre] || '').trim(),
+                  montoBono: m
+                });
+              }
+            }
+          } else if (categoria === 'vacantes') {
+            let colEjecutivo = -1, colCuenta = -1, colCadena = -1, colTienda = -1, colCiudad = -1, colEstado = -1, colEstatus = -1;
+
+            for (let i = 0; i < Math.min(jsonDatos.length, 10); i++) {
+              if (jsonDatos[i]) {
+                jsonDatos[i].forEach((col, idx) => {
+                  const val = String(col || '').toLowerCase();
+                  if (val.includes('ejecutivo')) colEjecutivo = idx;
+                  if (val.includes('cuenta')) colCuenta = idx;
+                  if (val.includes('cadena')) colCadena = idx;
+                  if (val.includes('tienda')) colTienda = idx;
+                  if (val.includes('ciudad')) colCiudad = idx;
+                  if (val.includes('estado')) colEstado = idx;
+                  if (val.includes('estatus')) colEstatus = idx;
+                });
+                if (colTienda !== -1) break;
+              }
+            }
+
+            if (colEjecutivo === -1) colEjecutivo = 0;
+            if (colCuenta === -1) colCuenta = 1;
+            if (colCadena === -1) colCadena = 4;
+            if (colTienda === -1) colTienda = 5;
+
+            for (let r = 1; r < jsonDatos.length; r++) {
+              const row = jsonDatos[r];
+              if (row && (row[colTienda] || row[colCadena])) {
+                estructuraVacantes.push({
+                  ejecutivo: String(row[colEjecutivo] || '').trim(),
+                  cuenta: String(row[colCuenta] || '').trim(),
+                  cadena: String(row[colCadena] || 'VARIAS').trim(),
+                  tienda: String(row[colTienda] || 'GENERAL').trim(),
+                  ciudad: String(row[colCiudad] || '').trim(),
+                  estado: String(row[colEstado] || '').trim(),
+                  estatus: String(row[colEstatus] || 'VACANTE').trim()
+                });
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Error al procesar Excel:", err);
+        }
+      }
+
+      if (categoria === 'facturacion' && extension === 'xml') {
+        const textoXML = await file.text();
+        const coincidencia = textoXML.match(/SubTotal=["']([\d.]+)\b["']/i);
+        if (coincidencia && coincidencia[1]) montoSubtotal = parseFloat(coincidencia[1]);
+      }
+
+      try {
+        const dbRef = window.ref(window.db, "archivos_evolve");
+        await window.push(dbRef, {
+          nombre: file.name,
+          categoria: categoria,
+          marca: claveMarca,
+          idCuenta: idCuentaNormal,
+          anio: String(anioActual),
+          mesNum: mesGuardar,
+          mes: NOMBRES_MESES[mesGuardar - 1].toLowerCase(),
+          montoSinIVA: montoSubtotal,
+          promotoresData: estructuraPromotores,
+          bonosData: estructuraBonos,
+          vacantesData: estructuraVacantes,
+          fechaSubida: new Date().toISOString()
+        });
+
+        mostrarToast("✓ Guardado permanentemente en Firebase");
+      } catch (e) {
+        console.error("Error guardando en Firebase:", e);
+        mostrarToast("❌ No se pudo guardar. Revisa Firebase.", true);
+      }
+
+      event.target.value = '';
+    }
+
+    async function eliminarArchivoNube(idDoc) {
+      if (confirm("¿Deseas eliminar este archivo para todos los usuarios?")) {
+        try {
+          const itemRef = window.ref(window.db, `archivos_evolve/${idDoc}`);
+          await window.remove(itemRef);
+          mostrarToast("🗑️ Archivo eliminado de Firebase");
+        } catch (e) {
+          mostrarToast("❌ Error al eliminar el archivo.", true);
+        }
+      }
+    }
+
+    function renderizarListaHTML(archivos) {
+      if (archivos.length === 0) return '<li class="text-slate-500 text-xs italic">Sin archivos guardados</li>';
+      return archivos.map(a => `<li class="flex justify-between items-center p-2.5 bg-slate-900/80 border border-slate-800 rounded-xl text-xs text-slate-300"><span class="truncate pr-2">${a.nombre}</span><button onclick="eliminarArchivoNube('${a.idDoc}')" class="text-rose-400 hover:text-rose-300 font-bold px-2 py-1 bg-rose-500/10 rounded-lg shrink-0 transition-colors">🗑️ Eliminar</button></li>`).join('');
+    }
+
+    function renderizarPantalla(archivos) {
+      const cobertura = archivos.filter(a => a.categoria === 'cobertura');
+      const facturacion = archivos.filter(a => a.categoria === 'facturacion');
+      const bonos = archivos.filter(a => a.categoria === 'bonos');
+      const vacantes = archivos.filter(a => a.categoria === 'vacantes');
+      const plan = archivos.filter(a => a.categoria === 'plan');
+
+      document.getElementById('lista-cobertura').innerHTML = renderizarListaHTML(cobertura);
+      document.getElementById('lista-facturacion').innerHTML = renderizarListaHTML(facturacion);
+      document.getElementById('lista-bonos').innerHTML = renderizarListaHTML(bonos);
+      document.getElementById('lista-vacantes').innerHTML = renderizarListaHTML(vacantes);
+      document.getElementById('lista-plan').innerHTML = renderizarListaHTML(plan);
+
+      // COBERTURA
+      let listaRegistros = [];
+      cobertura.forEach(c => {
+        if (c.promotoresData && Array.isArray(c.promotoresData)) {
+          listaRegistros = listaRegistros.concat(c.promotoresData);
+        }
+      });
+
+      datosPromotoresGlobal = listaRegistros;
+      poblarDesplegablesFiltros(listaRegistros);
+      aplicarFiltrosPromotores();
+
+      // BONOS
+      let listaBonos = [];
+      bonos.forEach(b => {
+        if (b.bonosData && Array.isArray(b.bonosData)) {
+          listaBonos = listaBonos.concat(b.bonosData);
+        }
+      });
+      datosBonosGlobal = listaBonos;
+      renderizarTablaBonos(listaBonos);
+
+      // VACANTES
+      let listaVacantes = [];
+      vacantes.forEach(v => {
+        if (v.vacantesData && Array.isArray(v.vacantesData)) {
+          listaVacantes = listaVacantes.concat(v.vacantesData);
+        }
+      });
+      datosVacantesGlobal = listaVacantes;
+      renderizarTablaVacantes(listaVacantes);
+
+      // FACTURACIÓN
+      const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+      let totalMonto = 0;
+      facturacion.forEach(f => totalMonto += f.montoSinIVA);
+
+      document.getElementById('metricas-facturacion').innerHTML = `
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Archivos Cargados</p><p class="text-2xl font-bold text-white mt-1">${facturacion.length}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Monto Total Sin IVA</p><p class="text-2xl font-bold text-cyan-400 mt-1">${formatoMoneda.format(totalMonto)}</p></div>
+      `;
+
+      document.getElementById('tabla-facturas-body').innerHTML = facturacion.length === 0 ? '<tr><td colspan="3" class="p-4 text-center text-slate-500 text-xs italic">Sin facturas registradas en este periodo</td></tr>' :
+        facturacion.map(f => `<tr class="hover:bg-slate-800/40 transition-colors"><td class="p-3.5 text-xs font-medium text-slate-200">${f.nombre}</td><td class="p-3.5 font-bold text-cyan-400">${formatoMoneda.format(f.montoSinIVA)}</td><td class="p-3.5 text-right"><button onclick="eliminarArchivoNube('${f.idDoc}')" class="text-rose-400 hover:text-rose-300 font-bold text-xs bg-rose-500/10 px-2.5 py-1 rounded-lg transition-colors">🗑️ Eliminar</button></td></tr>`).join('');
+    }
+
+    function renderizarTablaBonos(registros) {
+      const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+      let totalMontoBonos = 0;
+
+      registros.forEach(r => totalMontoBonos += r.montoBono);
+
+      const promedioBono = registros.length > 0 ? (totalMontoBonos / registros.length) : 0;
+
+      document.getElementById('metricas-bonos').innerHTML = `
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Colaboradores con Bono</p><p class="text-2xl font-bold text-white mt-1">${registros.length}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Monto Total de Bonos</p><p class="text-2xl font-bold text-amber-400 mt-1">${formatoMoneda.format(totalMontoBonos)}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Promedio por Persona</p><p class="text-2xl font-bold text-emerald-400 mt-1">${formatoMoneda.format(promedioBono)}</p></div>
+      `;
+
+      if (registros.length === 0) {
+        document.getElementById('tabla-bonos-body').innerHTML = '<tr><td colspan="2" class="p-6 text-center text-slate-500 italic">No hay reportes de bonos cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td></tr>';
+        return;
+      }
+
+      document.getElementById('tabla-bonos-body').innerHTML = registros.map(r => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="p-3.5 font-bold text-white">${r.nombre}</td>
+          <td class="p-3.5 text-right font-bold text-amber-400">${formatoMoneda.format(r.montoBono)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function filtrarTablaBonos() {
+      const q = document.getElementById('buscador-bono').value.toLowerCase();
+      const filtrados = datosBonosGlobal.filter(r => r.nombre.toLowerCase().includes(q));
+      renderizarTablaBonos(filtrados);
+    }
+
+    function renderizarTablaVacantes(registros) {
+      const conjuntoCadenas = new Set();
+      const conjuntoTiendas = new Set();
+
+      registros.forEach(r => {
+        if (r.cadena) conjuntoCadenas.add(r.cadena);
+        if (r.tienda) conjuntoTiendas.add(r.tienda);
+      });
+
+      document.getElementById('metricas-vacantes').innerHTML = `
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Total de Vacantes Registradas</p><p class="text-2xl font-bold text-rose-400 mt-1">${registros.length}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Cadenas Afectadas</p><p class="text-2xl font-bold text-amber-400 mt-1">${conjuntoCadenas.size}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Tiendas Afectadas</p><p class="text-2xl font-bold text-purple-400 mt-1">${conjuntoTiendas.size}</p></div>
+      `;
+
+      if (registros.length === 0) {
+        document.getElementById('tabla-vacantes-body').innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-500 italic">No hay reportes de vacantes cargados en este periodo. Sube un archivo Excel en "Descarga de Docs".</td></tr>';
+        return;
+      }
+
+      document.getElementById('tabla-vacantes-body').innerHTML = registros.map(r => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="p-3.5 font-bold text-white">${r.ejecutivo || '-'} ${r.cuenta ? '(' + r.cuenta + ')' : ''}</td>
+          <td class="p-3.5 font-semibold text-slate-400">${r.cadena}</td>
+          <td class="p-3.5 font-medium text-slate-300">${r.tienda}</td>
+          <td class="p-3.5 text-center text-slate-400">${r.ciudad || '-'} ${r.estado ? '(' + r.estado + ')' : ''}</td>
+          <td class="p-3.5 text-right"><span class="px-2.5 py-1 rounded-full border text-[10px] font-extrabold uppercase ${r.estatus.toUpperCase().includes('VACANTE') ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'}">${r.estatus}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function filtrarTablaVacantes() {
+      const q = document.getElementById('buscador-vacante').value.toLowerCase();
+      const filtrados = datosVacantesGlobal.filter(r => 
+        (r.ejecutivo && r.ejecutivo.toLowerCase().includes(q)) || 
+        (r.cuenta && r.cuenta.toLowerCase().includes(q)) || 
+        (r.cadena && r.cadena.toLowerCase().includes(q)) || 
+        (r.tienda && r.tienda.toLowerCase().includes(q)) || 
+        (r.ciudad && r.ciudad.toLowerCase().includes(q))
+      );
+      renderizarTablaVacantes(filtrados);
+    }
+
+    function exportarTablaExcel() {
+      if (!datosPromotoresFiltrados || datosPromotoresFiltrados.length === 0) {
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      const datosExcel = datosPromotoresFiltrados.map(p => ({
+        "Promotor": p.promotor,
+        "Usuario": p.usuario,
+        "Cadena Principal": p.cadena,
+        "Tiendas Atendidas": p.tiendas,
+        "Frecuencia Meta": p.frecuenciaMeta,
+        "Visitas Reales": p.visitasReales,
+        "% Cobertura": parseFloat(p.cobertura.toFixed(1)),
+        "Estatus": p.cobertura < 50 ? "Crítico" : (p.cobertura < 80 ? "En Riesgo" : "Óptimo")
+      }));
+
+      const hoja = XLSX.utils.json_to_sheet(datosExcel);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Cobertura");
+
+      const claveMarca = obtenerClaveMarcaActiva();
+      const mesTexto = modoVista === 'mes' ? NOMBRES_MESES[parseInt(document.getElementById('select-mes').value) - 1] : "Rango";
+      XLSX.writeFile(libro, `Reporte_Cobertura_${claveMarca}_${anioActual}_${mesTexto}.xlsx`);
+    }
+
+    function exportarTablaBonosExcel() {
+      if (!datosBonosGlobal || datosBonosGlobal.length === 0) {
+        alert("No hay datos de bonos para exportar.");
+        return;
+      }
+
+      const datosExcel = datosBonosGlobal.map(b => ({
+        "Colaborador / Promotor": b.nombre,
+        "Monto Bono": b.montoBono
+      }));
+
+      const hoja = XLSX.utils.json_to_sheet(datosExcel);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Bonos");
+
+      const claveMarca = obtenerClaveMarcaActiva();
+      XLSX.writeFile(libro, `Reporte_Bonos_${claveMarca}_${anioActual}.xlsx`);
+    }
+
+    function exportarTablaVacantesExcel() {
+      if (!datosVacantesGlobal || datosVacantesGlobal.length === 0) {
+        alert("No hay datos de vacantes para exportar.");
+        return;
+      }
+
+      const datosExcel = datosVacantesGlobal.map(v => ({
+        "Ejecutivo / Posición": v.ejecutivo,
+        "Cuenta": v.cuenta,
+        "Cadena": v.cadena,
+        "Nombre de Tienda": v.tienda,
+        "Ciudad": v.ciudad,
+        "Estado": v.estado,
+        "Estatus": v.estatus
+      }));
+
+      const hoja = XLSX.utils.json_to_sheet(datosExcel);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Vacantes");
+
+      const claveMarca = obtenerClaveMarcaActiva();
+      XLSX.writeFile(libro, `Reporte_Vacantes_${claveMarca}_${anioActual}.xlsx`);
+    }
+
+    function poblarDesplegablesFiltros(registros) {
+      const selectCadena = document.getElementById('filter-cadena');
+      const selectPromotor = document.getElementById('filter-promotor');
+      const selectTienda = document.getElementById('filter-tienda');
+
+      const valCadenaActual = selectCadena.value;
+      const valPromotorActual = selectPromotor.value;
+      const valTiendaActual = selectTienda ? selectTienda.value : 'TODAS';
+
+      const conjuntoCadenas = new Set();
+      const conjuntoPromotores = new Set();
+      const conjuntoTiendas = new Set();
+
+      registros.forEach(r => {
+        if (r.cadena) conjuntoCadenas.add(r.cadena);
+        if (r.promotor) conjuntoPromotores.add(r.promotor);
+        if (r.tienda) conjuntoTiendas.add(r.tienda);
+      });
+
+      const arrCadenas = Array.from(conjuntoCadenas).sort();
+      const arrPromotores = Array.from(conjuntoPromotores).sort();
+      const arrTiendas = Array.from(conjuntoTiendas).sort();
+
+      selectCadena.innerHTML = '<option value="TODAS">Todas las Cadenas</option>' + 
+        arrCadenas.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      selectPromotor.innerHTML = '<option value="TODOS">Todos los Promotores</option>' + 
+        arrPromotores.map(p => `<option value="${p}">${p}</option>`).join('');
+
+      if (selectTienda) {
+        selectTienda.innerHTML = '<option value="TODAS">Todas las Tiendas</option>' + 
+          arrTiendas.map(t => `<option value="${t}">${t}</option>`).join('');
+        if (arrTiendas.includes(valTiendaActual)) selectTienda.value = valTiendaActual;
+      }
+
+      if (arrCadenas.includes(valCadenaActual)) selectCadena.value = valCadenaActual;
+      if (arrPromotores.includes(valPromotorActual)) selectPromotor.value = valPromotorActual;
+    }
+
+    function aplicarFiltrosPromotores() {
+      const selCadena = document.getElementById('filter-cadena').value;
+      const selPromotor = document.getElementById('filter-promotor').value;
+      const selTienda = document.getElementById('filter-tienda') ? document.getElementById('filter-tienda').value : 'TODAS';
+      const q = document.getElementById('buscador-promotor').value.toLowerCase();
+
+      let filtrados = datosPromotoresGlobal.filter(r => {
+        const cumpleCadena = (selCadena === 'TODAS') || (r.cadena === selCadena);
+        const cumplePromotor = (selPromotor === 'TODOS') || (r.promotor === selPromotor);
+        const cumpleTienda = (selTienda === 'TODAS') || (r.tienda === selTienda);
+        const cumpleBusqueda = !q || 
+          r.promotor.toLowerCase().includes(q) || 
+          r.usuario.toLowerCase().includes(q) || 
+          r.tienda.toLowerCase().includes(q) || 
+          r.cadena.toLowerCase().includes(q);
+
+        return cumpleCadena && cumplePromotor && cumpleTienda && cumpleBusqueda;
+      });
+
+      renderizarTablaPromotores(filtrados);
+    }
+
+    function ordenarPorColumna(col) {
+      if (columnaOrden === col) {
+        direccionOrden = direccionOrden === 'asc' ? 'desc' : 'asc';
+      } else {
+        columnaOrden = col;
+        direccionOrden = 'desc';
+      }
+      actualizarIconosEncabezados();
+      aplicarFiltrosPromotores();
+    }
+
+    function cambiarOrdenSelector() {
+      const val = document.getElementById('select-orden-columna').value;
+      const partes = val.split('_');
+      columnaOrden = partes[0];
+      direccionOrden = partes[1];
+      actualizarIconosEncabezados();
+      aplicarFiltrosPromotores();
+    }
+
+    function actualizarIconosEncabezados() {
+      ['promotor', 'usuario', 'tiendas', 'frecuenciaMeta', 'visitasReales', 'cobertura'].forEach(c => {
+        const el = document.getElementById(`icon-${c}`);
+        if (el) {
+          if (c === columnaOrden) {
+            el.innerText = direccionOrden === 'asc' ? '↑' : '↓';
+            el.className = 'text-cyan-400 font-black';
+          } else {
+            el.innerText = '↕';
+            el.className = 'text-slate-600 font-normal';
+          }
+        }
+      });
+    }
+
+    function renderizarTablaPromotores(registros) {
+      if (registros.length === 0) {
+        datosPromotoresFiltrados = [];
+        document.getElementById('metricas-cobertura').innerHTML = `
+          <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Promotores Activos</p><p class="text-2xl font-bold text-slate-500 mt-1">0</p></div>
+          <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Tiendas Totales</p><p class="text-2xl font-bold text-slate-500 mt-1">0</p></div>
+          <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Visitas Programadas vs Reales</p><p class="text-2xl font-bold text-slate-500 mt-1">0 / 0</p></div>
+          <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">% Cobertura General</p><p class="text-2xl font-bold text-slate-500 mt-1">0.0%</p></div>
+        `;
+
+        document.getElementById('tabla-promotores-body').innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No hay resultados de cobertura para el filtro seleccionado.</td></tr>';
+        renderizarGrafica([], [], []);
+        return;
+      }
+
+      const mapa = {};
+      registros.forEach(r => {
+        if (!mapa[r.promotor]) {
+          mapa[r.promotor] = {
+            promotor: r.promotor,
+            usuario: r.usuario,
+            cadena: r.cadena,
+            tiendas: 0,
+            frecuenciaMeta: 0,
+            visitasReales: 0,
+            sumaCobertura: 0
+          };
+        }
+        mapa[r.promotor].tiendas += 1;
+        mapa[r.promotor].frecuenciaMeta += r.frecuencia;
+        mapa[r.promotor].visitasReales += r.visitas;
+        mapa[r.promotor].sumaCobertura += r.coberturaPct;
+      });
+
+      let listaAgrupada = Object.values(mapa);
+
+      listaAgrupada.forEach(p => {
+        p.cobertura = p.tiendas > 0 ? (p.sumaCobertura / p.tiendas) * 100 : 0;
+      });
+
+      listaAgrupada.sort((a, b) => {
+        let valA = a[columnaOrden];
+        let valB = b[columnaOrden];
+
+        if (typeof valA === 'string') {
+          valA = valA.toLowerCase();
+          valB = valB.toLowerCase();
+        }
+
+        if (valA < valB) return direccionOrden === 'asc' ? -1 : 1;
+        if (valA > valB) return direccionOrden === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      datosPromotoresFiltrados = listaAgrupada;
+
+      let totalTiendas = registros.length;
+      let totalPromotores = listaAgrupada.length;
+      let totalMeta = 0;
+      let totalReales = 0;
+
+      listaAgrupada.forEach(p => {
+        totalMeta += p.frecuenciaMeta;
+        totalReales += p.visitasReales;
+      });
+
+      const coberturaNacional = totalMeta > 0 ? ((totalReales / totalMeta) * 100).toFixed(1) : 0;
+
+      document.getElementById('metricas-cobertura').innerHTML = `
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Promotores Activos</p><p class="text-2xl font-bold text-white mt-1">${totalPromotores}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Tiendas Atendidas</p><p class="text-2xl font-bold text-cyan-400 mt-1">${totalTiendas}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">Visitas Programadas / Reales</p><p class="text-2xl font-bold text-purple-400 mt-1">${totalMeta} / ${totalReales}</p></div>
+        <div class="glass-card p-4 rounded-xl border border-slate-800"><p class="text-xs text-slate-400 font-bold uppercase">% Cobertura General</p><p class="text-2xl font-bold text-emerald-400 mt-1">${coberturaNacional}%</p></div>
+      `;
+
+      document.getElementById('tabla-promotores-body').innerHTML = listaAgrupada.map(p => {
+        const pctProm = p.cobertura.toFixed(1);
+        let badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+        let estatusTexto = "Óptimo";
+
+        if (pctProm < 50) {
+          badgeStyle = "bg-rose-500/10 text-rose-400 border-rose-500/30";
+          estatusTexto = "Crítico";
+        } else if (pctProm < 80) {
+          badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/30";
+          estatusTexto = "En Riesgo";
+        }
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="p-3.5 font-bold text-white">${p.promotor}</td>
+            <td class="p-3.5 text-center font-mono text-cyan-400 text-xs">${p.usuario}</td>
+            <td class="p-3.5 text-center font-semibold text-slate-400">${p.cadena}</td>
+            <td class="p-3.5 text-center font-semibold text-slate-300">${p.tiendas}</td>
+            <td class="p-3.5 text-center font-semibold text-slate-400">${p.frecuenciaMeta}</td>
+            <td class="p-3.5 text-center font-bold text-purple-300">${p.visitasReales}</td>
+            <td class="p-3.5 text-center font-extrabold text-cyan-300">${pctProm}%</td>
+            <td class="p-3.5 text-right"><span class="px-2.5 py-1 rounded-full border text-[10px] font-extrabold uppercase ${badgeStyle}">${estatusTexto}</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      const etiquetasTop = listaAgrupada.slice(0, 10).map(p => p.promotor.split(' ')[0] + ' ' + (p.promotor.split(' ')[1] || ''));
+      const metasTop = listaAgrupada.slice(0, 10).map(p => p.frecuenciaMeta);
+      const realesTop = listaAgrupada.slice(0, 10).map(p => p.visitasReales);
+
+      renderizarGrafica(etiquetasTop, metasTop, realesTop);
+    }
+
+    function renderizarGrafica(labels, dataMetas, dataReales) {
+      const ctx = document.getElementById('grafica-cobertura').getContext('2d');
+      if (miGrafica) miGrafica.destroy();
+
+      let maxVal = 0;
+      dataMetas.concat(dataReales).forEach(v => { if (v > maxVal) maxVal = v; });
+
+      const pluginValoresYPorcentaje = {
+        id: 'pluginEtiquetas',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          
+          chart.data.datasets.forEach((dataset, datasetIndex) => {
+            const meta = chart.getDatasetMeta(datasetIndex);
+            meta.data.forEach((bar, index) => {
+              const val = dataset.data[index];
+              if (val !== undefined && val !== null && val >= 0) {
+                ctx.save();
+                ctx.fillStyle = datasetIndex === 0 ? '#e2e8f0' : '#38bdf8';
+                ctx.font = 'extrabold 11px "Plus Jakarta Sans", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(val, bar.x, bar.y - 4);
+                ctx.restore();
+              }
+            });
+          });
+
+          const meta0 = chart.getDatasetMeta(0);
+          const meta1 = chart.getDatasetMeta(1);
+
+          meta0.data.forEach((bar0, index) => {
+            const metaVal = chart.data.datasets[0].data[index] || 0;
+            const realVal = chart.data.datasets[1].data[index] || 0;
+            const bar1 = meta1.data[index];
+
+            if (metaVal > 0 && bar1) {
+              const pctNum = (realVal / metaVal) * 100;
+              const pctTexto = pctNum.toFixed(0) + '%';
+              const topY = Math.min(bar0.y, bar1.y);
+              const posX = (bar0.x + bar1.x) / 2;
+
+              ctx.save();
+              ctx.fillStyle = pctNum >= 80 ? '#34d399' : (pctNum >= 50 ? '#fbbf24' : '#f43f5e');
+              ctx.font = '800 13px "Plus Jakarta Sans", sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(pctTexto, posX, topY - 22);
+              ctx.restore();
+            }
+          });
+        }
+      };
+
+      miGrafica = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Visitas Programadas (Meta)',
+              data: dataMetas,
+              backgroundColor: 'rgba(148, 163, 184, 0.35)',
+              borderColor: 'rgba(148, 163, 184, 0.8)',
+              borderWidth: 1,
+              borderRadius: 6
+            },
+            {
+              label: 'Visitas Reales Efectuadas',
+              data: dataReales,
+              backgroundColor: 'rgba(56, 189, 248, 0.85)',
+              borderColor: '#0091FF',
+              borderWidth: 1,
+              borderRadius: 6
+            }
+          ]
+        },
+        plugins: [pluginValoresYPorcentaje],
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: {
+            padding: {
+              top: 45,
+              bottom: 10
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              align: 'end',
+              labels: { 
+                color: '#94a3b8', 
+                font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
+                boxWidth: 14,
+                padding: 15
+              }
+            },
+            tooltip: {
+              callbacks: {
+                afterBody: function(context) {
+                  const idx = context[0].dataIndex;
+                  const m = dataMetas[idx] || 0;
+                  const r = dataReales[idx] || 0;
+                  const pct = m > 0 ? ((r / m) * 100).toFixed(1) : 0;
+                  return `% Cobertura: ${pct}%`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#94a3b8', font: { size: 10, weight: '600' } },
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            y: {
+              suggestedMax: maxVal > 0 ? maxVal * 1.3 : 10,
+              ticks: { color: '#94a3b8', font: { size: 10 } },
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    setTimeout(() => { cambiarMarca('juguetimax'); }, 800);
+  </script>
+</body>
+</html>
