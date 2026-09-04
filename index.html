@@ -231,7 +231,7 @@
     </div>
 
     <!-- VISTA 1: CARGA DE DOCUMENTOS -->
-    <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="vista-descarga" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
       
       <!-- 1. Cobertura -->
       <div class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
@@ -242,7 +242,7 @@
             </div>
             <h2 class="font-bold text-white text-lg">Reportes de Cobertura</h2>
           </div>
-          <p class="text-slate-400 text-xs mb-5">Archivos de inventario y disponibilidad en PDV (Excel/CSV).</p>
+          <p class="text-slate-400 text-xs mb-5">Archivos de inventario y disponibilidad en PDV por marca (Excel/CSV).</p>
           <ul id="lista-cobertura" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
         </div>
         
@@ -293,27 +293,7 @@
         </label>
       </div>
 
-      <!-- 4. Vacantes -->
-      <div id="card-vacantes" class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
-        <div>
-          <div class="flex items-center space-x-3 mb-2">
-            <div class="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-            </div>
-            <h2 class="font-bold text-white text-lg">Reportes de Vacantes</h2>
-          </div>
-          <p class="text-slate-400 text-xs mb-5">Archivos y seguimiento general de posiciones abiertas.</p>
-          <ul id="lista-vacantes" class="space-y-2.5 text-xs mb-6 max-h-48 overflow-y-auto pr-1"></ul>
-        </div>
-
-        <label class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-rose-400 hover:text-rose-300 text-xs font-bold py-3 px-4 rounded-xl border border-slate-700/80 hover:border-rose-500/50 flex items-center justify-center space-x-2 transition-all">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-          <span>Subir Archivo de Vacantes</span>
-          <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'vacantes')">
-        </label>
-      </div>
-
-      <!-- 5. Plan de Trabajo -->
+      <!-- 4. Plan de Trabajo -->
       <div id="card-plan" class="glass-card glass-card-hover rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
         <div>
           <div class="flex items-center space-x-3 mb-2">
@@ -505,12 +485,33 @@
       </div>
     </div>
 
-    <!-- VISTA 5: REPORTES DE VACANTES GENERAL CON NAVEGACIÓN POR SUB-PESTAÑAS -->
+    <!-- VISTA 5: MÓDULO GLOBAL DE VACANTES (INDEPENDIENTE Y CON SECCIÓN DE CARGA PROPIA) -->
     <div id="vista-vacantes" class="hidden space-y-6">
+      
+      <!-- SECCIÓN DEDICADA PARA CARGAR ARCHIVO DE VACANTES (GLOBAL) -->
+      <div class="glass-card rounded-2xl p-6 border-l-4 border-l-rose-500 shadow-xl flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-3 mb-1">
+            <div class="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12"></path></svg>
+            </div>
+            <h2 class="text-base font-extrabold text-white">Cargar Excel Concentrado de Vacantes</h2>
+          </div>
+          <p class="text-slate-400 text-xs">Sube el archivo "VACANTES.xlsx" para actualizar el diagnóstico global sin segmentación por marca.</p>
+        </div>
+
+        <label class="cursor-pointer bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs py-3 px-5 rounded-xl shadow-lg shadow-rose-600/20 border border-rose-400/40 flex items-center space-x-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Subir Excel Vacantes (.xlsx)</span>
+          <input type="file" accept=".xls, .xlsx, .csv" class="hidden" onchange="subirArchivoNube(event, 'vacantes')">
+        </label>
+      </div>
+
+      <!-- REPORTE COMPLETO CON SUB-PESTAÑAS -->
       <div class="glass-card rounded-2xl p-6 shadow-sm space-y-6">
         <div>
           <h2 class="text-lg font-extrabold text-white mb-1">🚨 Diagnóstico Operativo General de Vacantes</h2>
-          <p class="text-slate-400 text-xs">Monitoreo global de posiciones abiertas, asignación por reclutador y cobertura geográfica (Sin segmentación por marca).</p>
+          <p class="text-slate-400 text-xs">Monitoreo global de posiciones abiertas, asignación por reclutador y cobertura geográfica.</p>
         </div>
 
         <!-- MENÚ DE SUB-PESTAÑAS -->
@@ -817,12 +818,11 @@
           const mesDoc = normalizarMesNumero(data.mesNum || data.mes);
           const idDocNormal = normalizarCadena(data.idCuenta || data.marca);
 
-          // Si el archivo es de vacantes, lo tomamos de forma GLOBAL (sin segmentar por marca)
+          // Si es vacantes, se toma de forma GLOBAL
           if (data.categoria === 'vacantes') {
             archivosVacantesGlobales.push({ idDoc: keyDoc, ...data });
           }
 
-          // Para el resto de categorías, filtramos por marca/cuenta y fecha
           if ((idDocNormal === idCuentaFiltro || idDocNormal.includes(idCuentaFiltro) || idCuentaFiltro.includes(idDocNormal)) && 
               String(data.anio) === String(anioActual) && 
               (mesDoc >= mesNumInicio && mesDoc <= mesNumFin)) {
@@ -1028,7 +1028,6 @@
       document.getElementById('lista-cobertura').innerHTML = renderizarListaHTML(cobertura);
       document.getElementById('lista-facturacion').innerHTML = renderizarListaHTML(facturacion);
       document.getElementById('lista-bonos').innerHTML = renderizarListaHTML(bonos);
-      document.getElementById('lista-vacantes').innerHTML = renderizarListaHTML(archivosVacantesGlobales);
       document.getElementById('lista-plan').innerHTML = renderizarListaHTML(plan);
 
       // COBERTURA
@@ -1142,7 +1141,7 @@
       });
 
       document.getElementById('tabla-vacantes-cuentas-body').innerHTML = Object.keys(mapaCuentas).length === 0 
-        ? '<tr><td colspan="7" class="p-4 text-center text-slate-500 italic">Sin vacantes registradas</td></tr>'
+        ? '<tr><td colspan="7" class="p-4 text-center text-slate-500 italic">Sin vacantes registradas. Sube un archivo en Reportes de Vacantes.</td></tr>'
         : Object.entries(mapaCuentas).map(([cta, d]) => `
             <tr class="hover:bg-slate-800/40 transition-colors">
               <td class="p-3.5 font-bold text-white">${cta}</td>
